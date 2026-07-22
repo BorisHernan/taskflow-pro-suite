@@ -4,16 +4,20 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.server.ServerWebExchange;
 import pe.taskflow.board.config.TaskEventPublisher;
 import pe.taskflow.board.model.Task;
+import pe.taskflow.board.model.TaskEvent;
 import pe.taskflow.board.model.TaskEvent.TaskEventType;
 import pe.taskflow.board.model.TaskPositionUpdate;
 import pe.taskflow.board.repository.TaskRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,9 +34,24 @@ public class TaskController {
         return taskRepository.findAllByOrderByStatusAscPositionAsc();
     }
 
+    /**
+     * Algunos proxies/CDNs (p. ej. delante de Render) hacen buffering de respuestas
+     * en streaming, lo que retrasa o bloquea la entrega de eventos SSE en vivo.
+     * Los headers de abajo lo desactivan explícitamente, y el heartbeat cada 15s
+     * mantiene el flujo activo aunque no haya cambios de tareas.
+     */
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<pe.taskflow.board.model.TaskEvent> stream() {
-        return eventPublisher.stream();
+    public Flux<ServerSentEvent<TaskEvent>> stream(ServerWebExchange exchange) {
+        exchange.getResponse().getHeaders().add("X-Accel-Buffering", "no");
+        exchange.getResponse().getHeaders().add("Cache-Control", "no-cache, no-transform");
+
+        Flux<ServerSentEvent<TaskEvent>> events = eventPublisher.stream()
+                .map(event -> ServerSentEvent.builder(event).build());
+
+        Flux<ServerSentEvent<TaskEvent>> heartbeat = Flux.interval(Duration.ofSeconds(15))
+                .map(tick -> ServerSentEvent.<TaskEvent>builder().comment("keep-alive").build());
+
+        return Flux.merge(events, heartbeat);
     }
 
     @PostMapping
