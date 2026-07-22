@@ -2,13 +2,16 @@ package pe.taskflow.board.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import pe.taskflow.board.config.TaskEventPublisher;
+import pe.taskflow.board.demo.ContentModerationService;
 import pe.taskflow.board.model.Task;
 import pe.taskflow.board.model.TaskEvent;
 import pe.taskflow.board.model.TaskEvent.TaskEventType;
@@ -20,6 +23,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -28,6 +32,10 @@ public class TaskController {
 
     private final TaskRepository taskRepository;
     private final TaskEventPublisher eventPublisher;
+    private final ContentModerationService moderationService;
+
+    @Value("${app.demo.max-tasks-per-ip}")
+    private int maxTasksPerIp;
 
     @GetMapping
     public Flux<Task> findAll() {
@@ -55,19 +63,51 @@ public class TaskController {
     }
 
     @PostMapping
-    public Mono<Task> create(@Valid @RequestBody Task task) {
-        task.setId(null);
-        task.setCreatedAt(LocalDateTime.now());
-        task.setUpdatedAt(LocalDateTime.now());
-        if (task.getStatus() == null) {
-            task.setStatus("TODO");
+    public Mono<Task> create(@Valid @RequestBody Task task, ServerHttpRequest request) {
+        String clientIp = resolveClientIp(request);
+
+        if (moderationService.isBlocked(clientIp)) {
+            return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Tu IP quedó bloqueada por lenguaje ofensivo repetido. Este es un demo público compartido, sé respetuoso."));
         }
-        return taskRepository.save(task)
-                .doOnSuccess(saved -> eventPublisher.publish(TaskEventType.CREATED, saved));
+
+        return moderationService.findBlockedWord(task.getTitle(), task.getDescription())
+                .map(word -> Mono.<Task>error(new ResponseStatusException(HttpStatus.BAD_REQUEST, violationMessage(clientIp))))
+                .orElseGet(() -> taskRepository.countByCreatedByIp(clientIp)
+                        .flatMap(count -> {
+                            if (count >= maxTasksPerIp) {
+                                return taskRepository.deleteByCreatedByIp(clientIp)
+                                        .then(Mono.<Task>error(new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                                                "Creaste demasiadas tareas (" + maxTasksPerIp + "+). Se eliminaron todas las tuyas — no te pases, es un demo compartido con más visitantes.")))
+                                        .doOnSuccess(v -> eventPublisher.publish(TaskEventType.RESET, null));
+                            }
+
+                            task.setId(null);
+                            task.setCreatedByIp(clientIp);
+                            task.setCreatedAt(LocalDateTime.now());
+                            task.setUpdatedAt(LocalDateTime.now());
+                            if (task.getStatus() == null) {
+                                task.setStatus("TODO");
+                            }
+                            return taskRepository.save(task)
+                                    .doOnSuccess(saved -> eventPublisher.publish(TaskEventType.CREATED, saved));
+                        }));
     }
 
     @PutMapping("/{id}")
-    public Mono<Task> update(@PathVariable Long id, @Valid @RequestBody Task incoming) {
+    public Mono<Task> update(@PathVariable Long id, @Valid @RequestBody Task incoming, ServerHttpRequest request) {
+        String clientIp = resolveClientIp(request);
+
+        if (moderationService.isBlocked(clientIp)) {
+            return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Tu IP quedó bloqueada por lenguaje ofensivo repetido. Este es un demo público compartido, sé respetuoso."));
+        }
+
+        Optional<String> blockedWord = moderationService.findBlockedWord(incoming.getTitle(), incoming.getDescription());
+        if (blockedWord.isPresent()) {
+            return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, violationMessage(clientIp)));
+        }
+
         return taskRepository.findById(id)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada: " + id)))
                 .flatMap(existing -> {
@@ -109,5 +149,28 @@ public class TaskController {
                     return taskRepository.deleteById(id)
                             .doOnSuccess(v -> eventPublisher.publish(TaskEventType.DELETED, Task.builder().id(id).build()));
                 });
+    }
+
+    private String violationMessage(String clientIp) {
+        int violations = moderationService.recordViolation(clientIp);
+        if (violations >= ContentModerationService.MAX_VIOLATIONS) {
+            return "Evita lenguaje ofensivo. Alcanzaste el límite de avisos (" + violations + "/"
+                    + ContentModerationService.MAX_VIOLATIONS + "): ya no podrás crear ni editar tareas.";
+        }
+        return "Evita lenguaje ofensivo en las tareas. Aviso " + violations + "/" + ContentModerationService.MAX_VIOLATIONS + ".";
+    }
+
+    private String resolveClientIp(ServerHttpRequest request) {
+        String cfConnectingIp = request.getHeaders().getFirst("CF-Connecting-IP");
+        if (cfConnectingIp != null && !cfConnectingIp.isBlank()) {
+            return cfConnectingIp;
+        }
+        String forwardedFor = request.getHeaders().getFirst("X-Forwarded-For");
+        if (forwardedFor != null && !forwardedFor.isBlank()) {
+            return forwardedFor.split(",")[0].trim();
+        }
+        return request.getRemoteAddress() != null
+                ? request.getRemoteAddress().getAddress().getHostAddress()
+                : "unknown";
     }
 }

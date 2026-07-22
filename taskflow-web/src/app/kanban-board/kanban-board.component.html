@@ -19,6 +19,13 @@
     </form>
   </header>
 
+  <div class="demo-notice">
+    🌎 Este tablero es un <strong>demo público en vivo</strong>: cualquier visitante en el mundo puede
+    crear o mover tareas en tiempo real — si ves una tarea que no reconoces, probablemente la agregó
+    otra persona. El contenido se modera automáticamente y el tablero se limpia cada hora. Sé
+    respetuoso 🙂
+  </div>
+
   <div class="error-banner" *ngIf="errorMessage()">{{ errorMessage() }}</div>
 
   <div class="board" cdkDropListGroup>

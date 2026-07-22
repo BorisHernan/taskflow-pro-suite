@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Subject, takeUntil } from 'rxjs';
 import { STATUS_LABELS, STATUSES, Task, TaskPositionUpdate, TaskStatus } from '../models/task.model';
@@ -28,10 +29,7 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
   constructor(private taskService: TaskService) {}
 
   ngOnInit(): void {
-    this.taskService.getAll().subscribe({
-      next: (tasks) => this.tasks.set(tasks),
-      error: () => this.showError('No se pudieron cargar las tareas. Verifica que el backend esté corriendo.'),
-    });
+    this.loadAll();
 
     this.taskService
       .streamUpdates()
@@ -39,10 +37,12 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (event) => {
           this.connectionLive.set(true);
-          if (event.type === 'DELETED') {
-            this.removeTask(event.task.id!);
+          if (event.type === 'RESET') {
+            this.loadAll();
+          } else if (event.type === 'DELETED') {
+            this.removeTask(event.task!.id!);
           } else {
-            this.mergeTask(event.task);
+            this.mergeTask(event.task!);
           }
         },
       });
@@ -102,9 +102,9 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
     }));
 
     this.taskService.reorder(updates).subscribe({
-      error: () => {
+      error: (err) => {
         this.tasks.set(previousSnapshot);
-        this.showError('No se pudo mover la tarea. Se revirtió el cambio.');
+        this.showError(this.extractErrorMessage(err, 'No se pudo mover la tarea. Se revirtió el cambio.'));
       },
     });
   }
@@ -117,7 +117,7 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
       .create({ title, status: 'TODO', position: this.tasksByStatus('TODO').length + 1 })
       .subscribe({
         next: (created) => this.mergeTask(created),
-        error: () => this.showError('No se pudo crear la tarea.'),
+        error: (err) => this.showError(this.extractErrorMessage(err, 'No se pudo crear la tarea.')),
       });
 
     this.newTaskTitle = '';
@@ -128,7 +128,14 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
     if (!task.id) return;
     this.taskService.delete(task.id).subscribe({
       next: () => this.removeTask(task.id!),
-      error: () => this.showError('No se pudo eliminar la tarea.'),
+      error: (err) => this.showError(this.extractErrorMessage(err, 'No se pudo eliminar la tarea.')),
+    });
+  }
+
+  private loadAll(): void {
+    this.taskService.getAll().subscribe({
+      next: (tasks) => this.tasks.set(tasks),
+      error: () => this.showError('No se pudieron cargar las tareas. Verifica que el backend esté corriendo.'),
     });
   }
 
@@ -143,9 +150,20 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
     });
   }
 
+  private extractErrorMessage(err: unknown, fallback: string): string {
+    if (err instanceof HttpErrorResponse && err.error) {
+      const body = err.error;
+      if (typeof body === 'string' && body.trim()) return body;
+      if (typeof body?.error === 'string') return body.error;
+      const firstFieldMessage = Object.values(body ?? {}).find((v) => typeof v === 'string');
+      if (typeof firstFieldMessage === 'string') return firstFieldMessage;
+    }
+    return fallback;
+  }
+
   private showError(message: string): void {
     this.errorMessage.set(message);
     clearTimeout(this.errorTimeoutId);
-    this.errorTimeoutId = setTimeout(() => this.errorMessage.set(null), 4000);
+    this.errorTimeoutId = setTimeout(() => this.errorMessage.set(null), 6000);
   }
 }

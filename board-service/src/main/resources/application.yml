@@ -23,6 +23,11 @@ app:
     # Lista separada por comas. En producción, sobreescribir con la variable
     # de entorno ALLOWED_ORIGINS apuntando al dominio real del frontend.
     allowed-origins: ${ALLOWED_ORIGINS:http://localhost:4200}
+  demo:
+    # Este board es un demo público sin login. Estas dos properties limitan el abuso:
+    # cuantas tareas puede acumular una misma IP, y cada cuánto se limpia todo a los datos semilla.
+    max-tasks-per-ip: ${MAX_TASKS_PER_IP:50}
+    reset-cron: ${DEMO_RESET_CRON:0 0 * * * *}
 
 logging:
   level:

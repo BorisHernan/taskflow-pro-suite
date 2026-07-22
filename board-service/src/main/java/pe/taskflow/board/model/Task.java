@@ -34,4 +34,8 @@ public class Task {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    // IP del visitante que creó la tarea, usada para limitar abuso en el demo público.
+    // Se ignora cualquier valor que venga del cliente; el servidor siempre la sobreescribe.
+    private String createdByIp;
 }
