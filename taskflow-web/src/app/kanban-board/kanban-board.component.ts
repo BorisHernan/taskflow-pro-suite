@@ -22,6 +22,7 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
   newTaskTitle = '';
   connectionLive = signal(false);
   errorMessage = signal<string | null>(null);
+  showInfo = signal(false);
 
   private destroy$ = new Subject<void>();
   private errorTimeoutId: ReturnType<typeof setTimeout> | undefined;

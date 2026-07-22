@@ -30,7 +30,7 @@ public class DemoResetScheduler {
     private final TaskEventPublisher eventPublisher;
     private final ContentModerationService moderationService;
 
-    @Scheduled(cron = "${app.demo.reset-cron:0 0 * * * *}")
+    @Scheduled(cron = "${app.demo.reset-cron:0 0 3 * * *}")
     public void resetDemoData() {
         taskRepository.deleteAll()
                 .thenMany(Flux.fromIterable(seedTasks()))

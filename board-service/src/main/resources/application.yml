@@ -27,7 +27,8 @@ app:
     # Este board es un demo público sin login. Estas dos properties limitan el abuso:
     # cuantas tareas puede acumular una misma IP, y cada cuánto se limpia todo a los datos semilla.
     max-tasks-per-ip: ${MAX_TASKS_PER_IP:50}
-    reset-cron: ${DEMO_RESET_CRON:0 0 * * * *}
+    # Por defecto, una vez al día a las 03:00 UTC (poco tráfico esperado, es un demo de CV).
+    reset-cron: ${DEMO_RESET_CRON:0 0 3 * * *}
 
 logging:
   level:

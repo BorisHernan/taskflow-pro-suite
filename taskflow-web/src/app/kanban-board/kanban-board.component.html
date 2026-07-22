@@ -8,21 +8,68 @@
       </p>
     </div>
 
-    <form class="add-task-form" (ngSubmit)="addTask()">
-      <input
-        type="text"
-        placeholder="Nueva tarea..."
-        [(ngModel)]="newTaskTitle"
-        name="newTaskTitle"
-      />
-      <button type="submit">Agregar</button>
-    </form>
+    <div class="header-actions">
+      <button
+        type="button"
+        class="info-toggle"
+        (click)="showInfo.set(!showInfo())"
+        [attr.aria-expanded]="showInfo()"
+      >
+        {{ showInfo() ? 'Ocultar detalles ▲' : 'ℹ️ ¿Cómo funciona? ▼' }}
+      </button>
+
+      <form class="add-task-form" (ngSubmit)="addTask()">
+        <input
+          type="text"
+          placeholder="Nueva tarea..."
+          [(ngModel)]="newTaskTitle"
+          name="newTaskTitle"
+        />
+        <button type="submit">Agregar</button>
+      </form>
+    </div>
   </header>
+
+  <div class="info-panel" *ngIf="showInfo()">
+    <h2>¿Cómo funciona este tablero?</h2>
+    <p>
+      Es un mini-sistema de microservicios: <strong>Angular</strong> en el frontend y un backend
+      <strong>reactivo</strong> en Spring Boot (WebFlux + R2DBC), pensado para no bloquear hilos
+      mientras espera a la base de datos.
+    </p>
+    <ul>
+      <li>
+        <strong>Tiempo real sin refrescar:</strong> cada vez que alguien crea, mueve o borra una
+        tarea, el backend emite un evento por <em>Server-Sent Events (SSE)</em> a todos los
+        navegadores conectados — por eso lo ves cambiar al instante en cualquier pestaña, incluso
+        desde otro país.
+      </li>
+      <li>
+        <strong>Drag &amp; drop persistente:</strong> al soltar una tarjeta, el frontend reordena
+        localmente y confirma el nuevo orden con el backend en una sola llamada por lote.
+      </li>
+      <li>
+        <strong>Demo público moderado:</strong> como no hay login, cada visitante se identifica por
+        IP para limitar cuántas tareas puede crear, y hay un filtro de lenguaje ofensivo con
+        avisos progresivos antes de bloquear.
+      </li>
+      <li>
+        <strong>Desplegado gratis:</strong> frontend en Vercel, backend (Docker) en Render, y
+        Postgres en Neon.
+      </li>
+    </ul>
+    <p class="info-repo">
+      Código fuente:
+      <a href="https://github.com/BorisHernan/Proyecto_Portafolio" target="_blank" rel="noopener">
+        github.com/BorisHernan/Proyecto_Portafolio
+      </a>
+    </p>
+  </div>
 
   <div class="demo-notice">
     🌎 Este tablero es un <strong>demo público en vivo</strong>: cualquier visitante en el mundo puede
     crear o mover tareas en tiempo real — si ves una tarea que no reconoces, probablemente la agregó
-    otra persona. El contenido se modera automáticamente y el tablero se limpia cada hora. Sé
+    otra persona. El contenido se modera automáticamente y el tablero se limpia una vez al día. Sé
     respetuoso 🙂
   </div>
 
