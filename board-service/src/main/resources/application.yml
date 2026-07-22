@@ -1,0 +1,29 @@
+server:
+  # Render (y plataformas similares) inyectan la variable PORT en runtime.
+  port: ${PORT:8081}
+
+spring:
+  application:
+    name: board-service
+
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/taskflow
+    username: taskflow
+    password: taskflow
+
+  flyway:
+    # Flyway no soporta R2DBC directamente, usa JDBC solo para migraciones
+    url: jdbc:postgresql://localhost:5432/taskflow
+    user: taskflow
+    password: taskflow
+    locations: classpath:db/migration
+
+app:
+  cors:
+    # Lista separada por comas. En producción, sobreescribir con la variable
+    # de entorno ALLOWED_ORIGINS apuntando al dominio real del frontend.
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:4200}
+
+logging:
+  level:
+    org.springframework.r2dbc: INFO

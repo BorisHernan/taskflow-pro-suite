@@ -1,0 +1,56 @@
+<div class="board-page">
+  <header class="board-header">
+    <div>
+      <h1>TaskFlow Pro</h1>
+      <p class="subtitle">
+        <span class="dot" [class.live]="connectionLive()"></span>
+        {{ connectionLive() ? 'Conectado en tiempo real' : 'Conectando...' }}
+      </p>
+    </div>
+
+    <form class="add-task-form" (ngSubmit)="addTask()">
+      <input
+        type="text"
+        placeholder="Nueva tarea..."
+        [(ngModel)]="newTaskTitle"
+        name="newTaskTitle"
+      />
+      <button type="submit">Agregar</button>
+    </form>
+  </header>
+
+  <div class="error-banner" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+
+  <div class="board" cdkDropListGroup>
+    <div class="column" *ngFor="let status of statuses">
+      <div class="column-header" [attr.data-status]="status">
+        <span>{{ statusLabels[status] }}</span>
+        <span class="count">{{ tasksByStatus(status).length }}</span>
+      </div>
+
+      <div
+        class="column-body"
+        cdkDropList
+        [id]="'list-' + status"
+        [cdkDropListData]="tasksByStatus(status)"
+        [cdkDropListConnectedTo]="connectedLists()"
+        (cdkDropListDropped)="onDrop($event, status)"
+      >
+        <div class="card" *ngFor="let task of tasksByStatus(status)" cdkDrag>
+          <div class="card-drag-preview" *cdkDragPreview>{{ task.title }}</div>
+
+          <div class="card-content">
+            <p class="card-title">{{ task.title }}</p>
+            <p class="card-description" *ngIf="task.description">{{ task.description }}</p>
+          </div>
+
+          <button class="card-delete" (click)="deleteTask(task, $event)" aria-label="Eliminar tarea">
+            ×
+          </button>
+        </div>
+
+        <div class="empty-hint" *ngIf="tasksByStatus(status).length === 0">Sin tareas</div>
+      </div>
+    </div>
+  </div>
+</div>

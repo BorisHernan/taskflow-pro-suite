@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: taskflow-board-service
+    runtime: docker
+    dockerfilePath: ./board-service/Dockerfile
+    dockerContext: ./board-service
+    plan: free
+    envVars:
+      - key: SPRING_R2DBC_URL
+        sync: false
+      - key: SPRING_R2DBC_USERNAME
+        sync: false
+      - key: SPRING_R2DBC_PASSWORD
+        sync: false
+      - key: SPRING_FLYWAY_URL
+        sync: false
+      - key: SPRING_FLYWAY_USER
+        sync: false
+      - key: SPRING_FLYWAY_PASSWORD
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
