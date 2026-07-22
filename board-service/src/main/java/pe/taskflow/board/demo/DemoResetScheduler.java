@@ -30,13 +30,19 @@ public class DemoResetScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(DemoResetScheduler.class);
 
-    private static final Map<String, Integer> SEED_STOCK = Map.of(
-            "Taza \"Bug Free\"", 20,
-            "Sticker pack \"console.log\"", 50,
-            "Polo \"It works on my machine\"", 15,
-            "Llavero USB decorativo", 30,
-            "Mousepad \"git commit -m fix\"", 10,
-            "Termo \"Café o muerte\"", 12
+    private static final Map<String, Integer> SEED_STOCK = Map.ofEntries(
+            Map.entry("Taza \"Bug Free\"", 20),
+            Map.entry("Sticker pack \"console.log\"", 50),
+            Map.entry("Polo \"En mi compu sí funciona\"", 15),
+            Map.entry("Llavero USB decorativo", 30),
+            Map.entry("Mousepad \"git commit -m arreglo definitivo (otra vez)\"", 10),
+            Map.entry("Termo \"Primero el café, luego hablamos\"", 12),
+            Map.entry("Libreta \"Ideas geniales a las 2am\"", 25),
+            Map.entry("Pin \"¿Ya probaste apagar y prender?\"", 40),
+            Map.entry("Calcetines \"100% libres de bugs\"", 20),
+            Map.entry("Funda para laptop \"Shh... está compilando\"", 8),
+            Map.entry("Cojín \"Modo reunión: cámara apagada\"", 10),
+            Map.entry("Botella \"Hidratación > documentación\"", 14)
     );
 
     private final TaskRepository taskRepository;

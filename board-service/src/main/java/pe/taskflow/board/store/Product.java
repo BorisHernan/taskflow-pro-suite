@@ -27,5 +27,6 @@ public class Product {
 
     private Integer stock;
 
-    private String emoji;
+    // Clave de ícono (no un emoji): el frontend la mapea a un SVG propio.
+    private String icon;
 }

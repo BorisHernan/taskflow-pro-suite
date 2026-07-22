@@ -5,11 +5,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { CartItem, Product, ReceiptData, VALID_COUPONS } from '../models/product.model';
 import { ProductService } from '../services/product.service';
+import { ProductIconComponent } from './product-icon/product-icon.component';
 
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ProductIconComponent],
   templateUrl: './store.component.html',
   styleUrl: './store.component.scss',
 })
@@ -20,8 +21,14 @@ export class StoreComponent implements OnInit, OnDestroy {
   errorMessage = signal<string | null>(null);
   receipt = signal<ReceiptData | null>(null);
   appliedCoupon = signal<{ code: string; discount: number } | null>(null);
+  showCoupons = signal(false);
   couponInput = '';
   isCheckingOut = false;
+
+  readonly availableCoupons = Object.entries(VALID_COUPONS).map(([code, discount]) => ({
+    code,
+    discount,
+  }));
 
   private destroy$ = new Subject<void>();
   private errorTimeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -172,7 +179,6 @@ export class StoreComponent implements OnInit, OnDestroy {
       date: new Date(),
       lines: items.map((i) => ({
         name: i.product.name,
-        emoji: i.product.emoji,
         quantity: i.quantity,
         unitPrice: i.product.price,
         lineTotal: i.product.price * i.quantity,

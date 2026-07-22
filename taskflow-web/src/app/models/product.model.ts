@@ -4,7 +4,8 @@ export interface Product {
   description?: string;
   price: number;
   stock: number;
-  emoji?: string;
+  // Clave de ícono (no un emoji): la resuelve <app-product-icon>.
+  icon?: string;
 }
 
 export interface CartItem {
@@ -14,7 +15,6 @@ export interface CartItem {
 
 export interface ReceiptLine {
   name: string;
-  emoji?: string;
   quantity: number;
   unitPrice: number;
   lineTotal: number;
