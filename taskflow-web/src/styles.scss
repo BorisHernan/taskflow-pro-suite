@@ -1,1 +1,79 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-alt: #ebecf0;
+  --text-primary: #172b4d;
+  --text-secondary: #6b778c;
+  --text-muted: #97a0af;
+  --border: #dfe1e6;
+  --accent: #0052cc;
+  --accent-hover: #0747a6;
+  --success: #36b37e;
+  --success-hover: #2b9268;
+  --success-bg: #e3fcef;
+  --success-text: #006644;
+  --danger: #de350b;
+  --danger-bg: #ffebe6;
+  --danger-border: #ff8f73;
+  --danger-text: #bf2600;
+  --info-bg: #eae6ff;
+  --info-border: #998dd9;
+  --info-text: #403294;
+  --shadow: rgba(9, 30, 66, 0.15);
+}
+
+:root[data-theme='dark'] {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface-alt: #21262d;
+  --text-primary: #e6edf3;
+  --text-secondary: #9aa4b2;
+  --text-muted: #6e7681;
+  --border: #30363d;
+  --accent: #4c9aff;
+  --accent-hover: #79b8ff;
+  --success: #57d9a3;
+  --success-hover: #45c795;
+  --success-bg: #12352a;
+  --success-text: #7ee2c0;
+  --danger: #ff8f73;
+  --danger-bg: #3a1f1a;
+  --danger-border: #ff8f73;
+  --danger-text: #ffb3a1;
+  --info-bg: #241f3d;
+  --info-border: #5b4b9e;
+  --info-text: #c9beff;
+  --shadow: rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-alt: #21262d;
+    --text-primary: #e6edf3;
+    --text-secondary: #9aa4b2;
+    --text-muted: #6e7681;
+    --border: #30363d;
+    --accent: #4c9aff;
+    --accent-hover: #79b8ff;
+    --success: #57d9a3;
+    --success-hover: #45c795;
+    --success-bg: #12352a;
+    --success-text: #7ee2c0;
+    --danger: #ff8f73;
+    --danger-bg: #3a1f1a;
+    --danger-border: #ff8f73;
+    --danger-text: #ffb3a1;
+    --info-bg: #241f3d;
+    --info-border: #5b4b9e;
+    --info-text: #c9beff;
+    --shadow: rgba(0, 0, 0, 0.4);
+  }
+}
+
+body {
+  margin: 0;
+}

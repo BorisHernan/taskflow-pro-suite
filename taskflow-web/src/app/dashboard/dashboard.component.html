@@ -1,0 +1,61 @@
+<div class="dashboard-page">
+  <header class="dashboard-header">
+    <div>
+      <h1>📊 Estadísticas</h1>
+      <p class="subtitle">Contadores del demo, en vivo desde el último despliegue del backend.</p>
+    </div>
+    <button type="button" class="btn-refresh" [disabled]="loading()" (click)="refresh()">
+      {{ loading() ? 'Cargando...' : '🔄 Actualizar' }}
+    </button>
+  </header>
+
+  <div class="dashboard-notice">
+    ℹ️ Estos contadores viven en memoria en el backend, no en la base de datos: se reinician cada vez
+    que se despliega una nueva versión (no son un historial permanente).
+  </div>
+
+  <div class="error-banner" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+
+  <div class="kpi-grid" *ngIf="stats() as s">
+    <div class="kpi-card">
+      <span class="kpi-icon">📝</span>
+      <span class="kpi-value">{{ s.tasksCreated }}</span>
+      <span class="kpi-label">Tareas creadas</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-icon">🛍️</span>
+      <span class="kpi-value">{{ s.purchases }}</span>
+      <span class="kpi-label">Compras realizadas</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-icon">📦</span>
+      <span class="kpi-value">{{ s.unitsSold }}</span>
+      <span class="kpi-label">Unidades vendidas</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-icon">💰</span>
+      <span class="kpi-value">S/ {{ s.revenue.toFixed(2) }}</span>
+      <span class="kpi-label">Ingresos simulados</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-icon">👀</span>
+      <span class="kpi-value">{{ s.totalVisitors }}</span>
+      <span class="kpi-label">Conexiones de visitantes</span>
+    </div>
+  </div>
+
+  <div class="stock-panel" *ngIf="stockBars().length > 0">
+    <h2>Stock actual de la tienda</h2>
+    <div class="stock-row" *ngFor="let bar of stockBars()">
+      <span class="stock-name">{{ bar.product.name }}</span>
+      <div class="stock-bar-track">
+        <div
+          class="stock-bar-fill"
+          [class.low]="bar.product.stock <= 5"
+          [style.width.%]="bar.percent"
+        ></div>
+      </div>
+      <span class="stock-count">{{ bar.product.stock }}</span>
+    </div>
+  </div>
+</div>

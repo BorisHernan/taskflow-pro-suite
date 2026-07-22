@@ -1,6 +1,13 @@
 <nav class="app-nav">
-  <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">📋 Tablero Kanban</a>
-  <a routerLink="/tienda" routerLinkActive="active">🛒 Tienda</a>
+  <div class="app-nav-links">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">📋 Tablero Kanban</a>
+    <a routerLink="/tienda" routerLinkActive="active">🛒 Tienda</a>
+    <a routerLink="/estadisticas" routerLinkActive="active">📊 Estadísticas</a>
+  </div>
+
+  <button type="button" class="theme-toggle" (click)="themeService.toggle()" aria-label="Cambiar tema">
+    {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
+  </button>
 </nav>
 
 <router-outlet></router-outlet>

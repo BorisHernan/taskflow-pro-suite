@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import pe.taskflow.board.config.TaskEventPublisher;
 import pe.taskflow.board.demo.ContentModerationService;
+import pe.taskflow.board.demo.DemoStatsService;
 import pe.taskflow.board.model.Task;
 import pe.taskflow.board.model.TaskEvent;
 import pe.taskflow.board.model.TaskEvent.TaskEventType;
@@ -36,6 +37,7 @@ public class TaskController {
     private final TaskRepository taskRepository;
     private final TaskEventPublisher eventPublisher;
     private final ContentModerationService moderationService;
+    private final DemoStatsService statsService;
 
     @Value("${app.demo.max-tasks-per-ip}")
     private int maxTasksPerIp;
@@ -58,6 +60,7 @@ public class TaskController {
         exchange.getResponse().getHeaders().add("X-Accel-Buffering", "no");
         exchange.getResponse().getHeaders().add("Cache-Control", "no-cache, no-transform");
 
+        statsService.recordVisitor();
         int currentViewers = eventPublisher.registerViewer();
 
         Flux<ServerSentEvent<TaskEvent>> initialPresence = Flux.just(
@@ -102,7 +105,10 @@ public class TaskController {
                                 task.setStatus("TODO");
                             }
                             return taskRepository.save(task)
-                                    .doOnSuccess(saved -> eventPublisher.publish(TaskEventType.CREATED, saved));
+                                    .doOnSuccess(saved -> {
+                                        eventPublisher.publish(TaskEventType.CREATED, saved);
+                                        statsService.recordTaskCreated();
+                                    });
                         }));
     }
 

@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
+import pe.taskflow.board.demo.DemoStatsService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 
 /**
@@ -33,6 +35,7 @@ public class ProductController {
 
     private final ProductRepository productRepository;
     private final ProductEventPublisher eventPublisher;
+    private final DemoStatsService statsService;
 
     @Operation(summary = "Lista el catálogo con el stock actual")
     @GetMapping
@@ -50,6 +53,8 @@ public class ProductController {
     public Flux<ServerSentEvent<Product>> stream(ServerWebExchange exchange) {
         exchange.getResponse().getHeaders().add("X-Accel-Buffering", "no");
         exchange.getResponse().getHeaders().add("Cache-Control", "no-cache, no-transform");
+
+        statsService.recordVisitor();
 
         Flux<ServerSentEvent<Product>> initialSnapshot = productRepository.findAllByOrderByIdAsc()
                 .map(product -> ServerSentEvent.builder(product).build());
@@ -76,6 +81,10 @@ public class ProductController {
                     product.setStock(product.getStock() - request.quantity());
                     return productRepository.save(product);
                 })
-                .doOnSuccess(eventPublisher::publish);
+                .doOnSuccess(saved -> {
+                    eventPublisher.publish(saved);
+                    BigDecimal lineTotal = saved.getPrice().multiply(BigDecimal.valueOf(request.quantity()));
+                    statsService.recordPurchase(request.quantity(), lineTotal);
+                });
     }
 }
