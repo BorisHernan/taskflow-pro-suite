@@ -1,0 +1,56 @@
+<div class="arena-page">
+  <!-- Pantalla de nombre -->
+  <div class="name-screen" *ngIf="gameState() === 'name'">
+    <h1>🕹️ Arena Lite</h1>
+    <p class="subtitle">
+      Un mini agar.io: crece comiendo pellets y círculos más pequeños. Siempre hay unos cuantos
+      bots 🤖 dando vueltas para que nunca juegues solo de verdad.
+    </p>
+
+    <div class="error-banner" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+
+    <form class="name-form" (ngSubmit)="play()">
+      <input
+        type="text"
+        placeholder="Tu nombre..."
+        [(ngModel)]="nameInput"
+        name="nameInput"
+        maxlength="16"
+        autocomplete="off"
+      />
+      <button type="submit">Jugar</button>
+    </form>
+  </div>
+
+  <!-- Pantalla de juego -->
+  <div class="game-screen" *ngIf="gameState() === 'playing'">
+    <canvas #canvas (mousemove)="onPointerMove($event)"></canvas>
+
+    <div class="hud">
+      <div class="hud-size">Tamaño: {{ myRadius() }}</div>
+      <div class="hud-record">Récord de la sesión: {{ maxRadiusThisSession() }}</div>
+    </div>
+
+    <div class="leaderboard">
+      <h3>Ranking</h3>
+      <div class="leaderboard-row" *ngFor="let blob of leaderboard(); let i = index">
+        <span class="rank">{{ i + 1 }}</span>
+        <span class="lb-name">{{ blob.bot ? '🤖 ' : '' }}{{ blob.name }}</span>
+        <span class="lb-size">{{ blob.radius | number: '1.0-0' }}</span>
+      </div>
+    </div>
+
+    <div class="toast" *ngIf="toast()">{{ toast() }}</div>
+  </div>
+
+  <!-- Pantalla de muerte -->
+  <div class="death-screen" *ngIf="gameState() === 'dead' && deathInfo() as info">
+    <h1>💀 Te comieron</h1>
+    <p class="death-size">Llegaste a tamaño {{ info.size }}</p>
+    <p class="death-record" *ngIf="info.isRecord">¡Nuevo récord de la sesión! 🏆</p>
+    <div class="death-actions">
+      <button class="btn-primary" (click)="playAgain()">Jugar de nuevo</button>
+      <button class="btn-secondary" (click)="backToNameScreen()">Cambiar nombre</button>
+    </div>
+  </div>
+</div>

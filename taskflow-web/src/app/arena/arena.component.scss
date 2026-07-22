@@ -1,0 +1,239 @@
+:host {
+  display: block;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.arena-page {
+  min-height: calc(100vh - 50px);
+}
+
+.name-screen {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 60px 24px;
+  text-align: center;
+  background: var(--bg-gradient);
+  min-height: calc(100vh - 50px);
+  animation: tf-fade-in 0.35s ease;
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: 30px;
+    color: var(--text-primary);
+  }
+
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+}
+
+.error-banner {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-text);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  animation: tf-slide-down 0.25s ease;
+}
+
+.name-form {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+
+  input {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 220px;
+    background: var(--surface);
+    color: var(--text-primary);
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+  }
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background: var(--accent);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.game-screen {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 50px);
+  overflow: hidden;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.hud {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: rgba(13, 17, 23, 0.7);
+  color: #e6edf3;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  pointer-events: none;
+
+  .hud-size {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .hud-record {
+    margin-top: 2px;
+    opacity: 0.8;
+  }
+}
+
+.leaderboard {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(13, 17, 23, 0.7);
+  color: #e6edf3;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  min-width: 170px;
+  pointer-events: none;
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+  }
+}
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+
+  .rank {
+    width: 14px;
+    opacity: 0.7;
+  }
+
+  .lb-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lb-size {
+    font-weight: 600;
+  }
+}
+
+.toast {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(54, 179, 126, 0.9);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  animation: tf-slide-down 0.3s ease;
+  pointer-events: none;
+}
+
+.death-screen {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 80px 24px;
+  text-align: center;
+  background: var(--bg-gradient);
+  min-height: calc(100vh - 50px);
+  animation: tf-fade-in 0.3s ease;
+
+  h1 {
+    margin: 0 0 12px;
+    font-size: 32px;
+    color: var(--text-primary);
+  }
+
+  .death-size {
+    color: var(--text-secondary);
+    font-size: 16px;
+    margin: 0 0 4px;
+  }
+
+  .death-record {
+    color: var(--success);
+    font-weight: 700;
+    margin: 0 0 20px;
+  }
+}
+
+.death-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background: var(--success);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    background: var(--success-hover);
+    transform: translateY(-1px);
+  }
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--surface-alt);
+  }
+}
