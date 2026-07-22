@@ -5,6 +5,9 @@
       <p class="subtitle">
         <span class="dot" [class.live]="connectionLive()"></span>
         {{ connectionLive() ? 'Conectado en tiempo real' : 'Conectando...' }}
+        <span class="viewer-count" *ngIf="connectionLive()">
+          · 👀 {{ viewerCount() }} {{ viewerCount() === 1 ? 'persona viendo esto ahora' : 'personas viendo esto ahora' }}
+        </span>
       </p>
     </div>
 
@@ -63,6 +66,12 @@
       <a href="https://github.com/BorisHernan/Proyecto_Portafolio" target="_blank" rel="noopener">
         github.com/BorisHernan/Proyecto_Portafolio
       </a>
+    </p>
+    <p class="info-links">
+      API en vivo:
+      <a [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">Swagger / OpenAPI</a>
+      ·
+      <a [href]="backendBaseUrl + '/actuator/health'" target="_blank" rel="noopener">Health check</a>
     </p>
   </div>
 

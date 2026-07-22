@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Subject, takeUntil } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { STATUS_LABELS, STATUSES, Task, TaskPositionUpdate, TaskStatus } from '../models/task.model';
 import { TaskService } from '../services/task.service';
 
@@ -23,6 +24,8 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
   connectionLive = signal(false);
   errorMessage = signal<string | null>(null);
   showInfo = signal(false);
+  viewerCount = signal(1);
+  backendBaseUrl = environment.apiUrl.replace(/\/api\/tasks\/?$/, '');
 
   private destroy$ = new Subject<void>();
   private errorTimeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -38,7 +41,9 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (event) => {
           this.connectionLive.set(true);
-          if (event.type === 'RESET') {
+          if (event.type === 'PRESENCE') {
+            this.viewerCount.set(event.viewerCount ?? 1);
+          } else if (event.type === 'RESET') {
             this.loadAll();
           } else if (event.type === 'DELETED') {
             this.removeTask(event.task!.id!);

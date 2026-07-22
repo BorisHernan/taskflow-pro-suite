@@ -30,6 +30,22 @@ app:
     # Por defecto, una vez al día a las 03:00 UTC (poco tráfico esperado, es un demo de CV).
     reset-cron: ${DEMO_RESET_CRON:0 0 3 * * *}
 
+management:
+  endpoints:
+    web:
+      # Nunca agregar env/configprops/beans aquí: expondrían la password de la BD
+      # y otras configs sensibles vía variables de entorno.
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+info:
+  app:
+    name: TaskFlow Pro — board-service
+    description: API reactiva (WebFlux + R2DBC) del tablero kanban, con SSE en tiempo real
+
 logging:
   level:
     org.springframework.r2dbc: INFO

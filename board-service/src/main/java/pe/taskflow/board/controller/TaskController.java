@@ -1,5 +1,7 @@
 package pe.taskflow.board.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +30,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
+@Tag(name = "Tasks", description = "CRUD del tablero + stream en tiempo real por Server-Sent Events")
 public class TaskController {
 
     private final TaskRepository taskRepository;
@@ -37,6 +40,7 @@ public class TaskController {
     @Value("${app.demo.max-tasks-per-ip}")
     private int maxTasksPerIp;
 
+    @Operation(summary = "Lista todas las tareas ordenadas por columna y posición")
     @GetMapping
     public Flux<Task> findAll() {
         return taskRepository.findAllByOrderByStatusAscPositionAsc();
@@ -48,10 +52,16 @@ public class TaskController {
      * Los headers de abajo lo desactivan explícitamente, y el heartbeat cada 15s
      * mantiene el flujo activo aunque no haya cambios de tareas.
      */
+    @Operation(summary = "Stream de eventos en vivo (SSE): creación, edición, borrado, reset y presencia de visitantes")
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<TaskEvent>> stream(ServerWebExchange exchange) {
         exchange.getResponse().getHeaders().add("X-Accel-Buffering", "no");
         exchange.getResponse().getHeaders().add("Cache-Control", "no-cache, no-transform");
+
+        int currentViewers = eventPublisher.registerViewer();
+
+        Flux<ServerSentEvent<TaskEvent>> initialPresence = Flux.just(
+                ServerSentEvent.builder(new TaskEvent(TaskEventType.PRESENCE, null, currentViewers)).build());
 
         Flux<ServerSentEvent<TaskEvent>> events = eventPublisher.stream()
                 .map(event -> ServerSentEvent.builder(event).build());
@@ -59,9 +69,11 @@ public class TaskController {
         Flux<ServerSentEvent<TaskEvent>> heartbeat = Flux.interval(Duration.ofSeconds(15))
                 .map(tick -> ServerSentEvent.<TaskEvent>builder().comment("keep-alive").build());
 
-        return Flux.merge(events, heartbeat);
+        return Flux.merge(initialPresence, events, heartbeat)
+                .doFinally(signal -> eventPublisher.unregisterViewer());
     }
 
+    @Operation(summary = "Crea una tarea (moderada: bloquea lenguaje ofensivo y limita tareas por IP)")
     @PostMapping
     public Mono<Task> create(@Valid @RequestBody Task task, ServerHttpRequest request) {
         String clientIp = resolveClientIp(request);
@@ -94,6 +106,7 @@ public class TaskController {
                         }));
     }
 
+    @Operation(summary = "Actualiza una tarea existente (título, descripción, columna, posición)")
     @PutMapping("/{id}")
     public Mono<Task> update(@PathVariable Long id, @Valid @RequestBody Task incoming, ServerHttpRequest request) {
         String clientIp = resolveClientIp(request);
@@ -125,6 +138,7 @@ public class TaskController {
      * Reordena/mueve varias tareas de una sola vez (p. ej. tras un drag & drop),
      * para que todas las posiciones afectadas queden consistentes en una sola llamada.
      */
+    @Operation(summary = "Reordena/mueve varias tareas en una sola llamada (usado por el drag & drop)")
     @PutMapping("/reorder")
     public Flux<Task> reorder(@RequestBody List<TaskPositionUpdate> updates) {
         return Flux.fromIterable(updates)
@@ -139,6 +153,7 @@ public class TaskController {
                 .doOnNext(saved -> eventPublisher.publish(TaskEventType.UPDATED, saved));
     }
 
+    @Operation(summary = "Elimina una tarea por id")
     @DeleteMapping("/{id}")
     public Mono<Void> delete(@PathVariable Long id) {
         return taskRepository.existsById(id)

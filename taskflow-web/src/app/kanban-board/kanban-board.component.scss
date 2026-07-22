@@ -45,6 +45,10 @@
       background: #36b37e;
     }
   }
+
+  .viewer-count {
+    color: #6b778c;
+  }
 }
 
 .header-actions {
@@ -94,7 +98,8 @@
     margin-bottom: 6px;
   }
 
-  .info-repo {
+  .info-repo,
+  .info-links {
     margin: 8px 0 0;
     font-size: 12px;
 

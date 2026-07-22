@@ -18,12 +18,14 @@ export const STATUS_LABELS: Record<TaskStatus, string> = {
 
 export const STATUSES: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'DONE'];
 
-export type TaskEventType = 'CREATED' | 'UPDATED' | 'DELETED' | 'RESET';
+export type TaskEventType = 'CREATED' | 'UPDATED' | 'DELETED' | 'RESET' | 'PRESENCE';
 
 export interface TaskEvent {
   type: TaskEventType;
-  // Ausente cuando type es 'RESET': recarga la lista completa en ese caso.
+  // Ausente cuando type es 'RESET' o 'PRESENCE'.
   task?: Task;
+  // Solo presente cuando type es 'PRESENCE': visitantes conectados en este momento.
+  viewerCount?: number;
 }
 
 export interface TaskPositionUpdate {
