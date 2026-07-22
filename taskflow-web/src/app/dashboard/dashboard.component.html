@@ -16,30 +16,30 @@
 
   <div class="error-banner" *ngIf="errorMessage()">{{ errorMessage() }}</div>
 
-  <div class="kpi-grid" *ngIf="stats() as s">
+  <div class="kpi-grid" *ngIf="stats() as loaded">
     <div class="kpi-card">
       <span class="kpi-icon">📝</span>
-      <span class="kpi-value">{{ s.tasksCreated }}</span>
+      <span class="kpi-value">{{ animatedStats().tasksCreated }}</span>
       <span class="kpi-label">Tareas creadas</span>
     </div>
     <div class="kpi-card">
       <span class="kpi-icon">🛍️</span>
-      <span class="kpi-value">{{ s.purchases }}</span>
+      <span class="kpi-value">{{ animatedStats().purchases }}</span>
       <span class="kpi-label">Compras realizadas</span>
     </div>
     <div class="kpi-card">
       <span class="kpi-icon">📦</span>
-      <span class="kpi-value">{{ s.unitsSold }}</span>
+      <span class="kpi-value">{{ animatedStats().unitsSold }}</span>
       <span class="kpi-label">Unidades vendidas</span>
     </div>
     <div class="kpi-card">
       <span class="kpi-icon">💰</span>
-      <span class="kpi-value">S/ {{ s.revenue.toFixed(2) }}</span>
+      <span class="kpi-value">S/ {{ animatedStats().revenue.toFixed(2) }}</span>
       <span class="kpi-label">Ingresos simulados</span>
     </div>
     <div class="kpi-card">
       <span class="kpi-icon">👀</span>
-      <span class="kpi-value">{{ s.totalVisitors }}</span>
+      <span class="kpi-value">{{ animatedStats().totalVisitors }}</span>
       <span class="kpi-label">Conexiones de visitantes</span>
     </div>
   </div>

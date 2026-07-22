@@ -1,8 +1,10 @@
 :host {
   display: block;
   font-family: 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
+  background: var(--bg-gradient);
   min-height: 100vh;
+  animation: tf-fade-in 0.35s ease;
+  transition: background-color 0.25s ease;
 }
 
 .dashboard-page {
@@ -40,10 +42,15 @@
   padding: 8px 14px;
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.15s ease;
 
   &:hover:not(:disabled) {
     background: var(--surface-alt);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
 
   &:disabled {
@@ -61,6 +68,7 @@
   font-size: 13px;
   line-height: 1.5;
   margin-bottom: 16px;
+  animation: tf-slide-down 0.3s ease;
 }
 
 .error-banner {
@@ -71,6 +79,7 @@
   padding: 10px 14px;
   font-size: 13px;
   margin-bottom: 20px;
+  animation: tf-slide-down 0.25s ease;
 }
 
 .kpi-grid {
@@ -90,6 +99,19 @@
   align-items: center;
   text-align: center;
   gap: 4px;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  animation: tf-fade-in-up 0.35s ease backwards;
+
+  &:hover {
+    box-shadow: 0 6px 14px var(--shadow);
+    transform: translateY(-2px);
+  }
+}
+
+@for $i from 1 through 5 {
+  .kpi-card:nth-child(#{$i}) {
+    animation-delay: #{$i * 0.06}s;
+  }
 }
 
 .kpi-icon {
@@ -112,6 +134,7 @@
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 1px 2px var(--shadow);
+  animation: tf-fade-in-up 0.35s ease 0.2s backwards;
 
   h2 {
     margin: 0 0 16px;

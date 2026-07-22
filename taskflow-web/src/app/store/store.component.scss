@@ -1,8 +1,10 @@
 :host {
   display: block;
   font-family: 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
+  background: var(--bg-gradient);
   min-height: 100vh;
+  animation: tf-fade-in 0.35s ease;
+  transition: background-color 0.25s ease;
 }
 
 .store-page {
@@ -43,6 +45,8 @@
 
     &.live {
       background: var(--success);
+      color: var(--success);
+      animation: tf-pulse-glow 2s ease-in-out infinite;
     }
   }
 }
@@ -106,6 +110,7 @@
   font-size: 13px;
   line-height: 1.5;
   margin-bottom: 16px;
+  animation: tf-slide-down 0.3s ease;
 }
 
 .error-banner {
@@ -116,6 +121,7 @@
   padding: 10px 14px;
   font-size: 13px;
   margin-bottom: 20px;
+  animation: tf-slide-down 0.25s ease;
 }
 
 .store-body {
@@ -141,11 +147,29 @@
   align-items: center;
   text-align: center;
   gap: 4px;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  animation: tf-fade-in-up 0.3s ease backwards;
+
+  &:hover {
+    box-shadow: 0 6px 14px var(--shadow);
+    transform: translateY(-2px);
+  }
+}
+
+@for $i from 1 through 12 {
+  .product-card:nth-child(#{$i}) {
+    animation-delay: #{$i * 0.04}s;
+  }
 }
 
 .product-icon {
   color: var(--accent);
   margin-bottom: 4px;
+  transition: transform 0.2s ease;
+}
+
+.product-card:hover .product-icon {
+  transform: scale(1.1);
 }
 
 .product-name {
@@ -189,10 +213,15 @@
   color: white;
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.15s ease;
 
   &:hover:not(:disabled) {
     background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
 
   &:disabled {
@@ -239,6 +268,7 @@
   padding: 8px 0;
   border-bottom: 1px solid var(--bg);
   position: relative;
+  animation: tf-fade-in-up 0.25s ease;
 
   .cart-item-icon {
     grid-column: 1;
@@ -431,10 +461,17 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 
   &:hover:not(:disabled) {
     background: var(--success-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px var(--shadow);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: none;
   }
 
   &:disabled {
@@ -460,6 +497,8 @@
   box-shadow: 0 4px 16px var(--shadow);
   font-family: 'Courier New', monospace;
   color: var(--text-primary);
+  animation: tf-receipt-print 0.4s ease;
+  transform-origin: top center;
 
   &-header {
     text-align: center;

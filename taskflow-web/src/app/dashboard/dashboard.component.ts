@@ -11,6 +11,14 @@ interface StockBar {
   percent: number;
 }
 
+const EMPTY_STATS: StatsSnapshot = {
+  tasksCreated: 0,
+  purchases: 0,
+  unitsSold: 0,
+  revenue: 0,
+  totalVisitors: 0,
+};
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -20,6 +28,7 @@ interface StockBar {
 })
 export class DashboardComponent implements OnInit {
   stats = signal<StatsSnapshot | null>(null);
+  animatedStats = signal<StatsSnapshot>(EMPTY_STATS);
   stockBars = signal<StockBar[]>([]);
   loading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -40,7 +49,13 @@ export class DashboardComponent implements OnInit {
     }).subscribe({
       next: ({ stats, products }) => {
         this.stats.set(stats);
-        this.stockBars.set(this.buildStockBars(products));
+        this.animateStats(stats);
+
+        const targetBars = this.buildStockBars(products);
+        this.stockBars.set(targetBars.map((bar) => ({ ...bar, percent: 0 })));
+        // Doble rAF: deja que el navegador pinte el 0% antes de animar al valor real.
+        requestAnimationFrame(() => requestAnimationFrame(() => this.stockBars.set(targetBars)));
+
         this.loading.set(false);
       },
       error: () => {
@@ -56,5 +71,30 @@ export class DashboardComponent implements OnInit {
       product,
       percent: Math.round((product.stock / maxStock) * 100),
     }));
+  }
+
+  private animateStats(target: StatsSnapshot): void {
+    const start = this.animatedStats();
+    const duration = 800;
+    const startTime = performance.now();
+
+    const step = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+
+      this.animatedStats.set({
+        tasksCreated: Math.round(start.tasksCreated + (target.tasksCreated - start.tasksCreated) * eased),
+        purchases: Math.round(start.purchases + (target.purchases - start.purchases) * eased),
+        unitsSold: Math.round(start.unitsSold + (target.unitsSold - start.unitsSold) * eased),
+        revenue: start.revenue + (target.revenue - start.revenue) * eased,
+        totalVisitors: Math.round(start.totalVisitors + (target.totalVisitors - start.totalVisitors) * eased),
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    };
+
+    requestAnimationFrame(step);
   }
 }

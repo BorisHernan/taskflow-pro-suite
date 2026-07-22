@@ -7,7 +7,8 @@
   max-width: 1200px;
   margin: 0 auto;
   font-family: 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
+  background: var(--bg-gradient);
+  transition: background-color 0.25s ease;
 }
 
 .app-nav-links {
@@ -22,6 +23,21 @@
     padding: 10px 16px;
     border-radius: 6px 6px 0 0;
     border: 1px solid transparent;
+    position: relative;
+    transition: color 0.15s ease, background 0.15s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 4px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform 0.2s ease;
+    }
 
     &:hover {
       color: var(--text-primary);
@@ -35,6 +51,10 @@
       border-bottom-color: var(--surface);
       position: relative;
       top: 1px;
+
+      &::after {
+        transform: scaleX(1);
+      }
     }
   }
 }
@@ -48,8 +68,14 @@
   font-size: 16px;
   cursor: pointer;
   margin-bottom: 6px;
+  transition: background 0.15s ease, transform 0.3s ease;
 
   &:hover {
     background: var(--surface-alt);
+    transform: rotate(15deg) scale(1.05);
+  }
+
+  &:active {
+    transform: rotate(15deg) scale(0.95);
   }
 }

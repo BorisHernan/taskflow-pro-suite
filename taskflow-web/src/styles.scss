@@ -22,6 +22,8 @@
   --info-border: #998dd9;
   --info-text: #403294;
   --shadow: rgba(9, 30, 66, 0.15);
+  --bg-gradient: radial-gradient(circle at 15% 0%, rgba(76, 154, 255, 0.08), transparent 55%),
+    radial-gradient(circle at 85% 100%, rgba(54, 179, 126, 0.06), transparent 50%), var(--bg);
 }
 
 :root[data-theme='dark'] {
@@ -46,6 +48,8 @@
   --info-border: #5b4b9e;
   --info-text: #c9beff;
   --shadow: rgba(0, 0, 0, 0.4);
+  --bg-gradient: radial-gradient(circle at 15% 0%, rgba(76, 154, 255, 0.12), transparent 55%),
+    radial-gradient(circle at 85% 100%, rgba(87, 217, 163, 0.08), transparent 50%), var(--bg);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -71,9 +75,69 @@
     --info-border: #5b4b9e;
     --info-text: #c9beff;
     --shadow: rgba(0, 0, 0, 0.4);
+    --bg-gradient: radial-gradient(circle at 15% 0%, rgba(76, 154, 255, 0.12), transparent 55%),
+      radial-gradient(circle at 85% 100%, rgba(87, 217, 163, 0.08), transparent 50%), var(--bg);
   }
 }
 
 body {
   margin: 0;
+}
+
+html {
+  transition: background-color 0.25s ease;
+}
+
+@keyframes tf-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tf-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tf-pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 currentColor;
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 4px transparent;
+    opacity: 0.75;
+  }
+}
+
+@keyframes tf-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tf-receipt-print {
+  from {
+    opacity: 0;
+    transform: scaleY(0.85) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+  }
 }

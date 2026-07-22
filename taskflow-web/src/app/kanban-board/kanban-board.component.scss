@@ -1,8 +1,10 @@
 :host {
   display: block;
   font-family: 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
+  background: var(--bg-gradient);
   min-height: 100vh;
+  animation: tf-fade-in 0.35s ease;
+  transition: background-color 0.25s ease;
 }
 
 .board-page {
@@ -43,6 +45,8 @@
 
     &.live {
       background: var(--success);
+      color: var(--success);
+      animation: tf-pulse-glow 2s ease-in-out infinite;
     }
   }
 
@@ -67,10 +71,15 @@
   padding: 6px 12px;
   font-size: 12px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.15s ease;
 
   &:hover {
     background: var(--surface-alt);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 
@@ -136,10 +145,17 @@
     color: white;
     font-size: 14px;
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 
     &:hover {
       background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px var(--shadow);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: none;
     }
   }
 }
@@ -153,6 +169,7 @@
   font-size: 13px;
   line-height: 1.5;
   margin-bottom: 16px;
+  animation: tf-slide-down 0.3s ease;
 }
 
 .error-banner {
@@ -163,6 +180,7 @@
   padding: 10px 14px;
   font-size: 13px;
   margin-bottom: 20px;
+  animation: tf-slide-down 0.25s ease;
 }
 
 .board {
@@ -226,13 +244,21 @@
   box-shadow: 0 1px 2px var(--shadow);
   cursor: grab;
   transition: box-shadow 0.15s ease, transform 0.15s ease;
+  animation: tf-fade-in-up 0.3s ease backwards;
 
   &:hover {
-    box-shadow: 0 4px 10px var(--shadow);
+    box-shadow: 0 6px 14px var(--shadow);
+    transform: translateY(-2px);
   }
 
   &:active {
     cursor: grabbing;
+  }
+}
+
+@for $i from 1 through 12 {
+  .card:nth-child(#{$i}) {
+    animation-delay: #{$i * 0.04}s;
   }
 }
 
@@ -262,11 +288,12 @@
   cursor: pointer;
   padding: 4px 6px;
   border-radius: 4px;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
 
   &:hover {
     background: var(--danger-bg);
     color: var(--danger);
+    transform: scale(1.15);
   }
 }
 
