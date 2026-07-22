@@ -1,0 +1,32 @@
+.app-nav {
+  display: flex;
+  gap: 4px;
+  padding: 12px 24px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+
+  a {
+    text-decoration: none;
+    color: #6b778c;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 16px;
+    border-radius: 6px 6px 0 0;
+    border: 1px solid transparent;
+
+    &:hover {
+      color: #172b4d;
+      background: rgba(9, 30, 66, 0.04);
+    }
+
+    &.active {
+      color: #0052cc;
+      background: white;
+      border-color: #dfe1e6;
+      border-bottom-color: white;
+      position: relative;
+      top: 1px;
+    }
+  }
+}

@@ -1,1 +1,6 @@
-<app-kanban-board></app-kanban-board>
+<nav class="app-nav">
+  <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">📋 Tablero Kanban</a>
+  <a routerLink="/tienda" routerLinkActive="active">🛒 Tienda</a>
+</nav>
+
+<router-outlet></router-outlet>
