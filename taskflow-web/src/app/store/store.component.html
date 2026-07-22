@@ -7,7 +7,47 @@
         {{ connectionLive() ? 'Stock en vivo' : 'Conectando...' }}
       </p>
     </div>
+
+    <button
+      type="button"
+      class="info-toggle"
+      (click)="showInfo.set(!showInfo())"
+      [attr.aria-expanded]="showInfo()"
+    >
+      {{ showInfo() ? 'Ocultar detalles ▲' : 'ℹ️ ¿Cómo funciona? ▼' }}
+    </button>
   </header>
+
+  <div class="info-panel" *ngIf="showInfo()">
+    <h2>¿Cómo funciona esta tienda?</h2>
+    <p>
+      Es un flujo de compra simulado para mostrar cómo se construye un carrito, cupones y una boleta —
+      pero no todo es de mentira:
+    </p>
+    <ul>
+      <li>
+        <strong>Catálogo, carrito, cupones y boleta:</strong> viven en el navegador. No hay pasarela de
+        pago ni tarjetas reales, y no se guarda ninguna "orden" en ningún lado.
+      </li>
+      <li>
+        <strong>El stock sí es real:</strong> cada compra descuenta unidades de verdad en la base de
+        datos, y lo ves bajar en vivo en cualquier pestaña o dispositivo — el mismo mecanismo de
+        Server-Sent Events del tablero Kanban, aplicado aquí.
+      </li>
+      <li>
+        <strong>Cupones fijos:</strong> son un puñado de códigos predefinidos (los ves con el botón
+        "¿Qué cupones hay?" en el carrito), no un sistema de descuentos real.
+      </li>
+      <li>
+        <strong>Se repone solo:</strong> el stock vuelve a sus valores iniciales una vez al día, para que
+        la demo no se agote.
+      </li>
+    </ul>
+    <p class="info-links">
+      API en vivo:
+      <a [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">Swagger / OpenAPI</a>
+    </p>
+  </div>
 
   <div class="store-notice" *ngIf="!receipt()">
     🎭 Bienvenido a la tienda simulada: agrega productos al carrito, prueba un cupón y paga para ver tu

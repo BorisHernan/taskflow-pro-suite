@@ -40,11 +40,19 @@ public class ProductController {
         return productRepository.findAllByOrderByIdAsc();
     }
 
+    /**
+     * Al conectar, se reenvía el catálogo completo como eventos normales (no solo
+     * un comentario de heartbeat) para que el cliente sepa de inmediato que el
+     * stream está vivo, sin esperar a que alguien compre algo.
+     */
     @Operation(summary = "Stream en vivo (SSE) de cambios de stock")
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<Product>> stream(ServerWebExchange exchange) {
         exchange.getResponse().getHeaders().add("X-Accel-Buffering", "no");
         exchange.getResponse().getHeaders().add("Cache-Control", "no-cache, no-transform");
+
+        Flux<ServerSentEvent<Product>> initialSnapshot = productRepository.findAllByOrderByIdAsc()
+                .map(product -> ServerSentEvent.builder(product).build());
 
         Flux<ServerSentEvent<Product>> events = eventPublisher.stream()
                 .map(product -> ServerSentEvent.builder(product).build());
@@ -52,7 +60,7 @@ public class ProductController {
         Flux<ServerSentEvent<Product>> heartbeat = Flux.interval(Duration.ofSeconds(15))
                 .map(tick -> ServerSentEvent.<Product>builder().comment("keep-alive").build());
 
-        return Flux.merge(events, heartbeat);
+        return Flux.merge(initialSnapshot, events, heartbeat);
     }
 
     @Operation(summary = "Compra unidades de un producto: descuenta el stock real y lo transmite a todos")
