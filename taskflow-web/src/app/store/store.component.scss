@@ -256,6 +256,7 @@
 .cart-items {
   max-height: 320px;
   overflow-y: auto;
+  overflow-x: hidden;
   padding-right: 2px;
 }
 
@@ -281,6 +282,10 @@
     color: var(--text-primary);
     grid-column: 2;
     grid-row: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .cart-item-total {
