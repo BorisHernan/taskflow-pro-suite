@@ -53,4 +53,14 @@
       <button class="btn-secondary" (click)="backToNameScreen()">Cambiar nombre</button>
     </div>
   </div>
+
+  <!-- Pantalla de victoria -->
+  <div class="death-screen victory-screen" *ngIf="gameState() === 'won'">
+    <h1>🏆 ¡Ganaste!</h1>
+    <p class="death-size">Llegaste al tamaño máximo (2000) — la partida se acabó ahí para que nadie farmee sin límite.</p>
+    <div class="death-actions">
+      <button class="btn-primary" (click)="playAgain()">Jugar de nuevo</button>
+      <button class="btn-secondary" (click)="backToNameScreen()">Cambiar nombre</button>
+    </div>
+  </div>
 </div>

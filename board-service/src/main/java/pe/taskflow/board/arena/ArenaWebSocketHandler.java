@@ -50,6 +50,7 @@ public class ArenaWebSocketHandler implements WebSocketHandler {
 
         Blob player = state.addPlayer(name);
         Flux<String> myDeath = engine.deaths().filter(id -> id.equals(player.getId()));
+        Flux<String> myVictory = engine.victories().filter(id -> id.equals(player.getId()));
 
         Mono<Void> input = session.receive()
                 .doOnNext(message -> handleIncoming(player, message))
@@ -69,7 +70,11 @@ public class ArenaWebSocketHandler implements WebSocketHandler {
         Flux<WebSocketMessage> deathMessage = myDeath.take(1)
                 .map(id -> session.textMessage("{\"type\":\"death\"}"));
 
-        Mono<Void> output = session.send(Flux.concat(welcome, Flux.merge(snapshotMessages, deathMessage)));
+        Flux<WebSocketMessage> victoryMessage = myVictory.take(1)
+                .map(id -> session.textMessage("{\"type\":\"victory\"}"));
+
+        Mono<Void> output = session.send(
+                Flux.concat(welcome, Flux.merge(snapshotMessages, deathMessage, victoryMessage)));
 
         return Mono.when(input, output)
                 .doFinally(signal -> state.removePlayer(player.getId()));

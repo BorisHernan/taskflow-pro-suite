@@ -23,6 +23,10 @@ public class ArenaState {
     public static final double PELLET_RADIUS = 4;
     public static final double BIG_PELLET_RADIUS = 10;
     public static final double BIG_PELLET_CHANCE = 0.08;
+    // Al llegar acá se acaba la partida: para un jugador es una victoria, para
+    // un bot simplemente se "retira" y aparece uno nuevo — evita que farmear
+    // sin límite vuelva aburrido el resto del arena para todos.
+    public static final double MAX_RADIUS = 2000;
 
     private static final List<String> PLAYER_COLORS = List.of(
             "#ff5630", "#36b37e", "#0052cc", "#ffab00", "#6554c0", "#00b8d9", "#de350b", "#00875a"

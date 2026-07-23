@@ -39,6 +39,7 @@ public class ArenaEngine {
     // tablero, aquí el pasado no tiene valor una vez que hay un tick más nuevo).
     private final Sinks.Many<ArenaSnapshot> snapshots = Sinks.many().replay().limit(1);
     private final Sinks.Many<String> deaths = Sinks.many().multicast().onBackpressureBuffer();
+    private final Sinks.Many<String> victories = Sinks.many().multicast().onBackpressureBuffer();
     private final Map<String, Double> wanderTimers = new java.util.concurrent.ConcurrentHashMap<>();
 
     private Disposable loop;
@@ -72,6 +73,10 @@ public class ArenaEngine {
 
     public Flux<String> deaths() {
         return deaths.asFlux();
+    }
+
+    public Flux<String> victories() {
+        return victories.asFlux();
     }
 
     private void tick() {
@@ -181,12 +186,19 @@ public class ArenaEngine {
 
     private void resolvePelletCollisions(List<Blob> allBlobs) {
         for (Blob blob : allBlobs) {
+            if (isRemoved(blob)) {
+                continue;
+            }
             for (Pellet pellet : List.copyOf(state.pellets().values())) {
                 double dist = Math.hypot(pellet.x() - blob.getX(), pellet.y() - blob.getY());
                 if (dist < blob.getRadius()) {
                     state.pellets().remove(pellet.id());
                     double pelletRadius = pellet.big() ? ArenaState.BIG_PELLET_RADIUS : ArenaState.PELLET_RADIUS;
-                    blob.setRadius(Math.sqrt(blob.getRadius() * blob.getRadius() + pelletRadius * pelletRadius * 4));
+                    double newRadius = Math.sqrt(blob.getRadius() * blob.getRadius() + pelletRadius * pelletRadius * 4);
+                    growBlob(blob, newRadius);
+                    if (isRemoved(blob)) {
+                        break;
+                    }
                 }
             }
         }
@@ -206,11 +218,27 @@ public class ArenaEngine {
                 Blob smaller = bigger == a ? b : a;
 
                 if (dist < bigger.getRadius() && bigger.getRadius() > smaller.getRadius() * EAT_SIZE_RATIO) {
-                    bigger.setRadius(Math.sqrt(bigger.getRadius() * bigger.getRadius()
-                            + smaller.getRadius() * smaller.getRadius() * GROWTH_FACTOR));
+                    double newRadius = Math.sqrt(bigger.getRadius() * bigger.getRadius()
+                            + smaller.getRadius() * smaller.getRadius() * GROWTH_FACTOR);
                     eat(smaller);
+                    growBlob(bigger, newRadius);
                 }
             }
+        }
+    }
+
+    /** Crece un blob con tope en MAX_RADIUS: llegar ahí termina la partida (victoria o retiro del bot). */
+    private void growBlob(Blob blob, double newRadius) {
+        double capped = Math.min(newRadius, ArenaState.MAX_RADIUS);
+        blob.setRadius(capped);
+        if (capped < ArenaState.MAX_RADIUS) {
+            return;
+        }
+        if (blob.isBot()) {
+            state.respawnBot(blob.getId());
+        } else {
+            state.removePlayer(blob.getId());
+            victories.tryEmitNext(blob.getId());
         }
     }
 

@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { ArenaSnapshot, BlobView } from '../models/arena.model';
 import { ArenaService } from '../services/arena.service';
 
-type GameState = 'name' | 'playing' | 'dead';
+type GameState = 'name' | 'playing' | 'dead' | 'won';
 
 const START_RADIUS = 20;
 const LOOKAHEAD = 400;
@@ -38,6 +38,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
   private welcomeSub?: Subscription;
   private snapshotSub?: Subscription;
   private deathSub?: Subscription;
+  private victorySub?: Subscription;
   private closedSub?: Subscription;
   private sendIntervalId?: ReturnType<typeof setInterval>;
   private renderFrameId?: number;
@@ -74,13 +75,14 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     this.eatCount = 0;
     this.myRadius.set(START_RADIUS);
 
-    const { welcome$, snapshots$, death$, closed$ } = this.arenaService.connect(name);
+    const { welcome$, snapshots$, death$, victory$, closed$ } = this.arenaService.connect(name);
 
     this.gameState.set('playing');
 
     this.welcomeSub = welcome$.subscribe((msg) => (this.myId = msg.id));
     this.snapshotSub = snapshots$.subscribe((snapshot) => this.onSnapshot(snapshot));
     this.deathSub = death$.subscribe(() => this.onDeath());
+    this.victorySub = victory$.subscribe(() => this.onVictory());
     this.closedSub = closed$.subscribe((event) => this.onClosed(event));
 
     this.sendIntervalId = setInterval(() => this.sendTarget(), 100);
@@ -157,14 +159,23 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     this.arenaService.disconnect();
   }
 
+  private onVictory(): void {
+    clearInterval(this.sendIntervalId);
+    if (this.renderFrameId) {
+      cancelAnimationFrame(this.renderFrameId);
+    }
+    this.gameState.set('won');
+    this.arenaService.disconnect();
+  }
+
   private onClosed(event: CloseEvent): void {
     clearInterval(this.sendIntervalId);
     if (this.renderFrameId) {
       cancelAnimationFrame(this.renderFrameId);
     }
 
-    // Si ya estamos en pantalla de muerte, este cierre es solo la consecuencia
-    // normal de haber recibido el mensaje de muerte (ver onDeath); no es un error.
+    // Si ya estamos en pantalla de muerte/victoria, este cierre es solo la
+    // consecuencia normal de haber recibido ese mensaje; no es un error.
     if (this.gameState() === 'playing') {
       this.errorMessage.set(event.reason || 'Se perdió la conexión con el arena.');
       this.gameState.set('name');
@@ -296,6 +307,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     this.welcomeSub?.unsubscribe();
     this.snapshotSub?.unsubscribe();
     this.deathSub?.unsubscribe();
+    this.victorySub?.unsubscribe();
     this.closedSub?.unsubscribe();
     clearInterval(this.sendIntervalId);
     clearTimeout(this.toastTimeoutId);

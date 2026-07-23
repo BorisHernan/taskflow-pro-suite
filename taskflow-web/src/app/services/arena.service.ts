@@ -7,6 +7,7 @@ export interface ArenaConnection {
   welcome$: Subject<WelcomeMessage>;
   snapshots$: Subject<ArenaSnapshot>;
   death$: Subject<void>;
+  victory$: Subject<void>;
   closed$: Subject<CloseEvent>;
 }
 
@@ -22,6 +23,7 @@ export class ArenaService {
     const welcome$ = new Subject<WelcomeMessage>();
     const snapshots$ = new Subject<ArenaSnapshot>();
     const death$ = new Subject<void>();
+    const victory$ = new Subject<void>();
     const closed$ = new Subject<CloseEvent>();
 
     const socket = new WebSocket(this.buildWsUrl(name));
@@ -33,6 +35,8 @@ export class ArenaService {
         welcome$.next(data as WelcomeMessage);
       } else if (data.type === 'death') {
         death$.next();
+      } else if (data.type === 'victory') {
+        victory$.next();
       } else {
         snapshots$.next(data as ArenaSnapshot);
       }
@@ -44,9 +48,10 @@ export class ArenaService {
       snapshots$.complete();
       welcome$.complete();
       death$.complete();
+      victory$.complete();
     };
 
-    return { welcome$, snapshots$, death$, closed$ };
+    return { welcome$, snapshots$, death$, victory$, closed$ };
   }
 
   send(tx: number, ty: number): void {
