@@ -1,25 +1,38 @@
 <div class="arena-page">
   <!-- Pantalla de nombre -->
-  <div class="name-screen" *ngIf="gameState() === 'name'">
-    <h1>🕹️ Arena Lite</h1>
-    <p class="subtitle">
-      Un mini agar.io: crece comiendo pellets y círculos más pequeños. Siempre hay unos cuantos
-      bots 🤖 dando vueltas para que nunca juegues solo de verdad.
-    </p>
+  <div class="name-screen tf-dotted-bg" *ngIf="gameState() === 'name'">
+    <div class="deco-blob deco-blob-1"></div>
+    <div class="deco-blob deco-blob-2"></div>
+    <div class="deco-blob deco-blob-3"></div>
 
-    <div class="error-banner" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+    <div class="name-card tf-card">
+      <div class="name-card-icon">🕹️</div>
+      <h1>Arena Lite</h1>
+      <p class="subtitle">
+        Un mini agar.io: crece comiendo pellets y círculos más pequeños. Siempre hay unos cuantos
+        bots dando vueltas para que nunca juegues solo de verdad.
+      </p>
 
-    <form class="name-form" (ngSubmit)="play()">
-      <input
-        type="text"
-        placeholder="Tu nombre..."
-        [(ngModel)]="nameInput"
-        name="nameInput"
-        maxlength="16"
-        autocomplete="off"
-      />
-      <button type="submit">Jugar</button>
-    </form>
+      <div class="feature-pills">
+        <span class="pill">🤖 Bots con IA</span>
+        <span class="pill">⚡ Tiempo real</span>
+        <span class="pill">🏆 Logros</span>
+      </div>
+
+      <div class="error-banner" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+
+      <form class="name-form" (ngSubmit)="play()">
+        <input
+          type="text"
+          placeholder="Tu nombre..."
+          [(ngModel)]="nameInput"
+          name="nameInput"
+          maxlength="16"
+          autocomplete="off"
+        />
+        <button type="submit">Jugar</button>
+      </form>
+    </div>
   </div>
 
   <!-- Pantalla de juego -->
@@ -44,23 +57,38 @@
   </div>
 
   <!-- Pantalla de muerte -->
-  <div class="death-screen" *ngIf="gameState() === 'dead' && deathInfo() as info">
-    <h1>💀 Te comieron</h1>
-    <p class="death-size">Llegaste a tamaño {{ info.size }}</p>
-    <p class="death-record" *ngIf="info.isRecord">¡Nuevo récord de la sesión! 🏆</p>
-    <div class="death-actions">
-      <button class="btn-primary" (click)="playAgain()">Jugar de nuevo</button>
-      <button class="btn-secondary" (click)="backToNameScreen()">Cambiar nombre</button>
+  <div class="death-screen tf-dotted-bg" *ngIf="gameState() === 'dead' && deathInfo() as info">
+    <div class="deco-blob deco-blob-1 deco-blob-danger"></div>
+    <div class="deco-blob deco-blob-2 deco-blob-danger"></div>
+
+    <div class="death-card tf-card">
+      <div class="name-card-icon">💀</div>
+      <h1>Te comieron</h1>
+      <p class="death-size">Llegaste a tamaño {{ info.size }}</p>
+      <p class="death-record" *ngIf="info.isRecord">¡Nuevo récord de la sesión! 🏆</p>
+      <div class="death-actions">
+        <button class="btn-primary" (click)="playAgain()">Jugar de nuevo</button>
+        <button class="btn-secondary" (click)="backToNameScreen()">Cambiar nombre</button>
+      </div>
     </div>
   </div>
 
   <!-- Pantalla de victoria -->
-  <div class="death-screen victory-screen" *ngIf="gameState() === 'won'">
-    <h1>🏆 ¡Ganaste!</h1>
-    <p class="death-size">Llegaste al tamaño máximo (2000) — la partida se acabó ahí para que nadie farmee sin límite.</p>
-    <div class="death-actions">
-      <button class="btn-primary" (click)="playAgain()">Jugar de nuevo</button>
-      <button class="btn-secondary" (click)="backToNameScreen()">Cambiar nombre</button>
+  <div class="death-screen victory-screen tf-dotted-bg" *ngIf="gameState() === 'won'">
+    <div class="deco-blob deco-blob-1 deco-blob-gold"></div>
+    <div class="deco-blob deco-blob-2 deco-blob-gold"></div>
+    <div class="deco-blob deco-blob-3 deco-blob-gold"></div>
+
+    <div class="death-card tf-card">
+      <div class="name-card-icon">🏆</div>
+      <h1>¡Ganaste!</h1>
+      <p class="death-size">
+        Llegaste al tamaño máximo (2000) — la partida se acabó ahí para que nadie farmee sin límite.
+      </p>
+      <div class="death-actions">
+        <button class="btn-primary" (click)="playAgain()">Jugar de nuevo</button>
+        <button class="btn-secondary" (click)="backToNameScreen()">Cambiar nombre</button>
+      </div>
     </div>
   </div>
 </div>

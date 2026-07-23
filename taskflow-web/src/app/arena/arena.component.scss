@@ -7,26 +7,106 @@
   min-height: calc(100vh - 50px);
 }
 
-.name-screen {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 60px 24px;
-  text-align: center;
+.name-screen,
+.death-screen {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
   background: var(--bg-gradient);
   min-height: calc(100vh - 50px);
   animation: tf-fade-in 0.35s ease;
+  overflow: hidden;
+}
 
-  h1 {
-    margin: 0 0 8px;
-    font-size: 30px;
-    color: var(--text-primary);
-  }
+.deco-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  pointer-events: none;
+  animation: tf-float 9s ease-in-out infinite;
+  z-index: 0;
+}
 
-  .subtitle {
+.deco-blob-1 {
+  width: 280px;
+  height: 280px;
+  background: var(--accent);
+  top: -70px;
+  left: -70px;
+}
+
+.deco-blob-2 {
+  width: 220px;
+  height: 220px;
+  background: var(--success);
+  bottom: -50px;
+  right: -30px;
+  animation-delay: -3s;
+}
+
+.deco-blob-3 {
+  width: 180px;
+  height: 180px;
+  background: #ffab00;
+  bottom: 60px;
+  left: 8%;
+  animation-delay: -6s;
+}
+
+.deco-blob-danger {
+  background: var(--danger) !important;
+}
+
+.deco-blob-gold {
+  background: #ffab00 !important;
+}
+
+.name-card,
+.death-card {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  width: 100%;
+  padding: 48px 36px;
+  text-align: center;
+  animation: tf-fade-in-up 0.4s ease;
+}
+
+.name-card-icon {
+  font-size: 46px;
+  margin-bottom: 8px;
+}
+
+.name-card h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  color: var(--text-primary);
+}
+
+.name-card .subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.feature-pills {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+
+  .pill {
+    background: var(--surface-alt);
     color: var(--text-secondary);
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 24px;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
   }
 }
 
@@ -171,35 +251,26 @@ canvas {
   pointer-events: none;
 }
 
-.death-screen {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 80px 24px;
-  text-align: center;
-  background: var(--bg-gradient);
-  min-height: calc(100vh - 50px);
-  animation: tf-fade-in 0.3s ease;
-
-  h1 {
-    margin: 0 0 12px;
-    font-size: 32px;
-    color: var(--text-primary);
-  }
-
-  .death-size {
-    color: var(--text-secondary);
-    font-size: 16px;
-    margin: 0 0 4px;
-  }
-
-  .death-record {
-    color: var(--success);
-    font-weight: 700;
-    margin: 0 0 20px;
-  }
+.death-card h1 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  color: var(--text-primary);
 }
 
-.victory-screen h1 {
+.death-card .death-size {
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 4px;
+}
+
+.death-card .death-record {
+  color: var(--success);
+  font-weight: 700;
+  margin: 8px 0 20px;
+}
+
+.victory-screen .death-card h1 {
   color: #ffab00;
 }
 

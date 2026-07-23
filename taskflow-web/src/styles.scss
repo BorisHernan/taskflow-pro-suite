@@ -22,8 +22,11 @@
   --info-border: #998dd9;
   --info-text: #403294;
   --shadow: rgba(9, 30, 66, 0.15);
-  --bg-gradient: radial-gradient(circle at 15% 0%, rgba(76, 154, 255, 0.08), transparent 55%),
-    radial-gradient(circle at 85% 100%, rgba(54, 179, 126, 0.06), transparent 50%), var(--bg);
+  --bg-gradient: radial-gradient(circle at 8% -10%, rgba(76, 154, 255, 0.16), transparent 42%),
+    radial-gradient(circle at 92% 8%, rgba(101, 84, 192, 0.12), transparent 40%),
+    radial-gradient(circle at 85% 100%, rgba(54, 179, 126, 0.14), transparent 45%),
+    radial-gradient(circle at 0% 95%, rgba(255, 171, 0, 0.1), transparent 40%), var(--bg);
+  --dot-color: rgba(9, 30, 66, 0.06);
 }
 
 :root[data-theme='dark'] {
@@ -48,8 +51,11 @@
   --info-border: #5b4b9e;
   --info-text: #c9beff;
   --shadow: rgba(0, 0, 0, 0.4);
-  --bg-gradient: radial-gradient(circle at 15% 0%, rgba(76, 154, 255, 0.12), transparent 55%),
-    radial-gradient(circle at 85% 100%, rgba(87, 217, 163, 0.08), transparent 50%), var(--bg);
+  --bg-gradient: radial-gradient(circle at 8% -10%, rgba(76, 154, 255, 0.22), transparent 42%),
+    radial-gradient(circle at 92% 8%, rgba(139, 116, 255, 0.16), transparent 40%),
+    radial-gradient(circle at 85% 100%, rgba(87, 217, 163, 0.16), transparent 45%),
+    radial-gradient(circle at 0% 95%, rgba(255, 171, 0, 0.1), transparent 40%), var(--bg);
+  --dot-color: rgba(255, 255, 255, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -75,8 +81,11 @@
     --info-border: #5b4b9e;
     --info-text: #c9beff;
     --shadow: rgba(0, 0, 0, 0.4);
-    --bg-gradient: radial-gradient(circle at 15% 0%, rgba(76, 154, 255, 0.12), transparent 55%),
-      radial-gradient(circle at 85% 100%, rgba(87, 217, 163, 0.08), transparent 50%), var(--bg);
+    --bg-gradient: radial-gradient(circle at 8% -10%, rgba(76, 154, 255, 0.22), transparent 42%),
+      radial-gradient(circle at 92% 8%, rgba(139, 116, 255, 0.16), transparent 40%),
+      radial-gradient(circle at 85% 100%, rgba(87, 217, 163, 0.16), transparent 45%),
+      radial-gradient(circle at 0% 95%, rgba(255, 171, 0, 0.1), transparent 40%), var(--bg);
+    --dot-color: rgba(255, 255, 255, 0.05);
   }
 }
 
@@ -86,6 +95,22 @@ body {
 
 html {
   transition: background-color 0.25s ease;
+}
+
+/* Tarjeta reutilizable para contenido "flotante" sobre el fondo con gradiente,
+   así nunca se ve como texto suelto en el vacío. */
+.tf-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px -20px var(--shadow), 0 2px 10px var(--shadow);
+}
+
+/* Patrón de puntos sutil, para secciones grandes que necesitan más textura
+   que un gradiente plano (p. ej. pantallas de bienvenida). */
+.tf-dotted-bg {
+  background-image: radial-gradient(circle, var(--dot-color) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
 }
 
 @keyframes tf-fade-in {
@@ -139,5 +164,15 @@ html {
   to {
     opacity: 1;
     transform: scaleY(1) translateY(0);
+  }
+}
+
+@keyframes tf-float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-16px, 20px) scale(1.06);
   }
 }
