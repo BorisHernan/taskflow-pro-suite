@@ -185,7 +185,8 @@ public class ArenaEngine {
                 double dist = Math.hypot(pellet.x() - blob.getX(), pellet.y() - blob.getY());
                 if (dist < blob.getRadius()) {
                     state.pellets().remove(pellet.id());
-                    blob.setRadius(Math.sqrt(blob.getRadius() * blob.getRadius() + ArenaState.PELLET_RADIUS * ArenaState.PELLET_RADIUS * 4));
+                    double pelletRadius = pellet.big() ? ArenaState.BIG_PELLET_RADIUS : ArenaState.PELLET_RADIUS;
+                    blob.setRadius(Math.sqrt(blob.getRadius() * blob.getRadius() + pelletRadius * pelletRadius * 4));
                 }
             }
         }

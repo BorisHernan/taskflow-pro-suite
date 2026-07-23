@@ -1,4 +1,4 @@
 package pe.taskflow.board.arena;
 
-public record Pellet(String id, double x, double y) {
+public record Pellet(String id, double x, double y, boolean big) {
 }

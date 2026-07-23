@@ -49,6 +49,7 @@ public class ArenaWebSocketHandler implements WebSocketHandler {
         }
 
         Blob player = state.addPlayer(name);
+        Flux<String> myDeath = engine.deaths().filter(id -> id.equals(player.getId()));
 
         Mono<Void> input = session.receive()
                 .doOnNext(message -> handleIncoming(player, message))
@@ -57,18 +58,20 @@ public class ArenaWebSocketHandler implements WebSocketHandler {
         Flux<WebSocketMessage> welcome = Flux.just(
                 session.textMessage("{\"type\":\"welcome\",\"id\":\"" + player.getId() + "\"}"));
 
-        Flux<WebSocketMessage> outboundSnapshots = engine.snapshots()
+        // El servidor nunca cierra el socket activamente al morir: mandar snapshots
+        // y el aviso de muerte mezclados en el mismo stream, y dejar que sea el
+        // CLIENTE quien cierre la conexión al recibir el mensaje. Antes se llamaba
+        // session.close() desde un Mono aparte mientras session.send() seguía activo,
+        // y esa carrera a veces dejaba la conexión colgada sin avisarle nada al cliente.
+        Flux<WebSocketMessage> snapshotMessages = engine.snapshots()
                 .map(snapshot -> session.textMessage(toJson(snapshot)));
 
-        Mono<Void> output = session.send(Flux.concat(welcome, outboundSnapshots));
+        Flux<WebSocketMessage> deathMessage = myDeath.take(1)
+                .map(id -> session.textMessage("{\"type\":\"death\"}"));
 
-        Mono<Void> deathTermination = engine.deaths()
-                .filter(id -> id.equals(player.getId()))
-                .next()
-                .flatMap(id -> session.close(CloseStatus.NORMAL.withReason("eaten")))
-                .then();
+        Mono<Void> output = session.send(Flux.concat(welcome, Flux.merge(snapshotMessages, deathMessage)));
 
-        return Mono.when(input, output, deathTermination)
+        return Mono.when(input, output)
                 .doFinally(signal -> state.removePlayer(player.getId()));
     }
 

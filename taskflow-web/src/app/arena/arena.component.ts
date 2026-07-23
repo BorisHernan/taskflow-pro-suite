@@ -37,6 +37,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
   private latestSnapshot: ArenaSnapshot | null = null;
   private welcomeSub?: Subscription;
   private snapshotSub?: Subscription;
+  private deathSub?: Subscription;
   private closedSub?: Subscription;
   private sendIntervalId?: ReturnType<typeof setInterval>;
   private renderFrameId?: number;
@@ -61,6 +62,11 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     const name = this.nameInput.trim();
     if (!name) return;
 
+    // Cancela las suscripciones de una partida anterior (si las hay) antes de
+    // abrir una nueva conexión: si no, el cierre del socket viejo podía
+    // disparar un "se perdió la conexión" falso sobre la partida nueva.
+    this.cleanup();
+
     this.errorMessage.set(null);
     this.deathInfo.set(null);
     this.myId = null;
@@ -68,12 +74,13 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     this.eatCount = 0;
     this.myRadius.set(START_RADIUS);
 
-    const { welcome$, snapshots$, closed$ } = this.arenaService.connect(name);
+    const { welcome$, snapshots$, death$, closed$ } = this.arenaService.connect(name);
 
     this.gameState.set('playing');
 
     this.welcomeSub = welcome$.subscribe((msg) => (this.myId = msg.id));
     this.snapshotSub = snapshots$.subscribe((snapshot) => this.onSnapshot(snapshot));
+    this.deathSub = death$.subscribe(() => this.onDeath());
     this.closedSub = closed$.subscribe((event) => this.onClosed(event));
 
     this.sendIntervalId = setInterval(() => this.sendTarget(), 100);
@@ -136,17 +143,29 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     );
   }
 
+  private onDeath(): void {
+    clearInterval(this.sendIntervalId);
+    if (this.renderFrameId) {
+      cancelAnimationFrame(this.renderFrameId);
+    }
+    const size = this.myRadius();
+    this.deathInfo.set({ size, isRecord: size >= this.maxRadiusThisSession() });
+    this.gameState.set('dead');
+
+    // El servidor no cierra el socket por su cuenta al morir (para evitar la
+    // carrera que causaba el bug de pantalla congelada); lo cerramos nosotros.
+    this.arenaService.disconnect();
+  }
+
   private onClosed(event: CloseEvent): void {
     clearInterval(this.sendIntervalId);
     if (this.renderFrameId) {
       cancelAnimationFrame(this.renderFrameId);
     }
 
-    if (event.reason === 'eaten') {
-      const size = this.myRadius();
-      this.deathInfo.set({ size, isRecord: size >= this.maxRadiusThisSession() });
-      this.gameState.set('dead');
-    } else if (this.gameState() === 'playing') {
+    // Si ya estamos en pantalla de muerte, este cierre es solo la consecuencia
+    // normal de haber recibido el mensaje de muerte (ver onDeath); no es un error.
+    if (this.gameState() === 'playing') {
       this.errorMessage.set(event.reason || 'Se perdió la conexión con el arena.');
       this.gameState.set('name');
     }
@@ -200,10 +219,15 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
 
     this.drawGrid(ctx, snapshot.worldSize);
 
-    ctx.fillStyle = '#4c9aff88';
     for (const pellet of snapshot.pellets) {
       ctx.beginPath();
-      ctx.arc(pellet.x, pellet.y, 4, 0, Math.PI * 2);
+      if (pellet.big) {
+        ctx.fillStyle = '#ffab00cc';
+        ctx.arc(pellet.x, pellet.y, 10, 0, Math.PI * 2);
+      } else {
+        ctx.fillStyle = '#4c9aff88';
+        ctx.arc(pellet.x, pellet.y, 4, 0, Math.PI * 2);
+      }
       ctx.fill();
     }
 
@@ -271,6 +295,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
   private cleanup(): void {
     this.welcomeSub?.unsubscribe();
     this.snapshotSub?.unsubscribe();
+    this.deathSub?.unsubscribe();
     this.closedSub?.unsubscribe();
     clearInterval(this.sendIntervalId);
     clearTimeout(this.toastTimeoutId);

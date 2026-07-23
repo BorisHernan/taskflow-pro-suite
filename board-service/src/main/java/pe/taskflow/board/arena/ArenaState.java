@@ -21,6 +21,8 @@ public class ArenaState {
     public static final int MAX_PLAYERS = 20;
     public static final double START_RADIUS = 20;
     public static final double PELLET_RADIUS = 4;
+    public static final double BIG_PELLET_RADIUS = 10;
+    public static final double BIG_PELLET_CHANCE = 0.08;
 
     private static final List<String> PLAYER_COLORS = List.of(
             "#ff5630", "#36b37e", "#0052cc", "#ffab00", "#6554c0", "#00b8d9", "#de350b", "#00875a"
@@ -77,7 +79,8 @@ public class ArenaState {
     public void ensurePelletPopulation() {
         while (pellets.size() < MAX_PELLETS) {
             String id = UUID.randomUUID().toString();
-            pellets.put(id, new Pellet(id, randomCoordinate(), randomCoordinate()));
+            boolean big = ThreadLocalRandom.current().nextDouble() < BIG_PELLET_CHANCE;
+            pellets.put(id, new Pellet(id, randomCoordinate(), randomCoordinate(), big));
         }
     }
 

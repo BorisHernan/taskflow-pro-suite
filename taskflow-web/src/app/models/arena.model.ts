@@ -12,6 +12,7 @@ export interface Pellet {
   id: string;
   x: number;
   y: number;
+  big: boolean;
 }
 
 export interface ArenaSnapshot {
