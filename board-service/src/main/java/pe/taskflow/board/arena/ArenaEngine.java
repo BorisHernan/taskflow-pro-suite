@@ -79,7 +79,9 @@ public class ArenaEngine {
         return victories.asFlux();
     }
 
-    private void tick() {
+    // Visibilidad de paquete (no private) a propósito: permite que los tests
+    // llamen a un tick puntual sin depender del loop de Flux.interval real.
+    void tick() {
         List<Blob> allBlobs = new ArrayList<>(state.players().values());
         allBlobs.addAll(state.bots().values());
 
