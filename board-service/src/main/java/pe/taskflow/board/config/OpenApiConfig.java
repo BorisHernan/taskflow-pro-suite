@@ -11,8 +11,8 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI boardServiceOpenApi() {
         return new OpenAPI().info(new Info()
-                .title("TaskFlow Pro — Board Service API")
-                .description("API reactiva (Spring WebFlux + R2DBC) del tablero kanban de TaskFlow Pro, "
+                .title("TaskFlow App — Board Service API")
+                .description("API reactiva (Spring WebFlux + R2DBC) del tablero kanban de TaskFlow App, "
                         + "con actualizaciones en vivo por Server-Sent Events.")
                 .version("v0.1.0"));
     }

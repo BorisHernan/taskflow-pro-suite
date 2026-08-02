@@ -43,7 +43,7 @@ management:
 
 info:
   app:
-    name: TaskFlow Pro — board-service
+    name: TaskFlow App — board-service
     description: API reactiva (WebFlux + R2DBC) del tablero kanban, con SSE en tiempo real
 
 logging:

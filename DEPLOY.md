@@ -1,4 +1,4 @@
-# Desplegar TaskFlow Pro gratis (Neon + Render + Vercel)
+# Desplegar TaskFlow App gratis (Neon + Render + Vercel)
 
 Stack: **Neon** (Postgres gratis) + **Render** (backend Spring Boot, Docker) + **Vercel** (frontend Angular).
 Ninguno de los tres pide tarjeta para el tier gratuito.
@@ -9,7 +9,7 @@ Ninguno de los tres pide tarjeta para el tier gratuito.
 cd taskflow-pro
 git init
 git add .
-git commit -m "Initial commit: TaskFlow Pro kanban board"
+git commit -m "Initial commit: TaskFlow App kanban board"
 ```
 
 Crea un repo vacío en [github.com/new](https://github.com/new) (sin README, sin .gitignore — ya los tienes) y luego:

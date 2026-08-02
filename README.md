@@ -8,7 +8,7 @@
 
 ### Qué es esto
 
-TaskFlow Pro es un **proyecto de portafolio**: un tablero kanban con actualizaciones en tiempo real (Angular +
+TaskFlow App es un **proyecto de portafolio**: un tablero kanban con actualizaciones en tiempo real (Angular +
 Spring WebFlux reactivo), al que le fui sumando funcionalidades — tienda simulada con stock compartido en vivo,
 dashboard de estadísticas, un mini juego multijugador (Arena Lite) y modo oscuro — para mostrar un rango más
 amplio de lo que sé construir: desde CRUD reactivo hasta WebSockets, pasando por control de abuso en un demo
@@ -242,7 +242,7 @@ taskflow-pro/
 
 ### What this is
 
-TaskFlow Pro is a **portfolio project**: a real-time kanban board (Angular + reactive Spring WebFlux) that grew
+TaskFlow App is a **portfolio project**: a real-time kanban board (Angular + reactive Spring WebFlux) that grew
 into a small showcase of a wider range of backend/frontend skills — a simulated store with live shared stock, a
 stats dashboard, a real-time multiplayer mini-game (Arena Lite, an `agar.io`-style clone), and dark mode — built
 to demonstrate everything from reactive CRUD to WebSockets, abuse control on a public no-login demo, testing,
