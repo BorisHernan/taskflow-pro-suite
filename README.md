@@ -47,6 +47,11 @@ login. Cada cambio se transmite **en tiempo real por Server-Sent Events** a toda
 conectados: abrí la demo en dos pestañas y movés una tarjeta en una, aparece movida en la otra al instante, sin
 refrescar. Como es de escritura libre, tiene sus propios controles de abuso (ver más abajo).
 
+<p>
+  <img src="docs/screenshots/kanban-light.png" width="49%" alt="Tablero Kanban, modo claro">
+  <img src="docs/screenshots/kanban-dark.png" width="49%" alt="Tablero Kanban, modo oscuro">
+</p>
+
 #### 🛒 Tienda (`/tienda`) — estado compartido en vivo, sin base de datos de usuarios
 
 Un catálogo de productos (a modo de broma, todos relacionados con programar) con carrito, cupones de descuento
@@ -56,12 +61,26 @@ los visitantes conectados a la vez. Si comprás algo, el stock baja para todo el
 nadie tenga que refrescar. Existe para mostrar un patrón distinto al del tablero: acá el "tiempo real" es
 principalmente de lectura (stock bajando), no de edición colaborativa.
 
+<p>
+  <img src="docs/screenshots/tienda-dark.png" width="49%" alt="Tienda, catálogo y carrito, modo oscuro">
+  <img src="docs/screenshots/tienda-light.png" width="49%" alt="Tienda, catálogo y carrito, modo claro">
+</p>
+<p>
+  <img src="docs/screenshots/boleta-dark.png" width="49%" alt="Boleta de compra, modo oscuro">
+  <img src="docs/screenshots/boleta-light.png" width="49%" alt="Boleta de compra, modo claro">
+</p>
+
 #### 📊 Estadísticas (`/estadisticas`) — observabilidad del propio demo
 
 Un dashboard con contadores en vivo: tareas creadas, compras, unidades vendidas, ingresos simulados y
 visitantes totales desde el último despliegue. Los números se animan al cargar y también quedan expuestos como
 métricas reales de Micrometer en `/actuator/metrics`, para mostrar que no es solo un número bonito en pantalla
 sino algo instrumentado de verdad.
+
+<p>
+  <img src="docs/screenshots/stats-light.png" width="49%" alt="Dashboard de estadísticas, modo claro">
+  <img src="docs/screenshots/stats-dark.png" width="49%" alt="Dashboard de estadísticas, modo oscuro">
+</p>
 
 #### 🕹️ Arena (`/arena`) — el único menú que usa WebSocket en vez de SSE
 
@@ -73,11 +92,22 @@ que nadie pueda "farmear" sin límite y aburrir al resto. Es el único menú por
 acá el cliente también tiene que mandarle continuamente su posición al servidor (con SSE, que es unidireccional,
 esto no se podría).
 
+<p>
+  <img src="docs/screenshots/arena-inicio-dark.png" width="49%" alt="Arena, pantalla de nombre, modo oscuro">
+  <img src="docs/screenshots/arena-inicio-light.png" width="49%" alt="Arena, pantalla de nombre, modo claro">
+</p>
+<p>
+  <img src="docs/screenshots/arena-jugando-dark.png" width="49%" alt="Arena, partida en curso">
+  <img src="docs/screenshots/arena-muerte-light.png" width="49%" alt="Arena, pantalla de fin de partida">
+</p>
+
 #### 🌙 Botón de tema (arriba a la derecha) — no es un menú, pero está en todas las páginas
 
 Alterna entre modo claro y oscuro, persiste la elección en `localStorage` y respeta la preferencia del sistema
 operativo si nunca la tocaste. El tema se aplica antes del primer pintado de la página (ver `index.html`) para
-que no haya un destello blanco al cargar, ni al cambiar de página dentro de la demo.
+que no haya un destello blanco al cargar, ni al cambiar de página dentro de la demo. Las capturas de arriba, cada
+una en claro y oscuro, son la mejor prueba de que el theming está aplicado de punta a punta, no solo en la
+pantalla principal.
 
 #### Controles de abuso del demo público
 
@@ -194,6 +224,7 @@ taskflow-pro/
 │       ├── kanban-board/ store/ dashboard/ arena/
 │       └── services/      # incluye los *.spec.ts con Vitest
 ├── .github/workflows/ci.yml
+├── docs/screenshots/      # Capturas usadas en este README
 ├── docker-compose.yml     # Postgres + Keycloak (este último aún no está en uso)
 ├── render.yaml
 └── DEPLOY.md
@@ -250,6 +281,11 @@ broadcast **in real time over Server-Sent Events** to every connected tab/browse
 drag a card in one, and it moves in the other instantly, no refresh. Since it's open for anyone to write to, it
 has its own abuse controls (see below).
 
+<p>
+  <img src="docs/screenshots/kanban-light.png" width="49%" alt="Kanban board, light mode">
+  <img src="docs/screenshots/kanban-dark.png" width="49%" alt="Kanban board, dark mode">
+</p>
+
 #### 🛒 Store (`/tienda`) — shared live state, no user database needed
 
 A product catalog (a running programmer-joke theme) with a cart, discount coupons, and a final receipt — the
@@ -259,11 +295,25 @@ something and the stock drops for everyone instantly, no refresh required anywhe
 different pattern than the board: here "real-time" is mostly read-side (stock going down), not collaborative
 editing.
 
+<p>
+  <img src="docs/screenshots/tienda-dark.png" width="49%" alt="Store, catalog and cart, dark mode">
+  <img src="docs/screenshots/tienda-light.png" width="49%" alt="Store, catalog and cart, light mode">
+</p>
+<p>
+  <img src="docs/screenshots/boleta-dark.png" width="49%" alt="Purchase receipt, dark mode">
+  <img src="docs/screenshots/boleta-light.png" width="49%" alt="Purchase receipt, light mode">
+</p>
+
 #### 📊 Stats (`/estadisticas`) — observability of the demo itself
 
 A dashboard with live counters: tasks created, purchases, units sold, simulated revenue, and total visitors
 since the last deploy. The numbers animate on load and are also exposed as real Micrometer metrics at
 `/actuator/metrics`, to show it's not just a pretty number on screen but something actually instrumented.
+
+<p>
+  <img src="docs/screenshots/stats-light.png" width="49%" alt="Stats dashboard, light mode">
+  <img src="docs/screenshots/stats-dark.png" width="49%" alt="Stats dashboard, dark mode">
+</p>
 
 #### 🕹️ Arena (`/arena`) — the only menu that uses WebSocket instead of SSE
 
@@ -274,11 +324,21 @@ Reaching size 2000 ends the match with a win — a deliberate cap so no one can 
 everyone else. It's the only menu built on a **WebSocket** instead of SSE, because here the client also has to
 continuously send its position to the server (SSE is one-way, so it wouldn't work for this).
 
+<p>
+  <img src="docs/screenshots/arena-inicio-dark.png" width="49%" alt="Arena, name screen, dark mode">
+  <img src="docs/screenshots/arena-inicio-light.png" width="49%" alt="Arena, name screen, light mode">
+</p>
+<p>
+  <img src="docs/screenshots/arena-jugando-dark.png" width="49%" alt="Arena, match in progress">
+  <img src="docs/screenshots/arena-muerte-light.png" width="49%" alt="Arena, end-of-match screen">
+</p>
+
 #### 🌙 Theme toggle (top right) — not a menu, but present on every page
 
 Switches between light and dark mode, persists the choice in `localStorage`, and respects the OS preference if
 you've never touched it. The theme is applied before the page's first paint (see `index.html`) so there's no
-white flash on load or when navigating between pages inside the demo.
+white flash on load or when navigating between pages inside the demo. The screenshots above, each in both light
+and dark, are the best proof that theming is applied end-to-end, not just on the landing screen.
 
 #### Public-demo abuse controls
 
