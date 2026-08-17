@@ -50,6 +50,7 @@ public class DemoResetScheduler {
     private final ContentModerationService moderationService;
     private final ProductRepository productRepository;
     private final ProductEventPublisher productEventPublisher;
+    private final VisitCounterRepository visitCounterRepository;
 
     @Scheduled(cron = "${app.demo.reset-cron:0 0 3 * * *}")
     public void resetDemoData() {
@@ -75,6 +76,13 @@ public class DemoResetScheduler {
                 .doOnNext(productEventPublisher::publish)
                 .doOnComplete(() -> log.info("Store stock restocked to seed levels"))
                 .doOnError(err -> log.error("Failed to restock products", err))
+                .subscribe();
+
+        // Las filas de visit_log de días pasados ya cumplieron su función
+        // (evitar contar de nuevo la misma IP ese día); se limpian para que
+        // la tabla no crezca sin límite en un demo de larga duración.
+        visitCounterRepository.deleteOldVisitLogEntries()
+                .doOnError(err -> log.error("Failed to clean up old visit_log entries", err))
                 .subscribe();
     }
 

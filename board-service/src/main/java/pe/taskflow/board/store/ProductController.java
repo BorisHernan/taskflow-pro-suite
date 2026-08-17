@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import pe.taskflow.board.demo.DemoStatsService;
+import pe.taskflow.board.util.ClientIpResolver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -55,7 +56,7 @@ public class ProductController {
         exchange.getResponse().getHeaders().add("Cache-Control", "no-cache, no-transform");
 
         statsService.recordVisitor();
-        statsService.recordVisitorPersisted().subscribe();
+        statsService.recordVisitorPersisted(ClientIpResolver.resolve(exchange.getRequest())).subscribe();
 
         Flux<ServerSentEvent<Product>> initialSnapshot = productRepository.findAllByOrderByIdAsc()
                 .map(product -> ServerSentEvent.builder(product).build());
