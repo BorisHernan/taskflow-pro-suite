@@ -17,6 +17,7 @@ const EMPTY_STATS: StatsSnapshot = {
   unitsSold: 0,
   revenue: 0,
   totalVisitors: 0,
+  totalVisitsAllTime: 0,
 };
 
 @Component({
@@ -88,6 +89,9 @@ export class DashboardComponent implements OnInit {
         unitsSold: Math.round(start.unitsSold + (target.unitsSold - start.unitsSold) * eased),
         revenue: start.revenue + (target.revenue - start.revenue) * eased,
         totalVisitors: Math.round(start.totalVisitors + (target.totalVisitors - start.totalVisitors) * eased),
+        totalVisitsAllTime: Math.round(
+          start.totalVisitsAllTime + (target.totalVisitsAllTime - start.totalVisitsAllTime) * eased
+        ),
       });
 
       if (progress < 1) {

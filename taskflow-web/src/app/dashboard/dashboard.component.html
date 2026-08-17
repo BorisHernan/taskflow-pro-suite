@@ -10,8 +10,8 @@
   </header>
 
   <div class="dashboard-notice">
-    ℹ️ Estos contadores viven en memoria en el backend, no en la base de datos: se reinician cada vez
-    que se despliega una nueva versión (no son un historial permanente).
+    ℹ️ La mayoría de estos contadores vive en memoria en el backend y se reinicia con cada despliegue.
+    La excepción es "Visitas totales (histórico)": esa sí está guardada en la base de datos y no se pierde.
   </div>
 
   <div class="error-banner" *ngIf="errorMessage()">{{ errorMessage() }}</div>
@@ -40,7 +40,12 @@
     <div class="kpi-card">
       <span class="kpi-icon">👀</span>
       <span class="kpi-value">{{ animatedStats().totalVisitors }}</span>
-      <span class="kpi-label">Conexiones de visitantes</span>
+      <span class="kpi-label">Conexiones desde el último deploy</span>
+    </div>
+    <div class="kpi-card kpi-card-persisted">
+      <span class="kpi-icon">💾</span>
+      <span class="kpi-value">{{ animatedStats().totalVisitsAllTime }}</span>
+      <span class="kpi-label">Visitas totales (histórico)</span>
     </div>
   </div>
 

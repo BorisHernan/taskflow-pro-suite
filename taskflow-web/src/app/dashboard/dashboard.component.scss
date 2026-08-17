@@ -108,10 +108,14 @@
   }
 }
 
-@for $i from 1 through 5 {
+@for $i from 1 through 6 {
   .kpi-card:nth-child(#{$i}) {
     animation-delay: #{$i * 0.06}s;
   }
+}
+
+.kpi-card-persisted {
+  border: 1px solid var(--accent);
 }
 
 .kpi-icon {
