@@ -61,6 +61,7 @@ public class TaskController {
         exchange.getResponse().getHeaders().add("Cache-Control", "no-cache, no-transform");
 
         statsService.recordVisitor();
+        statsService.recordVisitorPersisted().subscribe();
         int currentViewers = eventPublisher.registerViewer();
 
         Flux<ServerSentEvent<TaskEvent>> initialPresence = Flux.just(

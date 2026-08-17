@@ -19,6 +19,6 @@ public class StatsController {
     @Operation(summary = "Contadores acumulados del demo")
     @GetMapping
     public Mono<StatsSnapshot> stats() {
-        return Mono.just(statsService.snapshot());
+        return statsService.snapshot();
     }
 }

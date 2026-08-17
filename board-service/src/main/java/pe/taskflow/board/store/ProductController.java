@@ -55,6 +55,7 @@ public class ProductController {
         exchange.getResponse().getHeaders().add("Cache-Control", "no-cache, no-transform");
 
         statsService.recordVisitor();
+        statsService.recordVisitorPersisted().subscribe();
 
         Flux<ServerSentEvent<Product>> initialSnapshot = productRepository.findAllByOrderByIdAsc()
                 .map(product -> ServerSentEvent.builder(product).build());
