@@ -20,6 +20,7 @@ import pe.taskflow.board.model.TaskEvent;
 import pe.taskflow.board.model.TaskEvent.TaskEventType;
 import pe.taskflow.board.model.TaskPositionUpdate;
 import pe.taskflow.board.repository.TaskRepository;
+import pe.taskflow.board.util.ClientIpResolver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -61,7 +62,7 @@ public class TaskController {
         exchange.getResponse().getHeaders().add("Cache-Control", "no-cache, no-transform");
 
         statsService.recordVisitor();
-        statsService.recordVisitorPersisted().subscribe();
+        statsService.recordVisitorPersisted(ClientIpResolver.resolve(exchange.getRequest())).subscribe();
         int currentViewers = eventPublisher.registerViewer();
 
         Flux<ServerSentEvent<TaskEvent>> initialPresence = Flux.just(
@@ -80,7 +81,7 @@ public class TaskController {
     @Operation(summary = "Crea una tarea (moderada: bloquea lenguaje ofensivo y limita tareas por IP)")
     @PostMapping
     public Mono<Task> create(@Valid @RequestBody Task task, ServerHttpRequest request) {
-        String clientIp = resolveClientIp(request);
+        String clientIp = ClientIpResolver.resolve(request);
 
         if (moderationService.isBlocked(clientIp)) {
             return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN,
@@ -119,7 +120,7 @@ public class TaskController {
     @Operation(summary = "Actualiza una tarea existente (título, descripción, columna, posición)")
     @PutMapping("/{id}")
     public Mono<Task> update(@PathVariable Long id, @Valid @RequestBody Task incoming, ServerHttpRequest request) {
-        String clientIp = resolveClientIp(request);
+        String clientIp = ClientIpResolver.resolve(request);
 
         if (moderationService.isBlocked(clientIp)) {
             return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN,
@@ -183,19 +184,5 @@ public class TaskController {
                     + ContentModerationService.MAX_VIOLATIONS + "): ya no podrás crear ni editar tareas.";
         }
         return "Evita lenguaje ofensivo en las tareas. Aviso " + violations + "/" + ContentModerationService.MAX_VIOLATIONS + ".";
-    }
-
-    private String resolveClientIp(ServerHttpRequest request) {
-        String cfConnectingIp = request.getHeaders().getFirst("CF-Connecting-IP");
-        if (cfConnectingIp != null && !cfConnectingIp.isBlank()) {
-            return cfConnectingIp;
-        }
-        String forwardedFor = request.getHeaders().getFirst("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
-        return request.getRemoteAddress() != null
-                ? request.getRemoteAddress().getAddress().getHostAddress()
-                : "unknown";
     }
 }

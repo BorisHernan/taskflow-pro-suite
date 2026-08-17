@@ -60,9 +60,10 @@ class DemoStatsServiceTest {
 
     @Test
     void unFalloAlPersistirLaVisitaNoPropagaError() {
-        when(visitCounterRepository.increment()).thenReturn(Mono.error(new RuntimeException("db caida")));
+        when(visitCounterRepository.incrementIfNewVisitorToday("1.2.3.4"))
+                .thenReturn(Mono.error(new RuntimeException("db caida")));
 
-        StepVerifier.create(statsService.recordVisitorPersisted())
+        StepVerifier.create(statsService.recordVisitorPersisted("1.2.3.4"))
                 .verifyComplete();
     }
 }

@@ -55,14 +55,15 @@ public class DemoStatsService {
     }
 
     /**
-     * Incrementa el contador persistido en Postgres. Se llama aparte de
-     * recordVisitor() y no bloquea la conexión SSE que la dispara: si la
-     * escritura falla (ej. un hiccup de la base de datos), se registra el
-     * error y se sigue sin romper el stream, porque esto es solo una
-     * métrica informativa, no algo crítico para el funcionamiento del demo.
+     * Incrementa el contador persistido en Postgres, solo si esta IP no
+     * había visitado hoy (ver VisitCounterRepository.incrementIfNewVisitorToday).
+     * Se llama aparte de recordVisitor() y no bloquea la conexión SSE que la
+     * dispara: si la escritura falla (ej. un hiccup de la base de datos), se
+     * registra el error y se sigue sin romper el stream, porque esto es solo
+     * una métrica informativa, no algo crítico para el funcionamiento del demo.
      */
-    public Mono<Void> recordVisitorPersisted() {
-        return visitCounterRepository.increment()
+    public Mono<Void> recordVisitorPersisted(String clientIp) {
+        return visitCounterRepository.incrementIfNewVisitorToday(clientIp)
                 .doOnError(err -> log.warn("No se pudo persistir la visita", err))
                 .onErrorResume(err -> Mono.empty())
                 .then();
