@@ -10,6 +10,10 @@ spring:
     url: r2dbc:postgresql://localhost:5432/taskflow
     username: taskflow
     password: taskflow
+    pool:
+      # Neon cierra las conexiones tras ~5 min sin uso; si el pool las reutiliza
+      # falla la validación y el request devuelve 500. Descartarlas antes evita eso.
+      max-idle-time: 2m
 
   flyway:
     # Flyway no soporta R2DBC directamente, usa JDBC solo para migraciones
