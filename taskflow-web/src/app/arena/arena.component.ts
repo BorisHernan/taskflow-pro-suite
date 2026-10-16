@@ -5,7 +5,8 @@ import { Subscription } from 'rxjs';
 import { ArenaEvent, ArenaSnapshot, BlobView, Pellet } from '../models/arena.model';
 import { ArenaService } from '../services/arena.service';
 import { IconoComponent } from '../shared/icono/icono.component';
-import { SKINS, dibujarSkin, semilla } from './dibujo/skins';
+import { SKINS, Skin, dibujarSkin, semilla } from './dibujo/skins';
+import { MuestraSkinComponent } from './dibujo/muestra-skin.component';
 
 type GameState = 'name' | 'playing' | 'dead' | 'won';
 
@@ -18,6 +19,9 @@ const TICK_MS = 100;
 const DURACION_EFECTO_MS = 8000;
 const ALCANCE_IMAN = 140;
 const CLAVE_JUGADOR = 'taskflow-arena';
+// Se dibuja un poco "en el pasado": así siempre hay dos estados entre los cuales interpolar,
+// aunque un paquete llegue tarde (la red de un servidor gratuito no es pareja).
+const RETRASO_DIBUJO_MS = 120;
 
 interface Particula {
   x: number;
@@ -48,7 +52,7 @@ const POWERUPS: Record<string, { color: string; simbolo: string; nombre: string 
 @Component({
   selector: 'app-arena',
   standalone: true,
-  imports: [DecimalPipe, KeyValuePipe, FormsModule, IconoComponent],
+  imports: [DecimalPipe, KeyValuePipe, FormsModule, IconoComponent, MuestraSkinComponent],
   templateUrl: './arena.component.html',
   styleUrl: './arena.component.scss',
 })
@@ -62,6 +66,11 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
   gameState = signal<GameState>('name');
   nameInput = '';
   skin = signal('clasico');
+  /** Mejor tamaño alcanzado en este navegador: desbloquea skins. */
+  record = signal(0);
+  /** Skin recién desbloqueada (notificación en pantalla). */
+  logro = signal<Skin | null>(null);
+  desbloqueadasEnPartida = signal<Skin[]>([]);
   errorMessage = signal<string | null>(null);
   myRadius = signal(START_RADIUS);
   celulas = signal(1);
@@ -82,10 +91,9 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
       .map(([clave, fin]) => ({ clave, ...POWERUPS[clave], restante: (fin - this.ahora()) / DURACION_EFECTO_MS })),
   );
 
-  private anterior: ArenaSnapshot | null = null;
   private actual: ArenaSnapshot | null = null;
-  private recibidoEn = 0;
-  private anteriorPorId = new Map<string, BlobView>();
+  /** Últimos estados recibidos, con el momento en que corresponde dibujarlos. */
+  private bufer: { t: number; porId: Map<string, BlobView>; snap: ArenaSnapshot }[] = [];
   private subs: Subscription[] = [];
   private sendIntervalId?: ReturnType<typeof setInterval>;
   private renderFrameId?: number;
@@ -100,14 +108,51 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
   private ultimaEstela = 0;
   private cam = { x: 0, y: 0, zoom: 1, lista: false };
   private avisoId = 0;
+  private logroTimeoutId?: ReturnType<typeof setTimeout>;
 
   constructor(private arenaService: ArenaService) {
     try {
       const guardado = JSON.parse(localStorage.getItem(CLAVE_JUGADOR) ?? '{}');
       this.nameInput = typeof guardado.nombre === 'string' ? guardado.nombre : '';
-      if (SKINS.some((s) => s.clave === guardado.skin)) this.skin.set(guardado.skin);
+      this.record.set(Number(guardado.record) || 0);
+      if (SKINS.some((s) => s.clave === guardado.skin && this.desbloqueada(s))) this.skin.set(guardado.skin);
     } catch {
       // Sin almacenamiento: se empieza en blanco.
+    }
+  }
+
+  desbloqueada(s: Skin): boolean {
+    return !s.desbloqueo || this.record() >= s.desbloqueo;
+  }
+
+  /** La próxima skin por desbloquear, para mostrar la meta en el inicio. */
+  readonly proximaSkin = computed(() => SKINS.find((s) => s.desbloqueo && this.record() < s.desbloqueo));
+  readonly totalDesbloqueadas = computed(() => SKINS.filter((s) => this.desbloqueada(s)).length);
+
+  private guardarJugador(): void {
+    try {
+      localStorage.setItem(CLAVE_JUGADOR, JSON.stringify({ nombre: this.nameInput.trim(), skin: this.skin(), record: this.record() }));
+    } catch {
+      // Solo es comodidad: si falla, se sigue jugando.
+    }
+  }
+
+  /** Al superar el récord se revisa si se cruzó la meta de alguna skin. */
+  private actualizarRecord(tamano: number): void {
+    const anterior = this.record();
+    if (tamano <= anterior) return;
+    this.record.set(tamano);
+    const nuevas = SKINS.filter((s) => s.desbloqueo && s.desbloqueo > anterior && s.desbloqueo <= tamano);
+    if (!nuevas.length) return;
+    this.guardarJugador();
+    this.desbloqueadasEnPartida.update((lista) => [...lista, ...nuevas]);
+    const ultima = nuevas[nuevas.length - 1];
+    this.logro.set(ultima);
+    clearTimeout(this.logroTimeoutId);
+    this.logroTimeoutId = setTimeout(() => this.logro.set(null), 4000);
+    const c = this.centro(this.misCelulas());
+    if (c) {
+      for (const color of ['#facc15', '#f472b6', '#22d3ee', '#a78bfa']) this.explosion(c.x, c.y, color, 14, 1.6);
     }
   }
 
@@ -121,8 +166,8 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     if (this.previewFrameId) cancelAnimationFrame(this.previewFrameId);
   }
 
-  elegirSkin(clave: string): void {
-    this.skin.set(clave);
+  elegirSkin(s: Skin): void {
+    if (this.desbloqueada(s)) this.skin.set(s.clave);
   }
 
   play(): void {
@@ -131,11 +176,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
 
     this.cleanup();
     if (this.previewFrameId) cancelAnimationFrame(this.previewFrameId);
-    try {
-      localStorage.setItem(CLAVE_JUGADOR, JSON.stringify({ nombre: name, skin: this.skin() }));
-    } catch {
-      // Solo es comodidad: si falla, se sigue jugando.
-    }
+    this.guardarJugador();
 
     this.miNombre = name;
     this.errorMessage.set(null);
@@ -144,9 +185,12 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     this.miPuesto.set(null);
     this.efectos.set({});
     this.avisos.set([]);
+    this.desbloqueadasEnPartida.set([]);
+    this.logro.set(null);
     this.particulas = [];
     this.estelas.clear();
-    this.anterior = this.actual = null;
+    this.actual = null;
+    this.bufer = [];
     this.cam.lista = false;
     this.myRadius.set(START_RADIUS);
     this.maxRadiusThisSession.set(START_RADIUS);
@@ -227,10 +271,13 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
 
   private onSnapshot(snapshot: ArenaSnapshot): void {
     this.detectarComidaPropia(snapshot);
-    this.anterior = this.actual;
-    this.anteriorPorId = new Map((this.anterior?.blobs ?? []).map((b) => [b.id, b]));
     this.actual = snapshot;
-    this.recibidoEn = performance.now();
+    // Si llegan varios juntos tras una pausa, se reparten en el tiempo en vez de saltar.
+    const ahora = performance.now();
+    const ultimo = this.bufer.at(-1);
+    const t = ultimo ? Math.min(Math.max(ahora, ultimo.t + TICK_MS * 0.6), ahora + 200) : ahora;
+    this.bufer.push({ t, snap: snapshot, porId: new Map(snapshot.blobs.map((b) => [b.id, b])) });
+    if (this.bufer.length > 12) this.bufer.shift();
     this.ahora.set(Date.now());
 
     const mias = this.misCelulas(snapshot);
@@ -239,6 +286,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
       this.myRadius.set(tamano);
       this.celulas.set(mias.length);
       if (tamano > this.maxRadiusThisSession()) this.maxRadiusThisSession.set(tamano);
+      this.actualizarRecord(tamano);
       this.sincronizarEfectos(mias);
     }
 
@@ -314,6 +362,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
 
   private onDeath(): void {
     this.detenerJuego();
+    this.guardarJugador();
     const size = this.myRadius();
     this.deathInfo.set({ size, isRecord: size >= this.maxRadiusThisSession() });
     this.gameState.set('dead');
@@ -323,6 +372,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
 
   private onVictory(): void {
     this.detenerJuego();
+    this.guardarJugador();
     this.gameState.set('won');
     this.arenaService.disconnect();
   }
@@ -359,12 +409,18 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     this.renderFrameId = requestAnimationFrame(draw);
   }
 
-  /** Posiciones entre el tick anterior y el actual: 60 fps fluidos con 10 estados por segundo. */
+  /** Posiciones entre los dos estados que rodean el momento a dibujar: 60 fps fluidos con 10 por segundo. */
   private interpolar(ahora: number): Dibujable[] {
-    if (!this.actual) return [];
-    const t = Math.min(1, (ahora - this.recibidoEn) / TICK_MS);
-    return this.actual.blobs.map((b) => {
-      const a = this.anteriorPorId.get(b.id);
+    const n = this.bufer.length;
+    if (!n) return [];
+    const objetivo = ahora - RETRASO_DIBUJO_MS;
+    let i = n - 1;
+    while (i > 0 && this.bufer[i - 1].t > objetivo) i--;
+    const destino = this.bufer[i];
+    const origen = this.bufer[Math.max(0, i - 1)];
+    const t = origen === destino ? 1 : Math.min(1, Math.max(0, (objetivo - origen.t) / (destino.t - origen.t)));
+    return destino.snap.blobs.map((b) => {
+      const a = origen.porId.get(b.id);
       if (!a) return { ...b, angulo: 0 };
       return {
         ...b,
@@ -464,13 +520,13 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     }
     ctx.stroke();
 
-    ctx.save();
-    ctx.shadowColor = '#fb7185';
-    ctx.shadowBlur = 24;
-    ctx.strokeStyle = 'rgba(251, 113, 133, 0.7)';
+    // Brillo del borde con dos trazos, sin shadowBlur (sobre un rectángulo de 4000 px es lentísimo).
+    ctx.strokeStyle = 'rgba(251, 113, 133, 0.15)';
+    ctx.lineWidth = 18;
+    ctx.strokeRect(0, 0, mundo, mundo);
+    ctx.strokeStyle = 'rgba(251, 113, 133, 0.75)';
     ctx.lineWidth = 4;
     ctx.strokeRect(0, 0, mundo, mundo);
-    ctx.restore();
   }
 
   private drawPellets(ctx: CanvasRenderingContext2D, pellets: Pellet[], v: { x0: number; y0: number; x1: number; y1: number }, t: number): void {
@@ -479,9 +535,10 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
       const power = POWERUPS[p.tipo];
       if (power) {
         const pulso = 1 + Math.sin(t * 4 + p.x) * 0.12;
-        ctx.save();
-        ctx.shadowColor = power.color;
-        ctx.shadowBlur = 18;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 22 * pulso, 0, Math.PI * 2);
+        ctx.fillStyle = power.color + '1f';
+        ctx.fill();
         ctx.beginPath();
         ctx.arc(p.x, p.y, 14 * pulso, 0, Math.PI * 2);
         ctx.fillStyle = power.color + '33';
@@ -489,7 +546,6 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
         ctx.lineWidth = 2.5;
         ctx.strokeStyle = power.color;
         ctx.stroke();
-        ctx.restore();
         ctx.font = '15px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -498,13 +554,13 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
       }
       ctx.beginPath();
       if (p.tipo === 'grande') {
-        ctx.save();
-        ctx.shadowColor = '#fbbf24';
-        ctx.shadowBlur = 14;
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.25)';
+        ctx.arc(p.x, p.y, 15, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
         ctx.fillStyle = '#fbbf24';
         ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
       } else {
         ctx.fillStyle = colorPellet(p);
         ctx.arc(p.x, p.y, p.tipo === 'masa' ? 12 : 4.5, 0, Math.PI * 2);
@@ -553,21 +609,17 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
       ctx.restore();
     }
 
-    ctx.save();
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
-    ctx.shadowBlur = Math.min(30, r * 0.4);
-    ctx.shadowOffsetY = Math.min(8, r * 0.08);
+    // Sombra simple (un círculo desplazado): shadowBlur por célula y por cuadro es muy caro.
     ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = '#000';
+    ctx.arc(x, y + Math.min(8, r * 0.08), r * 1.02, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
     ctx.fill();
-    ctx.restore();
 
-    dibujarSkin(ctx, blob.bot ? 'clasico' : blob.skin, x, y, r, blob.color, blob.ownerId, blob.angulo, t);
+    dibujarSkin(ctx, blob.skin, x, y, r, blob.color, blob.ownerId, blob.angulo, t);
 
     if (blob.bot) {
       ctx.setLineDash([5, 5]);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -583,8 +635,6 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
 
     if (blob.escudo) {
       ctx.save();
-      ctx.shadowColor = '#22d3ee';
-      ctx.shadowBlur = 16;
       ctx.setLineDash([r * 0.5, r * 0.25]);
       ctx.lineDashOffset = t * 40;
       ctx.strokeStyle = 'rgba(34, 211, 238, 0.9)';
@@ -702,6 +752,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     this.subs = [];
     clearInterval(this.sendIntervalId);
     clearTimeout(this.toastTimeoutId);
+    clearTimeout(this.logroTimeoutId);
     if (this.renderFrameId) cancelAnimationFrame(this.renderFrameId);
     this.arenaService.disconnect();
   }

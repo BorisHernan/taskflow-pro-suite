@@ -43,6 +43,8 @@ import {
   Sparkles,
   Star,
   Truck,
+  Lock,
+  LockOpen,
   type IconNode,
 } from 'lucide';
 
@@ -92,6 +94,8 @@ export const ICONOS = {
   garantia: ShieldCheck,
   chispas: Sparkles,
   azar: Shuffle,
+  candado: Lock,
+  candadoAbierto: LockOpen,
 } satisfies Record<string, IconNode>;
 
 export type NombreIcono = keyof typeof ICONOS;
