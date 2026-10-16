@@ -38,8 +38,10 @@ public class ArenaEngine {
     // juego, no un historial de ticks pasados (a diferencia de los eventos del
     // tablero, aquí el pasado no tiene valor una vez que hay un tick más nuevo).
     private final Sinks.Many<ArenaSnapshot> snapshots = Sinks.many().replay().limit(1);
-    private final Sinks.Many<String> deaths = Sinks.many().multicast().onBackpressureBuffer();
-    private final Sinks.Many<String> victories = Sinks.many().multicast().onBackpressureBuffer();
+    // directBestEffort: sobrevive a que se vayan todos los suscriptores (multicast con
+    // onBackpressureBuffer se terminaba para siempre) y no acumula eventos viejos sin nadie escuchando.
+    private final Sinks.Many<String> deaths = Sinks.many().multicast().directBestEffort();
+    private final Sinks.Many<String> victories = Sinks.many().multicast().directBestEffort();
     private final Map<String, Double> wanderTimers = new java.util.concurrent.ConcurrentHashMap<>();
 
     private Disposable loop;
