@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { StatsSnapshot } from '../models/stats.model';
+import { HistorialStats, StatsSnapshot } from '../models/stats.model';
 
 const API_URL = environment.apiUrl.replace(/\/api\/tasks\/?$/, '/api/stats');
 
@@ -12,5 +12,9 @@ export class StatsService {
 
   getStats(): Observable<StatsSnapshot> {
     return this.http.get<StatsSnapshot>(API_URL);
+  }
+
+  getHistorial(): Observable<HistorialStats> {
+    return this.http.get<HistorialStats>(`${API_URL}/historial`);
   }
 }

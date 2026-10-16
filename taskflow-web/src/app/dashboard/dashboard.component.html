@@ -6,7 +6,8 @@
         <h1 class="page-title">Estadísticas</h1>
       </div>
       <p class="page-subtitle">
-        Lo que pasa en la demo, contado por el backend con Micrometer.
+        Lo que pasa en la demo, resumido por PostgreSQL y dibujado en SVG. Toca
+        <app-icono nombre="info" [tamano]="14" /> en cada gráfico para saber cómo leerlo.
         @if (ultimaActualizacion()) {
           <span class="chip">Actualizado {{ haceCuanto() }}</span>
         }
@@ -40,7 +41,7 @@
 
   <section class="kpis" aria-label="Indicadores">
     @for (kpi of kpis; track kpi.clave; let i = $index) {
-      <article class="kpi card entrar" [style.--i]="i" [class.kpi-destacado]="kpi.persistido">
+      <article class="kpi card entrar" [style.--i]="i">
         <span class="kpi-icono"><app-icono [nombre]="kpi.icono" [tamano]="20" /></span>
         <p class="kpi-valor">
           @if (kpi.moneda) {
@@ -50,43 +51,168 @@
           }
         </p>
         <p class="kpi-etiqueta">{{ kpi.etiqueta }}</p>
-        @if (kpi.persistido) {
-          <span class="chip chip-accent kpi-nota">Guardado en PostgreSQL: 1 por persona al día</span>
-        }
+        <span class="kpi-origen" [class.historico]="kpi.persistido">
+          {{ kpi.persistido ? 'Histórico · Postgres' : 'Desde el último deploy' }}
+        </span>
       </article>
     }
   </section>
 
-  <p class="nota">
-    <app-icono nombre="info" [tamano]="16" />
-    Salvo las visitas totales, los contadores viven en memoria del backend y se reinician en cada despliegue.
-  </p>
+  @if (historial()) {
+    <section class="graficos" aria-label="Gráficos">
+      <app-tarjeta-grafico
+        class="ancho-completo entrar"
+        style="--i: 1"
+        titulo="Visitas por día"
+        subtitulo="Personas distintas por día, últimos 30 días"
+        ayuda="Cuántas personas diferentes abrieron la demo cada día. Si alguien entra varias veces el mismo día cuenta una sola vez."
+        comoLeer="Mira la forma de la curva: subidas = días con más tráfico (por ejemplo, cuando compartí el link). Pasa el mouse o usa las flechas del teclado para ver cada día."
+        fuente="SELECT visit_date, COUNT(*) FROM visit_log GROUP BY visit_date"
+        [lectura]="lecturaVisitas()"
+      >
+        <app-grafico-serie
+          tipo="area"
+          color="var(--g1)"
+          [puntos]="serieVisitas()"
+          [formato]="unidades"
+          descripcion="Visitas por día de los últimos 30 días"
+        />
+      </app-tarjeta-grafico>
 
-  @if (stockBars().length > 0) {
-    <section class="stock card" aria-labelledby="stock-titulo">
-      <header class="stock-cabecera">
-        <h2 id="stock-titulo">Stock de la tienda</h2>
-        @if (productosBajos() > 0) {
-          <span class="chip chip-warning">
-            {{ productosBajos() }} {{ productosBajos() === 1 ? 'producto por agotarse' : 'productos por agotarse' }}
-          </span>
+      <app-tarjeta-grafico
+        class="ancho-completo entrar"
+        style="--i: 2"
+        titulo="Ventas por día"
+        subtitulo="Últimos 30 días"
+        ayuda="Lo que se vendió en la tienda cada día. Cada barra es un día; la altura es el total de ese día."
+        comoLeer="Las barras sirven para comparar días entre sí. Cambia entre ingresos (soles) y unidades para ver si se venden muchas cosas baratas o pocas caras."
+        fuente="SELECT CAST(created_at AS DATE), SUM(quantity), SUM(total) FROM purchases GROUP BY 1"
+        [lectura]="lecturaVentas()"
+      >
+        <div acciones class="segmentado" role="group" aria-label="Medida">
+          <button type="button" [class.activo]="medidaVentas() === 'ingresos'" [attr.aria-pressed]="medidaVentas() === 'ingresos'" (click)="medidaVentas.set('ingresos')">Ingresos</button>
+          <button type="button" [class.activo]="medidaVentas() === 'unidades'" [attr.aria-pressed]="medidaVentas() === 'unidades'" (click)="medidaVentas.set('unidades')">Unidades</button>
+        </div>
+        <app-grafico-serie
+          tipo="barras"
+          color="var(--g2)"
+          [puntos]="serieVentas()"
+          [formato]="formatoVentas()"
+          descripcion="Ventas por día de los últimos 30 días"
+        />
+      </app-tarjeta-grafico>
+
+      <app-tarjeta-grafico
+        class="entrar"
+        style="--i: 3"
+        titulo="Ingresos por categoría"
+        subtitulo="Desde que empezó el historial"
+        ayuda="Cómo se reparten los ingresos entre las categorías de la tienda. La dona completa es el 100 %."
+        comoLeer="Un segmento más grande = esa categoría aporta más dinero. Pasa el mouse por la leyenda para ver su monto en el centro."
+        fuente="SELECT category, SUM(total) FROM purchases GROUP BY category"
+        [lectura]="lecturaCategorias()"
+      >
+        @if (segmentosCategoria().length) {
+          <app-grafico-dona [segmentos]="segmentosCategoria()" [formato]="soles" etiquetaTotal="ingresos" descripcion="Ingresos por categoría" />
         } @else {
-          <span class="chip chip-success">Todo con stock</span>
+          <p class="vacio">Sin ventas todavía.</p>
         }
-      </header>
-      <p class="stock-ayuda">Ordenado de menor a mayor: lo que se está por agotar queda arriba.</p>
+      </app-tarjeta-grafico>
 
-      <ul class="barras">
-        @for (bar of stockBars(); track bar.product.id) {
-          <li class="barra" [class.bajo]="bar.product.stock <= stockBajo">
-            <span class="barra-nombre" [title]="bar.product.name">{{ bar.product.name }}</span>
-            <div class="barra-pista" aria-hidden="true">
-              <span [style.width.%]="bar.percent"></span>
-            </div>
-            <span class="barra-valor">{{ bar.product.stock }}</span>
-          </li>
+      <app-tarjeta-grafico
+        class="entrar"
+        style="--i: 4"
+        titulo="Productos más vendidos"
+        subtitulo="Top 5 por unidades"
+        ayuda="Un ranking: los cinco productos con más unidades vendidas en todo el historial."
+        comoLeer="Las barras horizontales se leen de arriba hacia abajo, del primero al quinto. Son ideales cuando los nombres son largos."
+        fuente="SELECT product_name, SUM(quantity) FROM purchases GROUP BY 1 ORDER BY 2 DESC LIMIT 5"
+        [lectura]="lecturaTop()"
+      >
+        @if (topProductos().length) {
+          <ol class="ranking">
+            @for (p of topProductos(); track p.nombre; let i = $index) {
+              <li [style.--i]="i">
+                <span class="puesto">{{ i + 1 }}</span>
+                <div class="ranking-cuerpo">
+                  <span class="ranking-nombre" [title]="p.nombre">{{ p.nombre }}</span>
+                  <span class="ranking-pista"><span [style.width.%]="p.porcentaje"></span></span>
+                </div>
+                <span class="ranking-valor">{{ unidades(p.unidades) }} u.<small>{{ p.ingresos | soles }}</small></span>
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="vacio">Sin ventas todavía.</p>
         }
-      </ul>
+      </app-tarjeta-grafico>
+
+      <app-tarjeta-grafico
+        class="entrar"
+        style="--i: 5"
+        titulo="Estado del tablero"
+        subtitulo="Tareas por columna, ahora mismo"
+        ayuda="Cuántas tareas hay en cada columna del tablero Kanban en este momento."
+        comoLeer="Si 'Hecho' domina, el equipo avanza; si 'Por hacer' crece, hay trabajo acumulado."
+        fuente="SELECT status, COUNT(*) FROM tasks GROUP BY status"
+        [lectura]="lecturaTareas()"
+      >
+        <app-grafico-dona [segmentos]="segmentosTareas()" etiquetaTotal="tareas" descripcion="Tareas por estado" />
+      </app-tarjeta-grafico>
+
+      <app-tarjeta-grafico
+        class="entrar"
+        style="--i: 6"
+        titulo="Opiniones de la tienda"
+        subtitulo="Reseñas por cantidad de estrellas"
+        ayuda="Distribución de todas las reseñas publicadas: cuántas son de 5 estrellas, de 4, etc."
+        comoLeer="El promedio solo no cuenta toda la historia: mira si las opiniones están concentradas arriba o divididas."
+        fuente="SELECT rating, COUNT(*) FROM product_reviews GROUP BY rating"
+        [lectura]="lecturaResenas()"
+      >
+        <div class="resenas">
+          <div class="resenas-promedio">
+            <strong>{{ resenas().total ? resenas().promedio.toFixed(1) : '–' }}</strong>
+            <span>de 5 · {{ resenas().total }} reseñas</span>
+          </div>
+          <ul class="distribucion">
+            @for (f of resenas().filas; track f.estrellas) {
+              <li>
+                <span class="dist-etiqueta">{{ f.estrellas }} <app-icono nombre="estrella" [tamano]="12" /></span>
+                <span class="dist-pista"><span [style.width.%]="f.porcentaje"></span></span>
+                <span class="dist-valor">{{ f.cuenta }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </app-tarjeta-grafico>
+
+      <app-tarjeta-grafico
+        class="ancho-completo entrar"
+        style="--i: 7"
+        titulo="Inventario por categoría"
+        subtitulo="Stock actual frente al inicial"
+        ayuda="Cuánto queda de cada categoría comparado con el stock con el que empieza cada día (la tienda se repone cada noche)."
+        comoLeer="La barra llena es el 100 %. Mientras más corta, más se vendió hoy de esa categoría. En amarillo, las que bajaron de la mitad."
+        fuente="SELECT category, SUM(stock), SUM(initial_stock) FROM products GROUP BY category"
+        [lectura]="lecturaStock()"
+      >
+        <ul class="inventario">
+          @for (c of stockCategorias(); track c.categoria) {
+            <li [class.bajo]="c.porcentaje < 50">
+              <span class="inv-nombre">{{ c.categoria }}</span>
+              <span class="inv-pista" [attr.aria-label]="c.porcentaje + ' % de stock'"><span [style.width.%]="c.porcentaje"></span></span>
+              <span class="inv-valor">{{ c.stock }} / {{ c.inicial }}</span>
+            </li>
+          }
+        </ul>
+      </app-tarjeta-grafico>
+    </section>
+  } @else if (!errorMessage()) {
+    <section class="graficos" aria-hidden="true">
+      @for (n of [1, 2, 3, 4]; track n) {
+        <div class="card esqueleto" [class.ancho-completo]="n < 3"></div>
+      }
     </section>
   }
 </main>
