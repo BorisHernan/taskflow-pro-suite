@@ -12,7 +12,9 @@ import reactor.core.publisher.Sinks;
 @Component
 public class ProductEventPublisher {
 
-    private final Sinks.Many<Product> sink = Sinks.many().multicast().onBackpressureBuffer();
+    // directBestEffort: sobrevive a que se vayan todos los suscriptores (multicast con
+    // onBackpressureBuffer se terminaba para siempre) y no acumula eventos viejos sin nadie escuchando.
+    private final Sinks.Many<Product> sink = Sinks.many().multicast().directBestEffort();
 
     public void publish(Product product) {
         sink.tryEmitNext(product);

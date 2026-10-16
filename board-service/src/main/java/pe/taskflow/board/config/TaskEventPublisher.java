@@ -17,7 +17,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class TaskEventPublisher {
 
-    private final Sinks.Many<TaskEvent> sink = Sinks.many().multicast().onBackpressureBuffer();
+    // directBestEffort: sobrevive a que se vayan todos los suscriptores (multicast con
+    // onBackpressureBuffer se terminaba para siempre) y no acumula eventos viejos sin nadie escuchando.
+    private final Sinks.Many<TaskEvent> sink = Sinks.many().multicast().directBestEffort();
     private final AtomicInteger activeViewers = new AtomicInteger(0);
 
     public void publish(TaskEventType type, Task task) {
