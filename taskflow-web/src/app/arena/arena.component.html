@@ -23,12 +23,24 @@
           <form class="nombre" (ngSubmit)="play()">
             <fieldset class="skins">
               <legend>Elige tu skin</legend>
+              <p class="skins-progreso">
+                Tu récord: <strong>{{ record() }}</strong> · {{ totalDesbloqueadas() }} de {{ skins.length }} skins
+                @if (proximaSkin(); as p) {
+                  · próxima: <strong>{{ p.nombre }}</strong> al llegar a {{ p.desbloqueo }}
+                }
+              </p>
               <div class="skins-lista">
                 @for (s of skins; track s.clave) {
-                  <label class="skin" [class.activa]="skin() === s.clave">
-                    <input type="radio" name="skin" class="sr-only" [value]="s.clave" [checked]="skin() === s.clave" (change)="elegirSkin(s.clave)" />
-                    <span class="skin-muestra" [attr.data-skin]="s.clave" aria-hidden="true"></span>
-                    {{ s.nombre }}
+                  @let libre = desbloqueada(s);
+                  <label class="skin" [class.activa]="skin() === s.clave" [class.bloqueada]="!libre" [title]="libre ? s.nombre : 'Llega a tamaño ' + s.desbloqueo + ' para desbloquearla'">
+                    <input type="radio" name="skin" class="sr-only" [value]="s.clave" [checked]="skin() === s.clave" [disabled]="!libre" (change)="elegirSkin(s)" />
+                    <span class="skin-muestra">
+                      <app-muestra-skin [skin]="s.clave" />
+                      @if (!libre) {
+                        <span class="candado"><app-icono nombre="candado" [tamano]="14" /></span>
+                      }
+                    </span>
+                    <span class="skin-nombre">{{ libre ? s.nombre : s.desbloqueo }}</span>
                   </label>
                 }
               </div>
@@ -117,6 +129,17 @@
           <p class="aviso-juego" role="status">{{ toast() }}</p>
         }
 
+        @if (logro(); as l) {
+          <div class="logro" role="status">
+            <app-muestra-skin [skin]="l.clave" [tamano]="56" />
+            <div>
+              <p class="logro-titulo"><app-icono nombre="candadoAbierto" [tamano]="15" /> ¡Skin desbloqueada!</p>
+              <p class="logro-nombre">{{ l.nombre }}</p>
+              <p class="logro-detalle">Llegaste a tamaño {{ l.desbloqueo }}. Elígela en tu próxima partida.</p>
+            </div>
+          </div>
+        }
+
         <div class="controles-juego">
           <p class="atajos"><kbd>Espacio</kbd> dividirse · <kbd>W</kbd> expulsar masa</p>
           <button type="button" class="boton-accion" (pointerdown)="$event.stopPropagation()" (click)="accion('expulsar')" aria-label="Expulsar masa">
@@ -140,6 +163,18 @@
             @if (info.isRecord) {
               <p class="chip chip-success">Nuevo récord de la sesión</p>
             }
+          }
+          @if (desbloqueadasEnPartida().length) {
+            <div class="fin-desbloqueos">
+              <p>Desbloqueaste en esta partida:</p>
+              <ul>
+                @for (s of desbloqueadasEnPartida(); track s.clave) {
+                  <li><app-muestra-skin [skin]="s.clave" [tamano]="40" />{{ s.nombre }}</li>
+                }
+              </ul>
+            </div>
+          } @else if (proximaSkin(); as p) {
+            <p class="fin-meta">Te faltan {{ p.desbloqueo! - record() }} para desbloquear <strong>{{ p.nombre }}</strong>.</p>
           }
           <div class="fin-acciones">
             <button type="button" class="btn btn-primary btn-lg" (click)="playAgain()">Jugar de nuevo</button>

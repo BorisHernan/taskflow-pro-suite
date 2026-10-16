@@ -33,4 +33,18 @@ class ArenaStateTest {
         assertThat(jugador.getY()).isBetween(0.0, ArenaState.WORLD_SIZE);
         assertThat(jugador.getRadius()).isEqualTo(ArenaState.START_RADIUS);
     }
+
+    @Test
+    void losBotsUsanSkinsExclusivasYLosJugadoresNo() {
+        ArenaState state = new ArenaState();
+        state.ensureBotPopulation();
+
+        assertThat(state.bots().values()).allSatisfy(b -> assertThat(ArenaState.BOT_SKINS).contains(b.getSkin()));
+        assertThat(state.addPlayer("Intruso", "robot").getSkin()).isEqualTo("clasico");
+    }
+
+    @Test
+    void elJugadorNuevoNaceConUnosSegundosDeEscudo() {
+        assertThat(new ArenaState().addPlayer("Nuevo").getEscudoTicks()).isEqualTo(ArenaState.TICKS_PROTECCION_INICIAL);
+    }
 }

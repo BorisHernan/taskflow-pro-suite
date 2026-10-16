@@ -289,12 +289,8 @@ canvas {
 
 .skins-lista {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
   gap: 6px;
-
-  @media (max-width: 640px) {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
 }
 
 .nombre .skin {
@@ -330,39 +326,151 @@ canvas {
 }
 
 .skin-muestra {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fb7185, #be123c);
+  position: relative;
+  display: inline-flex;
+}
 
-  &[data-skin='sandia'] {
-    background: radial-gradient(circle, #ef4444 0 58%, #bbf7d0 60% 68%, #16a34a 70%);
+.nombre .skin.bloqueada {
+  cursor: not-allowed;
+  color: var(--text-muted);
+
+  app-muestra-skin {
+    filter: grayscale(1) brightness(0.6);
+    opacity: 0.45;
   }
 
-  &[data-skin='planeta'] {
-    background: radial-gradient(circle at 35% 35%, #fde68a, #d97706);
-    box-shadow: 0 0 0 3px rgb(254 243 199 / 0.5);
+  &:hover {
+    transform: none;
+    border-color: var(--border);
+  }
+}
+
+.candado {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--text-primary);
+}
+
+.skin-nombre {
+  font-variant-numeric: tabular-nums;
+}
+
+.skins-progreso {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--seccion);
+  }
+}
+
+/* Notificación de skin desbloqueada (en plena partida). */
+.logro {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px 14px 14px;
+  border: 1px solid rgb(250 204 21 / 0.6);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgb(30 27 75 / 0.95), rgb(88 28 135 / 0.95));
+  box-shadow: 0 0 0 4px rgb(250 204 21 / 0.15), 0 18px 40px -12px rgb(0 0 0 / 0.7);
+  color: #fff;
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: logro-entrar 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), logro-salir 0.4s ease-in 3.6s forwards;
+
+  p {
+    margin: 0;
   }
 
-  &[data-skin='galaxia'] {
-    background: radial-gradient(circle, #f0abfc, #7c3aed 50%, #1e1b4b);
+  app-muestra-skin {
+    animation: logro-girar 1.2s var(--ease);
+  }
+}
+
+.logro-titulo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #facc15;
+}
+
+.logro-nombre {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.logro-detalle {
+  font-size: 12px;
+  color: #c4b5fd;
+}
+
+@keyframes logro-entrar {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -30px) scale(0.6);
+  }
+}
+
+@keyframes logro-salir {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -16px);
+  }
+}
+
+@keyframes logro-girar {
+  from {
+    transform: rotate(-200deg) scale(0.3);
+  }
+}
+
+.fin-desbloqueos {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: var(--radius);
+  background: var(--seccion-suave);
+
+  p {
+    margin: 0 0 8px;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--seccion);
   }
 
-  &[data-skin='dona'] {
-    background: radial-gradient(circle, #0b1020 0 22%, #f472b6 24% 82%, #d6a36a 84%);
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  &[data-skin='ojo'] {
-    background: radial-gradient(circle, #0b1020 0 18%, #e11d48 20% 42%, #f8fafc 44%);
+  li {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 700;
   }
+}
 
-  &[data-skin='bug'] {
-    background:
-      radial-gradient(circle at 30% 60%, #111827 0 12%, transparent 13%),
-      radial-gradient(circle at 70% 55%, #111827 0 12%, transparent 13%),
-      linear-gradient(90deg, transparent 47%, #111827 47% 53%, transparent 53%),
-      #dc2626;
-  }
+.fin-meta {
+  margin: 12px 0 0;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
 }
 
 kbd {
@@ -526,7 +634,9 @@ kbd {
 
 @media (prefers-reduced-motion: reduce) {
   .avisos li,
-  .aviso-juego {
+  .aviso-juego,
+  .logro,
+  .logro app-muestra-skin {
     animation: none;
   }
 }

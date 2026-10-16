@@ -25,10 +25,13 @@ public class ArenaState {
     public static final double BIG_PELLET_RADIUS = 10;
     public static final double BIG_PELLET_CHANCE = 0.08;
     public static final double MASA_RADIUS = 12;
+    public static final int TICKS_PROTECCION_INICIAL = 30;
     public static final double POWERUP_RADIUS = 14;
     public static final int POWERUP_COUNT = 10;
     public static final int MAX_MASA = 150;
-    public static final List<String> SKINS = List.of("clasico", "sandia", "planeta", "galaxia", "dona", "ojo", "bug");
+    // Las 10 últimas se desbloquean por récord; el récord vive en el navegador (no hay cuentas).
+    public static final List<String> SKINS = List.of("clasico", "sandia", "planeta", "galaxia", "dona", "ojo", "bug",
+            "pixel", "cafe", "terminal", "pizza", "arcoiris", "luna", "sol", "balon", "lava", "diamante");
     private static final List<String> POWERUPS = List.of(Pellet.VELOCIDAD, Pellet.ESCUDO, Pellet.IMAN);
     // Al llegar acá se acaba la partida: para un jugador es una victoria, para
     // un bot simplemente se "retira" y aparece uno nuevo — evita que farmear
@@ -42,8 +45,10 @@ public class ArenaState {
             "#ff5630", "#36b37e", "#0052cc", "#ffab00", "#6554c0", "#00b8d9", "#de350b", "#00875a"
     );
     private static final List<String> BOT_COLORS = List.of(
-            "#8993a4", "#97a0af", "#7a869a", "#a5adba", "#6b778c"
+            "#22c55e", "#06b6d4", "#f97316", "#a855f7", "#ec4899", "#eab308"
     );
+    // Skins exclusivas de los bots: se distinguen de un vistazo de los jugadores.
+    static final List<String> BOT_SKINS = List.of("robot", "virus", "carita");
 
     private final Map<String, Blob> players = new ConcurrentHashMap<>();
     private final Map<String, Blob> bots = new ConcurrentHashMap<>();
@@ -60,6 +65,8 @@ public class ArenaState {
     public Blob addPlayer(String name, String skin) {
         Blob blob = randomBlob(UUID.randomUUID().toString(), false, name);
         blob.setSkin(SKINS.contains(skin) ? skin : "clasico");
+        // Protección al nacer: nadie te puede comer durante los primeros segundos.
+        blob.setEscudoTicks(TICKS_PROTECCION_INICIAL);
         ubicarLejosDeOtros(blob);
         players.put(blob.getId(), blob);
         return blob;
@@ -178,7 +185,11 @@ public class ArenaState {
         String color = bot
                 ? BOT_COLORS.get(ThreadLocalRandom.current().nextInt(BOT_COLORS.size()))
                 : PLAYER_COLORS.get(ThreadLocalRandom.current().nextInt(PLAYER_COLORS.size()));
-        return new Blob(id, bot, name, color, randomCoordinate(), randomCoordinate(), START_RADIUS);
+        Blob blob = new Blob(id, bot, name, color, randomCoordinate(), randomCoordinate(), START_RADIUS);
+        if (bot) {
+            blob.setSkin(BOT_SKINS.get(ThreadLocalRandom.current().nextInt(BOT_SKINS.size())));
+        }
+        return blob;
     }
 
     double randomCoordinate() {

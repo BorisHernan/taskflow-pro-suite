@@ -202,6 +202,7 @@ class ArenaEngineTest {
     }
 
     private void placeStill(Blob blob, double x, double y, double radius) {
+        blob.setEscudoTicks(0); // sin la protección de recién nacido
         blob.setX(x);
         blob.setY(y);
         blob.setRadius(radius);
