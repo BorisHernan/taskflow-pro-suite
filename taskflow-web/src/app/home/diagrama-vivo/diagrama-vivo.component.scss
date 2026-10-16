@@ -1,0 +1,95 @@
+:host {
+  display: block;
+}
+
+.diagrama {
+  margin: 0;
+}
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.nodo {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+
+  strong {
+    font-size: 15px;
+    color: var(--text-primary);
+  }
+
+  span {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+}
+
+.nodo-api {
+  border-color: var(--accent);
+}
+
+/* Tramo vertical de alto fijo: el pulso lo cruza entero con transform (cqh). */
+.tramo {
+  position: relative;
+  height: 44px;
+  width: 100%;
+  container-type: size;
+}
+
+.tramo-linea {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 28px;
+  width: 2px;
+  background: var(--border);
+}
+
+.tramo-nombre {
+  position: absolute;
+  top: 50%;
+  left: 48px;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Sube: de la base de datos hacia el navegador. */
+.pulso {
+  position: absolute;
+  bottom: 0;
+  left: 23px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: subir 0.9s ease-in-out forwards;
+}
+
+@keyframes subir {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(calc(-100cqh + 12px));
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulso {
+    display: none;
+  }
+}

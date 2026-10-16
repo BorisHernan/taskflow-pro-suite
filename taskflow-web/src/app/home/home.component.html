@@ -1,38 +1,66 @@
 <main class="home">
   <section class="hero" aria-labelledby="home-titulo">
-    <h1 id="home-titulo">
-      Boris Medrano
-      <span class="hero-rol">Desarrollador Full Stack Java</span>
-    </h1>
-    <p class="hero-texto">
-      Más de 3 años construyendo sistemas con Spring Boot, WebFlux y Angular. Esta suite corre en
-      producción: lo que hagas aquí lo ven los demás visitantes al instante.
-    </p>
+    <div class="hero-texto-col">
+      <h1 id="home-titulo">
+        Boris Medrano
+        <span class="hero-rol">Desarrollador Full Stack Java</span>
+      </h1>
+      <p class="hero-texto">
+        Más de 3 años construyendo sistemas con Spring Boot, WebFlux y Angular. Esta suite corre en
+        producción: lo que hagas aquí lo ven los demás visitantes al instante.
+      </p>
 
-    <div class="hero-acciones">
-      <a class="btn-principal" routerLink="/tablero">Empezar el recorrido</a>
-      <a class="btn-secundario" href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">
-        Ver el código en GitHub
-      </a>
-    </div>
+      <div class="hero-acciones">
+        <a class="btn-principal" routerLink="/tablero">Empezar el recorrido</a>
+        <a class="btn-secundario" href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">
+          Ver el código en GitHub
+        </a>
+      </div>
 
-    <p class="estado" [attr.data-estado]="estado()" aria-live="polite">
-      <span class="estado-punto" aria-hidden="true"></span>
-      @switch (estado()) {
-        @case ('despertando') {
-          Despertando el servidor gratuito… la primera carga puede tardar hasta un minuto.
-        }
-        @case ('en-linea') {
-          Servidor en línea
-          @if (visitas() !== null) {
-            · {{ visitas() }} visitas a esta demo
+      <p class="estado" [attr.data-estado]="estado()" aria-live="polite">
+        <span class="estado-punto" aria-hidden="true"></span>
+        @switch (estado()) {
+          @case ('despertando') {
+            Despertando el servidor gratuito… la primera carga puede tardar hasta un minuto.
+          }
+          @case ('en-linea') {
+            Servidor en línea
+            @if (visitas() !== null) {
+              · {{ visitas() }} visitas a esta demo
+            }
+          }
+          @case ('sin-respuesta') {
+            El servidor no respondió todavía. Las demos se reconectan solas en cuanto despierte.
           }
         }
-        @case ('sin-respuesta') {
-          El servidor no respondió todavía. Las demos se reconectan solas en cuanto despierte.
+      </p>
+    </div>
+
+    <section class="vivo" aria-labelledby="vivo-titulo">
+      <div class="vivo-cabecera">
+        <h2 id="vivo-titulo">Ahora mismo en la demo</h2>
+        @if (vivo.conectados(); as n) {
+          <p class="vivo-conectados">{{ n === 1 ? 'Solo tú por ahora' : n + ' personas conectadas' }}</p>
         }
-      }
-    </p>
+      </div>
+
+      <app-diagrama-vivo [latido]="vivo.latido()"></app-diagrama-vivo>
+
+      <ol class="vivo-lista" aria-live="polite">
+        @for (a of vivo.actividad(); track a.id) {
+          <li>
+            <span class="vivo-texto">{{ a.texto }}</span>
+            <span class="vivo-hora">{{ haceCuanto(a.fecha) }}</span>
+          </li>
+        } @empty {
+          <li class="vivo-vacio">
+            Todavía no pasó nada desde que llegaste.
+            <a routerLink="/tablero" target="_blank">Abre el tablero en otra pestaña</a>
+            y mueve una tarjeta: lo verás aparecer aquí y correr por el diagrama.
+          </li>
+        }
+      </ol>
+    </section>
   </section>
 
   <section class="recorrido" aria-labelledby="recorrido-titulo">

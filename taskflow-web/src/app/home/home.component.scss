@@ -29,6 +29,10 @@ h2 {
 /* ── Hero ─────────────────────────────────────────────── */
 
 .hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: start;
   padding-bottom: 88px;
 
   h1 {
@@ -118,6 +122,74 @@ h2 {
 
 .estado[data-estado='sin-respuesta'] .estado-punto {
   background: var(--danger);
+}
+
+/* ── En vivo ─────────────────────────────────────────── */
+
+.vivo {
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px -18px var(--shadow);
+}
+
+.vivo-cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+  }
+}
+
+.vivo-conectados {
+  margin: 0;
+  font-size: 14px;
+  color: var(--success-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.vivo-lista {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+    font-size: 15px;
+    line-height: 1.45;
+  }
+}
+
+.vivo-texto {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.vivo-hora {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.vivo-lista li.vivo-vacio {
+  display: block;
+  color: var(--text-secondary);
+
+  a {
+    color: var(--accent);
+    font-weight: 600;
+  }
 }
 
 /* ── Recorrido ────────────────────────────────────────── */
@@ -249,7 +321,18 @@ h2 {
   }
 }
 
+@media (max-width: 980px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
 @media (max-width: 760px) {
+  .vivo {
+    padding: 20px 16px;
+  }
+
   .home {
     padding: 40px 16px 48px;
   }

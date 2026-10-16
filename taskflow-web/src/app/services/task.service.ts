@@ -1,13 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Task, TaskEvent, TaskPositionUpdate } from '../models/task.model';
+import { STATUS_LABELS, Task, TaskEvent, TaskPositionUpdate } from '../models/task.model';
+import { RegistroEventosService } from '../shared/registro-eventos.service';
 
 const API_URL = environment.apiUrl;
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
+  private readonly registro = inject(RegistroEventosService);
+
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Task[]> {
@@ -42,6 +45,7 @@ export class TaskService {
 
       eventSource.onmessage = (event) => {
         const taskEvent: TaskEvent = JSON.parse(event.data);
+        this.registro.registrar({ demo: 'tablero', canal: 'SSE', direccion: 'entrada', detalle: describirEvento(taskEvent) });
         subscriber.next(taskEvent);
       };
 
@@ -54,4 +58,12 @@ export class TaskService {
       return () => eventSource.close();
     });
   }
+}
+
+function describirEvento(e: TaskEvent): string {
+  if (e.type === 'PRESENCE') return `PRESENCE · ${e.viewerCount ?? 0} conectados`;
+  if (e.type === 'RESET') return 'RESET · el tablero volvió a los datos iniciales';
+  if (!e.task) return e.type;
+  const columna = e.task.status ? ` → ${STATUS_LABELS[e.task.status]}` : '';
+  return `${e.type} · "${e.task.title ?? `tarea ${e.task.id}`}"${e.type === 'DELETED' ? '' : columna}`;
 }
