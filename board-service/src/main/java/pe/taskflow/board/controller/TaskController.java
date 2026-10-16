@@ -92,14 +92,10 @@ public class TaskController {
                 .map(word -> Mono.<Task>error(new ResponseStatusException(HttpStatus.BAD_REQUEST, violationMessage(clientIp))))
                 .orElseGet(() -> taskRepository.countByCreatedByIp(clientIp)
                         .flatMap(count -> {
+                            // Al llegar al límite solo se deja de crear: lo que ya existe se conserva.
                             if (count >= maxTasksPerIp) {
-                                // doOnSuccess va ANTES del .then(Mono.error(...)): ese Mono termina
-                                // en error, no en éxito, así que un doOnSuccess encadenado después
-                                // nunca se ejecutaría y el evento RESET jamás llegaría a los clientes.
-                                return taskRepository.deleteByCreatedByIp(clientIp)
-                                        .doOnSuccess(v -> eventPublisher.publish(TaskEventType.RESET, null))
-                                        .then(Mono.<Task>error(new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
-                                                "Creaste demasiadas tareas (" + maxTasksPerIp + "+). Se eliminaron todas las tuyas — no te pases, es un demo compartido con más visitantes.")));
+                                return Mono.<Task>error(new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                                        "Llegaste al máximo de " + maxTasksPerIp + " tareas por visitante. Mueve o termina las que ya creaste."));
                             }
 
                             task.setId(null);

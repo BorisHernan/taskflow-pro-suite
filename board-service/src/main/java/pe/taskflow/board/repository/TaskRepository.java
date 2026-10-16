@@ -13,5 +13,4 @@ public interface TaskRepository extends ReactiveCrudRepository<Task, Long> {
 
     Mono<Long> countByCreatedByIp(String createdByIp);
 
-    Mono<Void> deleteByCreatedByIp(String createdByIp);
 }
