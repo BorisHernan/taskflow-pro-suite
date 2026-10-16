@@ -17,9 +17,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 /**
- * Cada conexión WebSocket es un jugador del arena. El nombre viene en la query
- * string (?name=...) y se valida con el mismo filtro de contenido que las
- * tareas del tablero, antes de aceptar la conexión.
+ * Cada conexión WebSocket es un jugador del arena. Nombre y skin vienen en la
+ * query string (?name=...&skin=...); el nombre pasa por el mismo filtro de
+ * contenido que las tareas del tablero antes de aceptar la conexión.
+ * Mensajes del cliente: {tx, ty} para apuntar y {accion: dividir|expulsar}.
  */
 @Component
 public class ArenaWebSocketHandler implements WebSocketHandler {
@@ -48,7 +49,8 @@ public class ArenaWebSocketHandler implements WebSocketHandler {
             return session.close(new CloseStatus(1013, "Arena llena, intenta más tarde"));
         }
 
-        Blob player = state.addPlayer(name);
+        String skin = extractQueryParam(session.getHandshakeInfo().getUri(), "skin").orElse("clasico");
+        Blob player = state.addPlayer(name, skin);
         Flux<String> myDeath = engine.deaths().filter(id -> id.equals(player.getId()));
         Flux<String> myVictory = engine.victories().filter(id -> id.equals(player.getId()));
 
@@ -84,16 +86,14 @@ public class ArenaWebSocketHandler implements WebSocketHandler {
         try {
             JsonNode node = objectMapper.readTree(message.getPayloadAsText());
             if (node.has("tx") && node.has("ty")) {
-                player.setTargetX(clamp(node.get("tx").asDouble()));
-                player.setTargetY(clamp(node.get("ty").asDouble()));
+                engine.apuntar(player.getOwnerId(), node.get("tx").asDouble(), node.get("ty").asDouble());
+            }
+            if (node.has("accion")) {
+                engine.encolar(player.getOwnerId(), node.get("accion").asText());
             }
         } catch (Exception ignored) {
             // Mensaje malformado: se ignora, no vale la pena tumbar la conexión por esto.
         }
-    }
-
-    private double clamp(double value) {
-        return Math.max(0, Math.min(ArenaState.WORLD_SIZE, value));
     }
 
     private String toJson(ArenaSnapshot snapshot) {

@@ -97,7 +97,7 @@ WHERE id = 1 AND EXISTS (SELECT 1 FROM inserted)`,
     demo: 'arena',
     titulo: 'Arena multijugador',
     queEs: 'Un mini agar.io contra otros visitantes y bots con IA.',
-    pruebaEsto: 'Escribe tu nombre y juega: come círculos más chicos y llega a tamaño 2000 para ganar.',
+    pruebaEsto: 'Elige una skin y juega: come círculos más chicos, divídete con Espacio y atrapa power-ups.',
     tecnica: 'WebSocket bidireccional a 10 ticks por segundo',
     comoFunciona:
       'El servidor corre el juego: 10 veces por segundo mueve a todos, resuelve quién se come a quién y envía el estado por WebSocket. Tu navegador manda hacia dónde apuntas. Un jugador que entra recibe solo el último estado, no el historial.',

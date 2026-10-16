@@ -78,7 +78,7 @@ class ArenaEngineTest {
         Blob player = state.addPlayer("Campeon");
         placeStill(player, 1000, 1000, ArenaState.MAX_RADIUS);
 
-        state.pellets().put("p1", new Pellet("p1", 1000, 1000, false));
+        state.pellets().put("p1", new Pellet("p1", 1000, 1000, Pellet.NORMAL));
 
         StepVerifier.create(engine.victories())
                 .then(engine::tick)
@@ -95,12 +95,110 @@ class ArenaEngineTest {
         bot.setTargetX(1500);
         bot.setTargetY(1500);
         state.bots().put(bot.getId(), bot);
-        state.pellets().put("p2", new Pellet("p2", 1500, 1500, false));
+        state.pellets().put("p2", new Pellet("p2", 1500, 1500, Pellet.NORMAL));
 
         engine.tick();
 
         assertThat(state.bots()).containsKey("bot-2");
         assertThat(state.bots().get("bot-2").getRadius()).isEqualTo(ArenaState.START_RADIUS);
+    }
+
+    @Test
+    void alDividirseQuedanDosCelulasDeIgualAreaYMismoDueno() {
+        Blob jugador = state.addPlayer("Ameba");
+        placeStill(jugador, 1000, 1000, 100);
+        jugador.setTargetX(1500);
+
+        engine.dividir(jugador.getId());
+
+        assertThat(state.cellsOf(jugador.getId())).hasSize(2)
+                .allSatisfy(c -> assertThat(c.getRadius()).isCloseTo(100 / Math.sqrt(2), within(0.01)));
+        Blob hija = state.cellsOf(jugador.getId()).stream().filter(c -> c != jugador).findFirst().orElseThrow();
+        assertThat(hija.getVx()).isPositive();
+    }
+
+    @Test
+    void unaCelulaChicaNoSePuedeDividir() {
+        Blob jugador = state.addPlayer("Mini");
+        placeStill(jugador, 1000, 1000, ArenaEngine.RADIO_MIN_DIVIDIR - 1);
+
+        engine.dividir(jugador.getId());
+
+        assertThat(state.cellsOf(jugador.getId())).hasSize(1);
+    }
+
+    @Test
+    void elJugadorSoloMuereCuandoLeComenLaUltimaCelula() {
+        Blob jugador = state.addPlayer("Dividido");
+        placeStill(jugador, 1000, 1000, 100);
+        engine.dividir(jugador.getId());
+        Blob hija = state.cellsOf(jugador.getId()).stream().filter(c -> c != jugador).findFirst().orElseThrow();
+        placeStill(hija, 3000, 3000, hija.getRadius());
+
+        Blob cazador = new Blob("bot-3", true, "Cazador", "#8993a4", 1000, 1000, 300);
+        cazador.setTargetX(1000);
+        cazador.setTargetY(1000);
+        state.bots().put(cazador.getId(), cazador);
+
+        engine.tick();
+
+        assertThat(state.cellsOf(jugador.getId())).containsExactly(hija);
+    }
+
+    @Test
+    void lasCelulasPropiasSeFusionanCuandoTerminaElTiempo() {
+        Blob jugador = state.addPlayer("Fusion");
+        placeStill(jugador, 1000, 1000, 100);
+        engine.dividir(jugador.getId());
+        state.cellsOf(jugador.getId()).forEach(c -> {
+            c.setFusionTicks(0);
+            c.setVx(0);
+            c.setVy(0);
+            placeStill(c, 1000, 1000, c.getRadius());
+        });
+
+        engine.tick();
+
+        assertThat(state.cellsOf(jugador.getId())).hasSize(1);
+        assertThat(state.cellsOf(jugador.getId()).get(0).getRadius()).isCloseTo(100, within(0.5));
+    }
+
+    @Test
+    void conEscudoNoTePuedenComer() {
+        Blob chico = state.addPlayer("Protegido");
+        placeStill(chico, 800, 800, 30);
+        chico.setEscudoTicks(10);
+        Blob grande = state.addPlayer("Grande");
+        placeStill(grande, 800, 800, 200);
+
+        engine.tick();
+
+        assertThat(state.players()).containsKey(chico.getId());
+    }
+
+    @Test
+    void recogerUnPowerUpActivaElEfectoEnTodasTusCelulas() {
+        Blob jugador = state.addPlayer("Veloz");
+        placeStill(jugador, 2000, 2000, 100);
+        engine.dividir(jugador.getId());
+        state.pellets().put("v1", new Pellet("v1", 2000, 2000, Pellet.VELOCIDAD));
+
+        engine.tick();
+
+        assertThat(state.cellsOf(jugador.getId())).allSatisfy(c -> assertThat(c.getVelocidadTicks()).isPositive());
+    }
+
+    @Test
+    void expulsarMasaAchicaLaCelulaYDejaUnaBolitaQueNoSeRecogeAlInstante() {
+        Blob jugador = state.addPlayer("Donante");
+        placeStill(jugador, 2000, 2000, 60);
+        jugador.setTargetX(2500);
+
+        engine.expulsar(jugador.getId());
+        engine.tick();
+
+        assertThat(jugador.getRadius()).isLessThan(60);
+        assertThat(state.pellets().values()).anyMatch(p -> Pellet.MASA.equals(p.tipo()));
     }
 
     private void placeStill(Blob blob, double x, double y, double radius) {
