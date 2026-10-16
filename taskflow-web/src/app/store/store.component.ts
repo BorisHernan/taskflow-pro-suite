@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { SolesPipe } from '../shared/soles.pipe';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -11,7 +12,7 @@ import { ProductIconComponent } from './product-icon/product-icon.component';
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProductIconComponent],
+  imports: [SolesPipe, CommonModule, FormsModule, ProductIconComponent],
   templateUrl: './store.component.html',
   styleUrl: './store.component.scss',
 })

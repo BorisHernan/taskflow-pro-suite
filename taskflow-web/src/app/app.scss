@@ -1,81 +1,106 @@
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
 .app-nav {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 4px;
-  padding: 12px 24px 0;
+  gap: 24px;
   max-width: 1200px;
+  height: 60px;
   margin: 0 auto;
-  font-family: 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg-gradient);
-  transition: background-color 0.25s ease;
+  padding: 0 24px;
+}
+
+.app-marca {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  text-decoration: none;
+
+  &.active,
+  &:hover {
+    color: var(--accent);
+  }
 }
 
 .app-nav-links {
   display: flex;
+  align-items: stretch;
+  align-self: stretch;
   gap: 4px;
+  flex: 1;
+  min-width: 0;
 
   a {
-    text-decoration: none;
-    color: var(--text-secondary);
-    font-size: 14px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 15px;
     font-weight: 500;
-    padding: 10px 16px;
-    border-radius: 6px 6px 0 0;
-    border: 1px solid transparent;
-    position: relative;
-    transition: color 0.15s ease, background 0.15s ease;
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 12px;
-      right: 12px;
-      bottom: 4px;
-      height: 2px;
-      border-radius: 2px;
-      background: var(--accent);
-      transform: scaleX(0);
-      transition: transform 0.2s ease;
-    }
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
 
     &:hover {
       color: var(--text-primary);
-      background: var(--surface-alt);
     }
 
     &.active {
       color: var(--accent);
-      background: var(--surface);
-      border-color: var(--border);
-      border-bottom-color: var(--surface);
-      position: relative;
-      top: 1px;
-
-      &::after {
-        transform: scaleX(1);
-      }
+      border-bottom-color: var(--accent);
     }
   }
 }
 
 .theme-toggle {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--border);
+  border-radius: 8px;
   background: var(--surface);
-  border-radius: 6px;
-  width: 34px;
-  height: 34px;
   font-size: 16px;
   cursor: pointer;
-  margin-bottom: 6px;
-  transition: background 0.15s ease, transform 0.3s ease;
+  transition: background-color 0.15s ease;
 
   &:hover {
     background: var(--surface-alt);
-    transform: rotate(15deg) scale(1.05);
+  }
+}
+
+/* Celular: marca y tema arriba, las 4 secciones en su propia fila. */
+@media (max-width: 640px) {
+  .app-nav {
+    flex-wrap: wrap;
+    height: auto;
+    gap: 0;
+    padding: 0 16px;
   }
 
-  &:active {
-    transform: rotate(15deg) scale(0.95);
+  .app-marca {
+    flex: 1;
+    padding: 12px 0;
+  }
+
+  .app-nav-links {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: space-between;
+    gap: 0;
+
+    a {
+      padding: 10px 6px;
+      font-size: 14px;
+    }
   }
 }

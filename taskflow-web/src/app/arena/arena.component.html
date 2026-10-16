@@ -19,12 +19,15 @@
         <span class="pill">🏆 Logros</span>
       </div>
 
-      <div class="error-banner" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+      <div class="error-banner" role="alert" *ngIf="errorMessage()">{{ errorMessage() }}</div>
 
       <form class="name-form" (ngSubmit)="play()">
+        <label class="sr-only" for="nombre-jugador">Tu nombre de jugador</label>
         <input
+          id="nombre-jugador"
           type="text"
-          placeholder="Tu nombre..."
+          placeholder="Tu nombre…"
+          spellcheck="false"
           [(ngModel)]="nameInput"
           name="nameInput"
           maxlength="16"

@@ -39,7 +39,13 @@ El proyecto arrancó siendo solo el tablero kanban; el resto de los menús de la
 sumando después, cada uno para poner en práctica algo distinto (tiempo real vía SSE vs. WebSocket, estado
 compartido entre visitantes, métricas, theming). Esta es la nav tal cual aparece en la demo, menú por menú:
 
-#### 📋 Tablero Kanban (`/`) — el punto de partida
+#### 🏠 Portada (`/`) — quién lo hizo y por dónde empezar
+
+Presenta al autor y propone un recorrido guiado de 4 pasos. Cada demo muestra arriba una barra "Paso n
+de 4" con qué probar ahí y un botón al siguiente paso. Al abrirla, ya despierta el backend gratuito de
+Render, así que la primera demo carga más rápido.
+
+#### 📋 Tablero Kanban (`/tablero`) — el punto de partida
 
 Tres columnas (Por hacer / En progreso / Hecho) con **drag & drop** para mover tareas entre ellas o reordenarlas
 dentro de una misma columna. Cualquiera puede crear, editar, mover o borrar tareas — es un demo público sin
@@ -273,7 +279,13 @@ The project started out as just the kanban board; every other menu in the nav ba
 one to exercise something different (SSE vs. WebSocket real-time, state shared across visitors, metrics,
 theming). Here's the nav exactly as it appears in the demo, menu by menu:
 
-#### 📋 Kanban Board (`/`) — where it all started
+#### 🏠 Home (`/`) — who built it and where to start
+
+Introduces the author and proposes a 4-step guided tour. Every demo shows a "Step n of 4" bar on top with
+what to try there and a button to the next step. Opening it already wakes up the free Render backend, so
+the first demo loads faster.
+
+#### 📋 Kanban Board (`/tablero`) — where it all started
 
 Three columns (To do / In progress / Done) with **drag & drop** to move tasks between columns or reorder them
 within one. Anyone can create, edit, move, or delete tasks — it's a public demo, no login. Every change is

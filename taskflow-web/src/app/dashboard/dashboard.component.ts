@@ -1,4 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
+import { SolesPipe } from '../shared/soles.pipe';
 import { CommonModule } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { Product } from '../models/product.model';
@@ -23,7 +24,7 @@ const EMPTY_STATS: StatsSnapshot = {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [SolesPipe, CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })

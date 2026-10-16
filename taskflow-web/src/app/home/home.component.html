@@ -1,0 +1,104 @@
+<main class="home">
+  <section class="hero" aria-labelledby="home-titulo">
+    <h1 id="home-titulo">
+      Boris Medrano
+      <span class="hero-rol">Desarrollador Full Stack Java</span>
+    </h1>
+    <p class="hero-texto">
+      Más de 3 años construyendo sistemas con Spring Boot, WebFlux y Angular. Esta suite corre en
+      producción: lo que hagas aquí lo ven los demás visitantes al instante.
+    </p>
+
+    <div class="hero-acciones">
+      <a class="btn-principal" routerLink="/tablero">Empezar el recorrido</a>
+      <a class="btn-secundario" href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">
+        Ver el código en GitHub
+      </a>
+    </div>
+
+    <p class="estado" [attr.data-estado]="estado()" aria-live="polite">
+      <span class="estado-punto" aria-hidden="true"></span>
+      @switch (estado()) {
+        @case ('despertando') {
+          Despertando el servidor gratuito… la primera carga puede tardar hasta un minuto.
+        }
+        @case ('en-linea') {
+          Servidor en línea
+          @if (visitas() !== null) {
+            · {{ visitas() }} visitas a esta demo
+          }
+        }
+        @case ('sin-respuesta') {
+          El servidor no respondió todavía. Las demos se reconectan solas en cuanto despierte.
+        }
+      }
+    </p>
+  </section>
+
+  <section class="recorrido" aria-labelledby="recorrido-titulo">
+    <h2 id="recorrido-titulo">El recorrido, en {{ pasos.length }} pasos</h2>
+    <p class="seccion-texto">Cada demo muestra una técnica distinta. Sigue el orden o salta a la que te interese.</p>
+
+    <ol class="pasos">
+      @for (paso of pasos; track paso.ruta; let i = $index) {
+        <li class="paso">
+          <span class="paso-numero" aria-hidden="true">{{ i + 1 }}</span>
+          <div class="paso-cuerpo">
+            <h3>
+              <a [routerLink]="paso.ruta">{{ paso.titulo }}</a>
+            </h3>
+            <p>{{ paso.queEs }}</p>
+            <p class="paso-prueba"><strong>Prueba esto:</strong> {{ paso.pruebaEsto }}</p>
+            <p class="paso-tecnica">{{ paso.tecnica }}</p>
+          </div>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <section class="stack" aria-labelledby="stack-titulo">
+    <h2 id="stack-titulo">Cómo está hecho</h2>
+    <p class="seccion-texto">
+      Un microservicio reactivo que no bloquea hilos mientras espera a la base de datos, con tiempo real
+      en las dos direcciones y controles de abuso para una demo pública sin login.
+    </p>
+
+    <dl class="stack-lista">
+      <div>
+        <dt>Backend</dt>
+        <dd>Java 21, Spring Boot 3, Spring WebFlux, R2DBC, Flyway</dd>
+      </div>
+      <div>
+        <dt>Frontend</dt>
+        <dd>Angular 22 con componentes standalone y signals, RxJS, SCSS</dd>
+      </div>
+      <div>
+        <dt>Tiempo real</dt>
+        <dd>Server-Sent Events para difundir cambios, WebSocket para el juego</dd>
+      </div>
+      <div>
+        <dt>Calidad</dt>
+        <dd>JUnit 5, Mockito, Reactor Test, Vitest y CI en GitHub Actions</dd>
+      </div>
+      <div>
+        <dt>Despliegue</dt>
+        <dd>Docker en Render, Vercel y PostgreSQL en Neon, todo en planes gratuitos</dd>
+      </div>
+    </dl>
+
+    <p class="stack-links">
+      <a [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">API documentada en Swagger</a>
+      <a href="https://github.com/BorisHernan/taskflow-pro-suite#readme" target="_blank" rel="noopener">README con la arquitectura</a>
+    </p>
+  </section>
+
+  <footer class="contacto" aria-labelledby="contacto-titulo">
+    <h2 id="contacto-titulo">¿Conversamos?</h2>
+    <p class="seccion-texto">Disponible para trabajo 100 % remoto desde Lima, Perú.</p>
+    <p class="contacto-links">
+      <a href="mailto:mdrncastro@gmail.com">mdrncastro&#64;gmail.com</a>
+      <a href="https://www.linkedin.com/in/boris-hernan-dev" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/BorisHernan" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </footer>
+</main>

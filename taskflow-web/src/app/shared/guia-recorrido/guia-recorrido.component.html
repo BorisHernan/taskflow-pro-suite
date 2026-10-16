@@ -1,0 +1,20 @@
+@if (paso(); as p) {
+  <aside class="guia" aria-label="Recorrido guiado">
+    <div class="guia-texto">
+      <p class="guia-paso">Paso {{ indice() + 1 }} de {{ total }}: {{ p.titulo }}</p>
+      <p class="guia-prueba"><strong>Prueba esto:</strong> {{ p.pruebaEsto }}</p>
+    </div>
+    <nav class="guia-acciones" aria-label="Pasos del recorrido">
+      @if (anterior(); as a) {
+        <a class="guia-link" [routerLink]="a.ruta">Anterior</a>
+      } @else {
+        <a class="guia-link" routerLink="/">Inicio</a>
+      }
+      @if (siguiente(); as s) {
+        <a class="guia-siguiente" [routerLink]="s.ruta">Siguiente: {{ s.titulo }}</a>
+      } @else {
+        <a class="guia-siguiente" routerLink="/">Terminar el recorrido</a>
+      }
+    </nav>
+  </aside>
+}

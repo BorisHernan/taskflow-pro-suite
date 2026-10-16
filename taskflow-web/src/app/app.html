@@ -1,14 +1,27 @@
-<nav class="app-nav">
-  <div class="app-nav-links">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">📋 Tablero Kanban</a>
-    <a routerLink="/tienda" routerLinkActive="active">🛒 Tienda</a>
-    <a routerLink="/estadisticas" routerLinkActive="active">📊 Estadísticas</a>
-    <a routerLink="/arena" routerLinkActive="active">🕹️ Arena</a>
-  </div>
+<header class="app-header">
+  <nav class="app-nav" aria-label="Principal">
+    <a class="app-marca" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      TaskFlow
+    </a>
 
-  <button type="button" class="theme-toggle" (click)="themeService.toggle()" aria-label="Cambiar tema">
-    {{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}
-  </button>
-</nav>
+    <div class="app-nav-links">
+      <a routerLink="/tablero" routerLinkActive="active">Tablero</a>
+      <a routerLink="/tienda" routerLinkActive="active">Tienda</a>
+      <a routerLink="/estadisticas" routerLinkActive="active">Estadísticas</a>
+      <a routerLink="/arena" routerLinkActive="active">Arena</a>
+    </div>
+
+    <button
+      type="button"
+      class="theme-toggle"
+      (click)="themeService.toggle()"
+      [attr.aria-label]="themeService.theme() === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
+    >
+      <span aria-hidden="true">{{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}</span>
+    </button>
+  </nav>
+
+  <app-guia-recorrido></app-guia-recorrido>
+</header>
 
 <router-outlet></router-outlet>
