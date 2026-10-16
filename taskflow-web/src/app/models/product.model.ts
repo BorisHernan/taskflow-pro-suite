@@ -9,6 +9,29 @@ export interface Product {
   stock: number;
   // Clave de ícono (no un emoji): la resuelve <app-product-icon>.
   icon?: string;
+  category: string;
+  details?: string;
+}
+
+export interface Review {
+  id: number;
+  productId: number;
+  author: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
+export interface NewReview {
+  author: string;
+  rating: number;
+  comment: string;
+}
+
+export interface RatingSummary {
+  productId: number;
+  average: number;
+  count: number;
 }
 
 export interface CartItem {

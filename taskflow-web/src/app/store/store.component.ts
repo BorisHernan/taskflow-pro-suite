@@ -1,49 +1,57 @@
-import { Component, ElementRef, OnDestroy, OnInit, computed, signal, viewChild } from '@angular/core';
-import { SolesPipe } from '../shared/soles.pipe';
-import { DatePipe } from '@angular/common';
+import { Component, DestroyRef, OnInit, computed, effect, inject } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Subject, firstValueFrom, takeUntil } from 'rxjs';
-import { CartItem, Product, ReceiptData, STOCK_BAJO, VALID_COUPONS } from '../models/product.model';
-import { ProductService } from '../services/product.service';
-import { ProductIconComponent } from './product-icon/product-icon.component';
 import { IconoComponent } from '../shared/icono/icono.component';
+import { CatalogoService } from './servicios/catalogo.service';
+import { CarritoService } from './servicios/carrito.service';
+import { TarjetaProductoComponent } from './tarjeta-producto/tarjeta-producto.component';
+import { BotonCarritoComponent } from './boton-carrito/boton-carrito.component';
 
-type Orden = 'destacados' | 'precio-asc' | 'precio-desc' | 'stock';
+type Orden = 'destacados' | 'precio-asc' | 'precio-desc' | 'valoracion' | 'stock';
 
+const POR_PAGINA = 12;
+
+/** Catálogo: filtros, orden y página viven en la URL (se pueden compartir y el "atrás" funciona). */
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [SolesPipe, DatePipe, FormsModule, ProductIconComponent, IconoComponent],
+  imports: [FormsModule, IconoComponent, TarjetaProductoComponent, BotonCarritoComponent],
   templateUrl: './store.component.html',
   styleUrl: './store.component.scss',
 })
-export class StoreComponent implements OnInit, OnDestroy {
-  products = signal<Product[]>([]);
-  cart = signal<CartItem[]>([]);
-  connectionLive = signal(false);
-  errorMessage = signal<string | null>(null);
-  receipt = signal<ReceiptData | null>(null);
-  appliedCoupon = signal<{ code: string; discount: number } | null>(null);
-  showCoupons = signal(false);
-  couponInput = '';
-  isCheckingOut = false;
-  readonly stockBajo = STOCK_BAJO;
+export class StoreComponent implements OnInit {
+  readonly catalogo = inject(CatalogoService);
+  private readonly carrito = inject(CarritoService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
-  busqueda = signal('');
-  orden = signal<Orden>('destacados');
-  private stockMaximo = computed(() => Math.max(1, ...this.products().map((p) => p.stock)));
+  private readonly params = toSignal(this.route.queryParamMap, { requireSync: true });
 
-  readonly productosVisibles = computed(() => {
-    const texto = this.busqueda().trim().toLowerCase();
-    const lista = this.products().filter(
-      (p) => !texto || `${p.name} ${p.description ?? ''}`.toLowerCase().includes(texto),
-    );
+  readonly categoria = computed(() => this.params().get('cat') ?? '');
+  readonly busqueda = computed(() => this.params().get('q') ?? '');
+  readonly orden = computed(() => (this.params().get('orden') as Orden) ?? 'destacados');
+  private readonly paginaPedida = computed(() => Math.max(1, Number(this.params().get('pag')) || 1));
+
+  readonly stockMaximo = computed(() => Math.max(1, ...this.catalogo.productos().map((p) => p.stock)));
+
+  readonly filtrados = computed(() => {
+    const texto = normalizar(this.busqueda().trim());
+    const cat = this.categoria();
+    const notas = this.catalogo.valoraciones();
+    const lista = this.catalogo
+      .productos()
+      .filter((p) => !cat || p.category === cat)
+      .filter((p) => !texto || normalizar(`${p.name} ${p.description ?? ''} ${p.category}`).includes(texto));
+
     switch (this.orden()) {
       case 'precio-asc':
         return [...lista].sort((a, b) => a.price - b.price);
       case 'precio-desc':
         return [...lista].sort((a, b) => b.price - a.price);
+      case 'valoracion':
+        return [...lista].sort((a, b) => (notas[b.id]?.average ?? 0) - (notas[a.id]?.average ?? 0));
       case 'stock':
         return [...lista].sort((a, b) => a.stock - b.stock);
       default:
@@ -51,203 +59,58 @@ export class StoreComponent implements OnInit, OnDestroy {
     }
   });
 
-  readonly unidadesEnCarrito = computed(() => this.cart().reduce((n, i) => n + i.quantity, 0));
+  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.filtrados().length / POR_PAGINA)));
+  readonly pagina = computed(() => Math.min(this.paginaPedida(), this.totalPaginas()));
+  readonly visibles = computed(() => this.filtrados().slice((this.pagina() - 1) * POR_PAGINA, this.pagina() * POR_PAGINA));
+  readonly paginas = computed(() => Array.from({ length: this.totalPaginas() }, (_, i) => i + 1));
+  readonly rango = computed(() => {
+    const total = this.filtrados().length;
+    const desde = total === 0 ? 0 : (this.pagina() - 1) * POR_PAGINA + 1;
+    return { desde, hasta: Math.min(total, this.pagina() * POR_PAGINA), total };
+  });
 
-  private readonly carritoRef = viewChild<ElementRef<HTMLElement>>('carrito');
-
-  readonly availableCoupons = Object.entries(VALID_COUPONS).map(([code, discount]) => ({
-    code,
-    discount,
-  }));
-
-  private destroy$ = new Subject<void>();
-  private errorTimeoutId: ReturnType<typeof setTimeout> | undefined;
-
-  constructor(private productService: ProductService) {}
+  constructor() {
+    // El carrito siempre con el stock más reciente.
+    effect(() => this.carrito.sincronizar(this.catalogo.productos()));
+  }
 
   ngOnInit(): void {
-    this.productService.getAll().subscribe({
-      next: (products) => this.products.set(products),
-      error: () => this.showError('No se pudo cargar el catálogo. Verifica que el backend esté corriendo.'),
-    });
-
-    this.productService
-      .streamUpdates()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (updated) => {
-          this.connectionLive.set(true);
-          this.products.update((list) =>
-            list.map((p) => (p.id === updated.id ? updated : p))
-          );
-        },
-      });
+    this.catalogo.cargar();
+    this.catalogo.vivo$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-    clearTimeout(this.errorTimeoutId);
+  /** Cambiar filtro u orden vuelve a la página 1; la búsqueda reemplaza la URL para no llenar el historial. */
+  filtrar(cambios: { cat?: string; q?: string; orden?: Orden }): void {
+    this.navegar({ ...this.estado(), ...cambios, pag: 1 }, cambios.q !== undefined);
   }
 
-  cartQuantity(productId: number): number {
-    return this.cart().find((i) => i.product.id === productId)?.quantity ?? 0;
+  irAPagina(n: number): void {
+    // El router sube al inicio de la página (withInMemoryScrolling).
+    this.navegar({ ...this.estado(), pag: n });
   }
 
-  addToCart(product: Product): void {
-    const alreadyInCart = this.cartQuantity(product.id);
-    if (alreadyInCart >= product.stock) {
-      this.showError(`Solo quedan ${product.stock} unidades de "${product.name}".`);
-      return;
-    }
+  private estado() {
+    return { cat: this.categoria(), q: this.busqueda(), orden: this.orden() };
+  }
 
-    this.cart.update((items) => {
-      const existing = items.find((i) => i.product.id === product.id);
-      if (existing) {
-        return items.map((i) =>
-          i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...items, { product, quantity: 1 }];
+  private navegar(p: { cat: string; q: string; orden: Orden; pag: number }, reemplazar = false): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        cat: p.cat || null,
+        q: p.q || null,
+        orden: p.orden === 'destacados' ? null : p.orden,
+        pag: p.pag > 1 ? p.pag : null,
+      },
+      replaceUrl: reemplazar,
     });
   }
 
-  changeQuantity(item: CartItem, delta: number): void {
-    const newQuantity = item.quantity + delta;
-
-    if (newQuantity <= 0) {
-      this.cart.update((items) => items.filter((i) => i.product.id !== item.product.id));
-      return;
-    }
-
-    if (newQuantity > item.product.stock) {
-      this.showError(`Solo quedan ${item.product.stock} unidades de "${item.product.name}".`);
-      return;
-    }
-
-    this.cart.update((items) =>
-      items.map((i) => (i.product.id === item.product.id ? { ...i, quantity: newQuantity } : i))
-    );
+  reintentar(): void {
+    this.catalogo.cargar();
   }
+}
 
-  removeFromCart(item: CartItem): void {
-    this.cart.update((items) => items.filter((i) => i.product.id !== item.product.id));
-  }
-
-  subtotal(): number {
-    return this.cart().reduce((sum, i) => sum + i.product.price * i.quantity, 0);
-  }
-
-  discountAmount(): number {
-    const coupon = this.appliedCoupon();
-    return coupon ? this.subtotal() * coupon.discount : 0;
-  }
-
-  total(): number {
-    return this.subtotal() - this.discountAmount();
-  }
-
-  applyCoupon(): void {
-    const code = this.couponInput.trim().toUpperCase();
-    if (!code) return;
-
-    const discount = VALID_COUPONS[code];
-    if (discount === undefined) {
-      this.showError(`El cupón "${this.couponInput}" no existe o ya no es válido.`);
-      return;
-    }
-
-    this.appliedCoupon.set({ code, discount });
-    this.couponInput = '';
-  }
-
-  removeCoupon(): void {
-    this.appliedCoupon.set(null);
-  }
-
-  async checkout(): Promise<void> {
-    const items = this.cart();
-    if (items.length === 0 || this.isCheckingOut) return;
-
-    this.isCheckingOut = true;
-    const purchased: CartItem[] = [];
-
-    for (const item of items) {
-      try {
-        await firstValueFrom(this.productService.purchase(item.product.id, item.quantity));
-        purchased.push(item);
-      } catch (err) {
-        const already = purchased.length > 0
-          ? ' Los productos anteriores de esta compra ya se descontaron del stock.'
-          : '';
-        this.showError(this.extractErrorMessage(err, `No se pudo completar la compra de "${item.product.name}".`) + already);
-        this.cart.update((cartItems) =>
-          cartItems.filter((c) => !purchased.some((p) => p.product.id === c.product.id))
-        );
-        this.isCheckingOut = false;
-        return;
-      }
-    }
-
-    this.buildReceipt(items);
-    this.cart.set([]);
-    this.appliedCoupon.set(null);
-    this.isCheckingOut = false;
-  }
-
-  newPurchase(): void {
-    this.receipt.set(null);
-  }
-
-  /** Porcentaje de la barra de stock, relativo al producto con más unidades. */
-  porcentajeStock(stock: number): number {
-    return Math.round((stock / this.stockMaximo()) * 100);
-  }
-
-  imprimirBoleta(): void {
-    window.print();
-  }
-
-  /** Celular: el carrito queda debajo del catálogo; el resumen flotante lleva hasta él. */
-  irAlCarrito(): void {
-    const carrito = this.carritoRef()?.nativeElement;
-    carrito?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    carrito?.focus({ preventScroll: true });
-  }
-
-  private buildReceipt(items: CartItem[]): void {
-    const coupon = this.appliedCoupon();
-    const subtotal = this.subtotal();
-    const discount = this.discountAmount();
-
-    this.receipt.set({
-      number: 'TF-' + Math.floor(100000 + Math.random() * 900000),
-      date: new Date(),
-      lines: items.map((i) => ({
-        name: i.product.name,
-        quantity: i.quantity,
-        unitPrice: i.product.price,
-        lineTotal: i.product.price * i.quantity,
-      })),
-      subtotal,
-      discount,
-      couponCode: coupon?.code,
-      total: subtotal - discount,
-    });
-  }
-
-  private extractErrorMessage(err: unknown, fallback: string): string {
-    if (err instanceof HttpErrorResponse && err.error) {
-      const body = err.error;
-      if (typeof body === 'string' && body.trim()) return body;
-      if (typeof body?.error === 'string') return body.error;
-    }
-    return fallback;
-  }
-
-  private showError(message: string): void {
-    this.errorMessage.set(message);
-    clearTimeout(this.errorTimeoutId);
-    this.errorTimeoutId = setTimeout(() => this.errorMessage.set(null), 6000);
-  }
+function normalizar(texto: string): string {
+  return texto.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 }

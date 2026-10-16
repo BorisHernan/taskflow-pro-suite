@@ -12,7 +12,7 @@ describe('ActividadEnVivoService', () => {
   let service: ActividadEnVivoService;
 
   const tarea = (id: number, status: Task['status']): Task => ({ id, title: `Tarea ${id}`, status, position: 0 });
-  const producto = (stock: number): Product => ({ id: 1, name: 'Taza', price: 15, stock });
+  const producto = (stock: number): Product => ({ id: 1, name: 'Taza', price: 15, stock, category: 'Hogar' });
 
   beforeEach(() => {
     tareas$ = new Subject<TaskEvent>();

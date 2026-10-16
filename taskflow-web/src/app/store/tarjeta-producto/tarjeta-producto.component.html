@@ -1,0 +1,46 @@
+@let p = producto();
+<article class="producto card" [class.agotado]="p.stock === 0">
+  <a class="producto-enlace" [routerLink]="['/tienda/producto', p.id]" [attr.aria-label]="'Ver detalle de ' + p.name">
+    <div class="producto-icono" [style.view-transition-name]="'producto-' + p.id">
+      <app-product-icon [icon]="p.icon || ''" [size]="40" />
+      @if (p.stock === 0) {
+        <span class="sello">Agotado</span>
+      } @else if (p.stock <= stockBajo) {
+        <span class="sello sello-bajo">¡Últimas {{ p.stock }}!</span>
+      }
+    </div>
+
+    <span class="producto-categoria">{{ p.category }}</span>
+    <h2 class="producto-nombre">{{ p.name }}</h2>
+  </a>
+
+  <div class="producto-valoracion">
+    @if (valoracion(); as v) {
+      <app-estrellas [valor]="v.average" />
+      <span>{{ v.average.toFixed(1) }} ({{ v.count }})</span>
+    } @else {
+      <span class="sin-resenas">Sin reseñas aún</span>
+    }
+  </div>
+
+  <div class="producto-pie">
+    <div class="producto-precio-fila">
+      <p class="producto-precio">{{ p.price | soles }}</p>
+      @if (enCarrito() > 0) {
+        <span class="chip chip-accent">{{ enCarrito() }} en carrito</span>
+      }
+    </div>
+
+    <div class="stock" [class.bajo]="p.stock <= stockBajo">
+      <div class="stock-barra" aria-hidden="true">
+        <span [style.width.%]="porcentaje()"></span>
+      </div>
+      <span class="stock-texto">{{ p.stock === 0 ? 'Sin stock' : p.stock + ' en stock' }}</span>
+    </div>
+
+    <button type="button" class="btn btn-primary" [disabled]="sinMas()" (click)="carrito.agregarYAvisar(p)">
+      <app-icono [nombre]="enCarrito() > 0 ? 'mas' : 'carrito'" [tamano]="16" />
+      {{ enCarrito() > 0 ? 'Agregar otro' : 'Agregar al carrito' }}
+    </button>
+  </div>
+</article>

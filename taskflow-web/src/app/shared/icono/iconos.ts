@@ -35,6 +35,14 @@ import {
   Users,
   X,
   Zap,
+  ChevronLeft,
+  ChevronRight,
+  MessageSquare,
+  ShieldCheck,
+  Shuffle,
+  Sparkles,
+  Star,
+  Truck,
   type IconNode,
 } from 'lucide';
 
@@ -76,6 +84,14 @@ export const ICONOS = {
   ojo: Eye,
   baseDatos: Database,
   paquete: Package,
+  estrella: Star,
+  comentario: MessageSquare,
+  anterior: ChevronLeft,
+  siguiente: ChevronRight,
+  envio: Truck,
+  garantia: ShieldCheck,
+  chispas: Sparkles,
+  azar: Shuffle,
 } satisfies Record<string, IconNode>;
 
 export type NombreIcono = keyof typeof ICONOS;

@@ -1,0 +1,236 @@
+<main class="page">
+  <header class="page-header cabecera">
+    <nav class="migas" aria-label="Ruta de navegación">
+      <a routerLink="/tienda"><app-icono nombre="izquierda" [tamano]="15" /> Tienda</a>
+      @if (producto(); as p) {
+        <span aria-hidden="true">/</span>
+        <a routerLink="/tienda" [queryParams]="{ cat: p.category }">{{ p.category }}</a>
+        <span aria-hidden="true">/</span>
+        <span class="migas-actual" aria-current="page">{{ p.name }}</span>
+      }
+    </nav>
+    <app-boton-carrito />
+  </header>
+
+  @if (producto(); as p) {
+    <article class="detalle">
+      <div class="galeria">
+        <div class="galeria-imagen" [style.view-transition-name]="'producto-' + p.id" [class.agotado]="p.stock === 0">
+          <app-product-icon [icon]="p.icon || ''" [size]="120" />
+        </div>
+      </div>
+
+      <div class="info entrar">
+        <span class="chip chip-accent">{{ p.category }}</span>
+        <h1 class="nombre">{{ p.name }}</h1>
+
+        <button type="button" class="valoracion" (click)="irAResenas()">
+          <app-estrellas [valor]="promedio()" [tamano]="16" />
+          @if (resenas().length > 0) {
+            <span>{{ promedio().toFixed(1) }} · {{ resenas().length }} {{ resenas().length === 1 ? 'reseña' : 'reseñas' }}</span>
+          } @else {
+            <span>Sé el primero en opinar</span>
+          }
+        </button>
+
+        <p class="precio">{{ p.price | soles }}</p>
+
+        @if (p.description) {
+          <p class="resumen">{{ p.description }}</p>
+        }
+        @if (p.details) {
+          <p class="detalles">{{ p.details }}</p>
+        }
+
+        <div class="compra card">
+          <p class="estado-stock" [class.bajo]="p.stock > 0 && p.stock <= stockBajo" [class.sin]="p.stock === 0">
+            <span class="punto" [class.en-vivo]="p.stock > stockBajo"></span>
+            @if (p.stock === 0) {
+              Agotado por ahora
+            } @else if (p.stock <= stockBajo) {
+              ¡Solo quedan {{ p.stock }}! Otros visitantes también lo están viendo.
+            } @else {
+              En stock: {{ p.stock }} unidades
+            }
+          </p>
+          @if (enCarrito() > 0) {
+            <p class="en-carrito">Ya tienes {{ enCarrito() }} en tu carrito.</p>
+          }
+
+          <div class="compra-acciones">
+            <div class="selector" role="group" aria-label="Cantidad">
+              <button type="button" class="btn btn-icon btn-sm" [disabled]="cantidad() <= 1" (click)="cambiarCantidad(-1)" aria-label="Uno menos">
+                <app-icono nombre="menos" [tamano]="14" />
+              </button>
+              <span aria-live="polite">{{ cantidad() }}</span>
+              <button type="button" class="btn btn-icon btn-sm" [disabled]="cantidad() >= maximo()" (click)="cambiarCantidad(1)" aria-label="Uno más">
+                <app-icono nombre="mas" [tamano]="14" />
+              </button>
+            </div>
+            <button type="button" class="btn btn-primary btn-lg" [disabled]="maximo() === 0" (click)="agregar()">
+              <app-icono nombre="carrito" [tamano]="18" />
+              Agregar al carrito
+            </button>
+            <button type="button" class="btn btn-secondary btn-lg" [disabled]="maximo() === 0" (click)="agregar(true)">
+              Comprar ahora
+            </button>
+          </div>
+
+          <ul class="beneficios">
+            <li><app-icono nombre="envio" [tamano]="16" /> Envío instantáneo y gratis (no llega nada, es un demo)</li>
+            <li><app-icono nombre="garantia" [tamano]="16" /> El stock se descuenta en PostgreSQL y baja para todos en vivo</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- Reseñas -->
+    <section class="resenas" id="resenas" aria-labelledby="resenas-titulo">
+      <h2 id="resenas-titulo" class="seccion-titulo">Opiniones de los visitantes</h2>
+
+      <div class="resenas-grid">
+        <aside class="resumen-resenas">
+          <div class="card resumen-card">
+            <p class="promedio-grande">{{ resenas().length ? promedio().toFixed(1) : '–' }}</p>
+            <app-estrellas [valor]="promedio()" [tamano]="20" />
+            <p class="total-resenas">{{ resenas().length }} {{ resenas().length === 1 ? 'reseña' : 'reseñas' }}</p>
+
+            <ul class="distribucion">
+              @for (d of distribucion(); track d.estrellas) {
+                <li>
+                  <button
+                    type="button"
+                    class="dist-fila"
+                    [class.activa]="filtroEstrellas() === d.estrellas"
+                    [disabled]="d.cuenta === 0"
+                    [attr.aria-pressed]="filtroEstrellas() === d.estrellas"
+                    (click)="filtrarPorEstrellas(d.estrellas)"
+                    [attr.aria-label]="'Ver reseñas de ' + d.estrellas + ' estrellas (' + d.cuenta + ')'"
+                  >
+                    <span class="dist-etiqueta">{{ d.estrellas }} <app-icono nombre="estrella" [tamano]="12" /></span>
+                    <span class="dist-pista"><span [style.width.%]="d.porcentaje"></span></span>
+                    <span class="dist-cuenta">{{ d.cuenta }}</span>
+                  </button>
+                </li>
+              }
+            </ul>
+            @if (filtroEstrellas()) {
+              <button type="button" class="btn btn-sm btn-ghost" (click)="filtroEstrellas.set(null)">Ver todas las reseñas</button>
+            }
+          </div>
+
+          <!-- Formulario -->
+          <form class="card form-resena" (ngSubmit)="publicar()" aria-labelledby="form-titulo">
+            <h3 id="form-titulo">Escribe tu reseña</h3>
+
+            <fieldset class="selector-estrellas" (mouseleave)="calificacionHover.set(0)">
+              <legend>Tu calificación</legend>
+              <div class="estrellas-input">
+                @for (n of [1, 2, 3, 4, 5]; track n) {
+                  <label
+                    [class.encendida]="n <= (calificacionHover() || calificacion())"
+                    (mouseenter)="calificacionHover.set(n)"
+                  >
+                    <input type="radio" name="calificacion" class="sr-only" [value]="n" [checked]="calificacion() === n" (change)="calificacion.set(n)" />
+                    <app-icono nombre="estrella" [tamano]="26" />
+                    <span class="sr-only">{{ n }} {{ n === 1 ? 'estrella' : 'estrellas' }}</span>
+                  </label>
+                }
+                <span class="etiqueta-estrellas">{{ etiquetas[calificacionHover() || calificacion()] }}</span>
+              </div>
+            </fieldset>
+
+            <label class="campo">
+              <span>Tu nombre</span>
+              <input class="input" name="autor" [(ngModel)]="autor" maxlength="40" autocomplete="nickname" placeholder="Cómo quieres aparecer" />
+            </label>
+            <label class="campo">
+              <span>Comentario</span>
+              <textarea class="input" name="comentario" [(ngModel)]="comentario" maxlength="500" rows="4" placeholder="¿Qué te pareció?"></textarea>
+              <small class="contador">{{ comentario.length }}/500</small>
+            </label>
+
+            @if (errorResena(); as e) {
+              <p class="alerta alerta-error" role="alert"><app-icono nombre="alerta" [tamano]="16" />{{ e }}</p>
+            }
+
+            <button type="submit" class="btn btn-primary" [disabled]="enviando()">
+              {{ enviando() ? 'Publicando…' : 'Publicar reseña' }}
+            </button>
+            <p class="nota-moderacion">Se publica al instante. Hay filtro de lenguaje ofensivo y un máximo de 5 reseñas por día.</p>
+          </form>
+        </aside>
+
+        <div class="lista-resenas">
+          @if (cargandoResenas()) {
+            <p class="vacio">Cargando reseñas…</p>
+          } @else {
+            @for (r of resenasVisibles(); track r.id; let i = $index) {
+              <article class="resena card entrar" [style.--i]="i">
+                <header class="resena-cabecera">
+                  <span class="avatar" [style.--tono]="tono(r.author)" aria-hidden="true">{{ inicial(r.author) }}</span>
+                  <div>
+                    <p class="resena-autor">{{ r.author }}</p>
+                    <p class="resena-fecha" [title]="fechaCompleta(r.createdAt)">{{ hace(r.createdAt) }}</p>
+                  </div>
+                  <app-estrellas class="resena-estrellas" [valor]="r.rating" />
+                </header>
+                <p class="resena-texto">{{ r.comment }}</p>
+              </article>
+            } @empty {
+              <div class="vacio card">
+                <app-icono nombre="comentario" [tamano]="28" [grosor]="1.5" />
+                @if (filtroEstrellas()) {
+                  No hay reseñas de {{ filtroEstrellas() }} estrellas.
+                } @else {
+                  Aún no hay reseñas. ¡Escribe la primera!
+                }
+              </div>
+            }
+
+            @if (totalPaginasResenas() > 1) {
+              <nav class="paginacion-resenas" aria-label="Páginas de reseñas">
+                <button type="button" class="btn btn-sm btn-secondary" [disabled]="paginaResenas() === 1" (click)="paginaResenas.set(paginaResenas() - 1)">
+                  <app-icono nombre="anterior" [tamano]="15" /> Anteriores
+                </button>
+                <span>{{ paginaResenas() }} de {{ totalPaginasResenas() }}</span>
+                <button type="button" class="btn btn-sm btn-secondary" [disabled]="paginaResenas() === totalPaginasResenas()" (click)="paginaResenas.set(paginaResenas() + 1)">
+                  Siguientes <app-icono nombre="siguiente" [tamano]="15" />
+                </button>
+              </nav>
+            }
+          }
+        </div>
+      </div>
+    </section>
+
+    @if (relacionados().length > 0) {
+      <section class="relacionados" aria-labelledby="relacionados-titulo">
+        <h2 id="relacionados-titulo" class="seccion-titulo">También te puede gustar</h2>
+        <div class="relacionados-grid">
+          @for (r of relacionados(); track r.id; let i = $index) {
+            <app-tarjeta-producto class="entrar" [style.--i]="i" [producto]="r" [valoracion]="catalogo.valoraciones()[r.id]" />
+          }
+        </div>
+      </section>
+    }
+  } @else if (catalogo.cargado()) {
+    <div class="vacio card no-encontrado">
+      <app-icono nombre="paquete" [tamano]="32" [grosor]="1.5" />
+      <strong>Este producto no existe</strong>
+      <a class="btn btn-primary" routerLink="/tienda">Volver a la tienda</a>
+    </div>
+  } @else if (catalogo.error(); as error) {
+    <div class="alerta alerta-error" role="alert"><app-icono nombre="alerta" />{{ error }}</div>
+  } @else {
+    <div class="detalle" aria-hidden="true">
+      <div class="galeria"><div class="galeria-imagen esqueleto"></div></div>
+      <div class="info">
+        <span class="esq-linea corta"></span>
+        <span class="esq-linea grande"></span>
+        <span class="esq-linea media"></span>
+        <span class="esq-linea"></span>
+      </div>
+    </div>
+  }
+</main>

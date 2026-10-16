@@ -18,6 +18,17 @@ export const routes: Routes = [
     loadComponent: () => import('./store/store.component').then((m) => m.StoreComponent),
   },
   {
+    path: 'tienda/producto/:id',
+    title: 'Producto · Tienda · TaskFlow App',
+    loadComponent: () =>
+      import('./store/producto-detalle/producto-detalle.component').then((m) => m.ProductoDetalleComponent),
+  },
+  {
+    path: 'tienda/boleta',
+    title: 'Tu boleta · Tienda · TaskFlow App',
+    loadComponent: () => import('./store/boleta/boleta.component').then((m) => m.BoletaComponent),
+  },
+  {
     path: 'estadisticas',
     title: 'Estadísticas · TaskFlow App',
     loadComponent: () => import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
