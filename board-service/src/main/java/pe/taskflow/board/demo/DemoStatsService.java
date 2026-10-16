@@ -4,6 +4,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import pe.taskflow.board.store.PurchaseRepository;
+import pe.taskflow.board.store.PurchaseTotals;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
@@ -12,12 +14,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.DoubleAdder;
 
 /**
- * Contadores del demo para el dashboard de estadísticas. La mayoría vive en
- * memoria (no en la base de datos): se reinician con cada despliegue, algo
- * que se deja claro en el frontend en vez de pretender que son datos
- * históricos. También se registran como métricas de Micrometer, visibles en
- * /actuator/metrics. La única excepción es el total de visitas histórico,
- * que sí se persiste vía VisitCounterRepository para sobrevivir reinicios.
+ * Contadores del demo para el dashboard. Visitas totales y compras salen de
+ * Postgres (historial permanente); tareas creadas y conexiones viven en memoria
+ * y se reinician con cada despliegue. Todo se expone también en Micrometer.
  */
 @Component
 public class DemoStatsService {
@@ -30,9 +29,12 @@ public class DemoStatsService {
     private final DoubleAdder revenue = new DoubleAdder();
     private final AtomicLong totalVisitors = new AtomicLong();
     private final VisitCounterRepository visitCounterRepository;
+    private final PurchaseRepository purchaseRepository;
 
-    public DemoStatsService(MeterRegistry registry, VisitCounterRepository visitCounterRepository) {
+    public DemoStatsService(MeterRegistry registry, VisitCounterRepository visitCounterRepository,
+                            PurchaseRepository purchaseRepository) {
         this.visitCounterRepository = visitCounterRepository;
+        this.purchaseRepository = purchaseRepository;
         registry.gauge("demo.tasks.created", tasksCreated);
         registry.gauge("demo.store.purchases", purchases);
         registry.gauge("demo.store.units.sold", unitsSold);
@@ -69,17 +71,20 @@ public class DemoStatsService {
                 .then();
     }
 
+    /** Compras, unidades e ingresos salen del historial en Postgres; el resto, de memoria. */
     public Mono<StatsSnapshot> snapshot() {
-        return visitCounterRepository.findById(1)
+        Mono<Long> visitas = visitCounterRepository.findById(1)
                 .map(VisitCounter::getTotalVisits)
-                .defaultIfEmpty(0L)
-                .map(totalVisitsAllTime -> new StatsSnapshot(
-                        tasksCreated.get(),
-                        purchases.get(),
-                        unitsSold.get(),
-                        BigDecimal.valueOf(revenue.sum()).setScale(2, RoundingMode.HALF_UP),
-                        totalVisitors.get(),
-                        totalVisitsAllTime
-                ));
+                .defaultIfEmpty(0L);
+        Mono<PurchaseTotals> compras = purchaseRepository.totales().defaultIfEmpty(PurchaseTotals.VACIO);
+
+        return Mono.zip(visitas, compras).map(t -> new StatsSnapshot(
+                tasksCreated.get(),
+                t.getT2().compras(),
+                t.getT2().unidades(),
+                t.getT2().ingresos().setScale(2, RoundingMode.HALF_UP),
+                totalVisitors.get(),
+                t.getT1()
+        ));
     }
 }

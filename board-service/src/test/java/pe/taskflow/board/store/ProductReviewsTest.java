@@ -33,6 +33,7 @@ class ProductReviewsTest {
     @Mock private DemoStatsService statsService;
     @Mock private ProductReviewRepository reviewRepository;
     @Mock private ContentModerationService moderation;
+    @Mock private PurchaseRepository purchaseRepository;
 
     private ProductController controller;
     private final MockServerHttpRequest request = MockServerHttpRequest.post("/api/products/1/reviews")
@@ -40,7 +41,7 @@ class ProductReviewsTest {
 
     @BeforeEach
     void setUp() {
-        controller = new ProductController(productRepository, eventPublisher, statsService, reviewRepository, moderation);
+        controller = new ProductController(productRepository, eventPublisher, statsService, reviewRepository, moderation, purchaseRepository);
     }
 
     private static Mono<Product> producto() {
