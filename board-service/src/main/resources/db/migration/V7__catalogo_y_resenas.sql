@@ -2,6 +2,9 @@
 -- la tabla (el reset diario repone a este valor, en vez de a una lista fija
 -- escrita en el código). Más productos y reseñas de los visitantes.
 
+-- icon nació como emoji VARCHAR(8): las claves nuevas (p. ej. 'headphones') no entran.
+ALTER TABLE products ALTER COLUMN icon TYPE VARCHAR(40);
+
 ALTER TABLE products ADD COLUMN category VARCHAR(40) NOT NULL DEFAULT 'Accesorios';
 ALTER TABLE products ADD COLUMN details TEXT;
 ALTER TABLE products ADD COLUMN initial_stock INT;
