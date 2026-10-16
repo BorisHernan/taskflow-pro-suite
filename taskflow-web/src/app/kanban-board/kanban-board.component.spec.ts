@@ -3,6 +3,7 @@ import { NEVER, of } from 'rxjs';
 import { KanbanBoardComponent } from './kanban-board.component';
 import { TaskService } from '../services/task.service';
 import { Task } from '../models/task.model';
+import { TAREAS_EJEMPLO } from './tareas-ejemplo';
 
 describe('KanbanBoardComponent', () => {
   let servicio: {
@@ -52,6 +53,18 @@ describe('KanbanBoardComponent', () => {
       { id: 2, status: 'TODO', position: 1 },
     ]);
     expect(componente.tasksByStatus('IN_PROGRESS').map((t) => t.id)).toEqual([3, 1]);
+  });
+
+  it('"Sorpréndeme" crea una tarea de ejemplo que no esté ya en el tablero', () => {
+    servicio.create.mockImplementation((t: Task) => of({ ...t, id: 99 }));
+
+    componente.sorprender();
+
+    const creada = servicio.create.mock.calls[0][0] as Task;
+    expect(TAREAS_EJEMPLO.some((e) => e.title === creada.title && e.description === creada.description)).toBe(true);
+    expect(tareas.some((t) => t.title === creada.title)).toBe(false);
+    expect(creada.status).toBe('TODO');
+    expect(componente.newTaskTitle).toBe('');
   });
 
   it('no hay columna vecina a la izquierda de "Por hacer"', () => {

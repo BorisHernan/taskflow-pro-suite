@@ -25,6 +25,23 @@
   }
 }
 
+.sorpresa app-icono {
+  color: var(--seccion);
+}
+
+.sorpresa .girar {
+  animation: tirar-dado 0.5s var(--ease);
+}
+
+@keyframes tirar-dado {
+  50% {
+    transform: rotate(180deg) scale(1.3);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .aviso-filtro {
   display: flex;
   align-items: center;
