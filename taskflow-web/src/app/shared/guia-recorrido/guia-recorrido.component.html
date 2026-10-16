@@ -5,6 +5,16 @@
       <p class="guia-prueba"><strong>Prueba esto:</strong> {{ p.pruebaEsto }}</p>
     </div>
     <nav class="guia-acciones" aria-label="Pasos del recorrido">
+      <button
+        #botonPanel
+        type="button"
+        class="guia-panel-btn"
+        aria-controls="panel-como-esta-hecho"
+        [attr.aria-expanded]="panelAbierto()"
+        (click)="alternarPanel()"
+      >
+        Cómo está hecho
+      </button>
       @if (anterior(); as a) {
         <a class="guia-link" [routerLink]="a.ruta">Anterior</a>
       } @else {
@@ -17,4 +27,41 @@
       }
     </nav>
   </aside>
+
+  @if (panelAbierto()) {
+    <section id="panel-como-esta-hecho" class="panel" aria-labelledby="panel-titulo">
+      <div class="panel-cabecera">
+        <h2 id="panel-titulo" #tituloPanel tabindex="-1">Cómo está hecho</h2>
+        <button type="button" class="panel-cerrar" (click)="cerrarPanel()" aria-label="Cerrar el panel">✕</button>
+      </div>
+
+      <p class="panel-tecnica">{{ p.tecnica }}</p>
+      <p class="panel-texto">{{ p.comoFunciona }}</p>
+
+      <h3>Mensajes en vivo</h3>
+      <p class="panel-ayuda">Lo que viaja entre tu navegador y el servidor mientras usas esta demo.</p>
+      <ol class="panel-mensajes">
+        @for (m of mensajes(); track m.id) {
+          <li>
+            <span class="msg-hora">{{ m.fecha | date: 'HH:mm:ss' }}</span>
+            <span class="msg-canal" [attr.data-canal]="m.canal">
+              {{ m.canal }} {{ m.direccion === 'entrada' ? 'recibido' : 'enviado' }}
+            </span>
+            <span class="msg-detalle">{{ m.detalle }}</span>
+          </li>
+        } @empty {
+          <li class="msg-vacio">Usa la demo y aquí aparecerán los mensajes.</li>
+        }
+      </ol>
+
+      <h3>El código</h3>
+      <p class="panel-ayuda">
+        {{ p.codigo.archivo.split('/').pop() }}{{ p.codigo.simplificado ? ' (simplificado)' : '' }}
+      </p>
+      <pre class="panel-codigo"><code>{{ p.codigo.fragmento }}</code></pre>
+      <a class="panel-github" [href]="urlArchivo(p.codigo.archivo)" target="_blank" rel="noopener">
+        Ver el archivo completo en GitHub
+      </a>
+    </section>
+  }
 }

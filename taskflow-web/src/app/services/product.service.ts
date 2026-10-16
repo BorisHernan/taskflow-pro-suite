@@ -1,13 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Product } from '../models/product.model';
+import { RegistroEventosService } from '../shared/registro-eventos.service';
 
 const API_URL = environment.apiUrl.replace(/\/api\/tasks\/?$/, '/api/products');
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
+  private readonly registro = inject(RegistroEventosService);
+
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Product[]> {
@@ -25,6 +28,7 @@ export class ProductService {
 
       eventSource.onmessage = (event) => {
         const product: Product = JSON.parse(event.data);
+        this.registro.registrar({ demo: 'tienda', canal: 'SSE', direccion: 'entrada', detalle: `stock · ${product.name} = ${product.stock}` });
         subscriber.next(product);
       };
 

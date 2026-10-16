@@ -1,0 +1,34 @@
+<figure class="diagrama">
+  <div class="columna" role="img" aria-label="Arquitectura: el navegador habla con la API reactiva por REST, SSE y WebSocket, y la API con PostgreSQL por R2DBC.">
+    <div class="nodo">
+      <strong>Tu navegador</strong>
+      <span>Angular · Vercel</span>
+    </div>
+
+    <div class="tramo">
+      <span class="tramo-linea"></span>
+      @for (p of pulsosDe('cliente'); track p.id) {
+        <span class="pulso"></span>
+      }
+      <span class="tramo-nombre">REST, SSE y WebSocket</span>
+    </div>
+
+    <div class="nodo nodo-api">
+      <strong>API reactiva</strong>
+      <span>Spring WebFlux · Render</span>
+    </div>
+
+    <div class="tramo">
+      <span class="tramo-linea"></span>
+      @for (p of pulsosDe('datos'); track p.id) {
+        <span class="pulso"></span>
+      }
+      <span class="tramo-nombre">R2DBC, sin bloquear hilos</span>
+    </div>
+
+    <div class="nodo">
+      <strong>PostgreSQL</strong>
+      <span>Neon</span>
+    </div>
+  </div>
+</figure>
