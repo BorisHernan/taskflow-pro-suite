@@ -14,6 +14,8 @@ function normalizar(texto: string): string {
   return texto.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 }
 
+import { TAREAS_EJEMPLO } from './tareas-ejemplo';
+
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
@@ -34,6 +36,8 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
   newTaskTitle = '';
   newTaskDescription = '';
   mostrarDescripcion = signal(false);
+  /** Cuenta las tiradas del botón "Sorpréndeme" (reinicia la animación del dado). */
+  dado = signal(0);
 
   filtro = signal('');
   filtrando = computed(() => this.filtro().trim().length > 0);
@@ -128,6 +132,17 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
     const movida = { ...task, status: destino, position: this.totalDe(destino) + 1 };
 
     this.guardarOrden([movida, ...origen], previousSnapshot);
+  }
+
+  /** Crea al instante una tarea de ejemplo que todavía no esté en el tablero. */
+  sorprender(): void {
+    const enTablero = new Set(this.tasks().map((t) => t.title));
+    const libres = TAREAS_EJEMPLO.filter((t) => !enTablero.has(t.title));
+    const elegida = (libres.length ? libres : TAREAS_EJEMPLO)[Math.floor(Math.random() * (libres.length || TAREAS_EJEMPLO.length))];
+    this.dado.update((n) => n + 1);
+    this.newTaskTitle = elegida.title;
+    this.newTaskDescription = elegida.description;
+    this.addTask();
   }
 
   addTask(): void {

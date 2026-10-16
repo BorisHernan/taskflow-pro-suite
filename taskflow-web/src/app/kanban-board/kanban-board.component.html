@@ -62,6 +62,12 @@
         <app-icono nombre="mas" [tamano]="16" />
         Agregar tarea
       </button>
+      <button type="button" class="btn btn-secondary sorpresa" (click)="sorprender()" title="Crea una tarea de ejemplo al azar">
+        @for (n of [dado()]; track n) {
+          <app-icono nombre="azar" [tamano]="16" [class.girar]="n > 0" />
+        }
+        Sorpréndeme
+      </button>
     </div>
     @if (mostrarDescripcion()) {
       <label class="sr-only" for="nueva-descripcion">Descripción</label>
