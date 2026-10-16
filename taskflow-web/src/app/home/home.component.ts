@@ -5,6 +5,7 @@ import { StatsService } from '../services/stats.service';
 import { RECORRIDO } from '../shared/recorrido';
 import { ActividadEnVivoService } from './actividad-en-vivo.service';
 import { DiagramaVivoComponent } from './diagrama-vivo/diagrama-vivo.component';
+import { IconoComponent } from '../shared/icono/icono.component';
 
 const FORMATO_NUMERO = new Intl.NumberFormat('es-PE');
 const FORMATO_RELATIVO = new Intl.RelativeTimeFormat('es', { numeric: 'auto' });
@@ -14,7 +15,7 @@ type EstadoServidor = 'despertando' | 'en-linea' | 'sin-respuesta';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, DiagramaVivoComponent],
+  imports: [RouterLink, DiagramaVivoComponent, IconoComponent],
   providers: [ActividadEnVivoService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',

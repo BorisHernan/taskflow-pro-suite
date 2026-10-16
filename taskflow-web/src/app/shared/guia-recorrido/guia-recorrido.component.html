@@ -8,22 +8,23 @@
       <button
         #botonPanel
         type="button"
-        class="guia-panel-btn"
+        class="btn btn-secondary btn-sm guia-panel-btn"
         aria-controls="panel-como-esta-hecho"
         [attr.aria-expanded]="panelAbierto()"
         (click)="alternarPanel()"
       >
+        <app-icono nombre="codigo" [tamano]="16" />
         Cómo está hecho
       </button>
       @if (anterior(); as a) {
-        <a class="guia-link" [routerLink]="a.ruta">Anterior</a>
+        <a class="btn btn-ghost btn-sm" [routerLink]="a.ruta"><app-icono nombre="izquierda" [tamano]="16" />Anterior</a>
       } @else {
-        <a class="guia-link" routerLink="/">Inicio</a>
+        <a class="btn btn-ghost btn-sm" routerLink="/"><app-icono nombre="inicio" [tamano]="16" />Inicio</a>
       }
       @if (siguiente(); as s) {
-        <a class="guia-siguiente" [routerLink]="s.ruta">Siguiente: {{ s.titulo }}</a>
+        <a class="btn btn-primary btn-sm guia-siguiente" [routerLink]="s.ruta">Siguiente: {{ s.titulo }}<app-icono nombre="derecha" [tamano]="16" /></a>
       } @else {
-        <a class="guia-siguiente" routerLink="/">Terminar el recorrido</a>
+        <a class="btn btn-primary btn-sm guia-siguiente" routerLink="/">Terminar el recorrido<app-icono nombre="check" [tamano]="16" /></a>
       }
     </nav>
   </aside>
@@ -32,7 +33,7 @@
     <section id="panel-como-esta-hecho" class="panel" aria-labelledby="panel-titulo">
       <div class="panel-cabecera">
         <h2 id="panel-titulo" #tituloPanel tabindex="-1">Cómo está hecho</h2>
-        <button type="button" class="panel-cerrar" (click)="cerrarPanel()" aria-label="Cerrar el panel">✕</button>
+        <button type="button" class="btn btn-icon" (click)="cerrarPanel()" aria-label="Cerrar el panel"><app-icono nombre="cerrar" /></button>
       </div>
 
       <p class="panel-tecnica">{{ p.tecnica }}</p>

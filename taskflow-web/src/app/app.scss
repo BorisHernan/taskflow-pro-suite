@@ -2,15 +2,15 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
   border-bottom: 1px solid var(--border);
-  font-family: 'Segoe UI', Roboto, sans-serif;
 }
 
 .app-nav {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 28px;
   max-width: 1200px;
   height: 60px;
   margin: 0 auto;
@@ -18,13 +18,15 @@
 }
 
 .app-marca {
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-primary);
   text-decoration: none;
 
-  &.active,
   &:hover {
     color: var(--accent);
   }
@@ -32,7 +34,6 @@
 
 .app-nav-links {
   display: flex;
-  align-items: stretch;
   align-self: stretch;
   gap: 4px;
   flex: 1;
@@ -41,13 +42,14 @@
   a {
     display: flex;
     align-items: center;
+    gap: 8px;
     padding: 0 12px;
-    font-size: 15px;
-    font-weight: 500;
+    font-size: var(--fs-sm);
+    font-weight: 600;
     color: var(--text-secondary);
     text-decoration: none;
-    border-bottom: 3px solid transparent;
-    transition: color 0.15s ease, border-color 0.15s ease;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
 
     &:hover {
       color: var(--text-primary);
@@ -61,24 +63,10 @@
 }
 
 .theme-toggle {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-
-  &:hover {
-    background: var(--surface-alt);
-  }
 }
 
-/* Celular: marca y tema arriba, las 4 secciones en su propia fila. */
+/* Celular: marca y tema arriba; las 4 secciones en su propia fila, con icono encima. */
 @media (max-width: 640px) {
   .app-nav {
     flex-wrap: wrap;
@@ -89,18 +77,21 @@
 
   .app-marca {
     flex: 1;
-    padding: 12px 0;
+    padding: 10px 0;
   }
 
   .app-nav-links {
     order: 3;
     flex-basis: 100%;
-    justify-content: space-between;
     gap: 0;
 
     a {
-      padding: 10px 6px;
-      font-size: 14px;
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      padding: 6px 2px 8px;
+      font-size: 12px;
     }
   }
 }

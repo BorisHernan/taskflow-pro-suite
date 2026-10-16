@@ -1,122 +1,153 @@
-<div class="board-page">
-  <header class="board-header">
+<main class="page">
+  <header class="page-header">
     <div>
-      <h1>TaskFlow App</h1>
-      <p class="subtitle">
-        <span class="dot" [class.live]="connectionLive()"></span>
-        {{ connectionLive() ? 'Conectado en tiempo real' : 'Conectando…' }}
-        <span class="viewer-count" *ngIf="connectionLive()">
-          · 👀 {{ viewerCount() }} {{ viewerCount() === 1 ? 'persona viendo esto ahora' : 'personas viendo esto ahora' }}
+      <h1 class="page-title">Tablero</h1>
+      <p class="page-subtitle">
+        <span class="chip" [class.chip-success]="connectionLive()">
+          <span class="punto" [class.en-vivo]="connectionLive()"></span>
+          {{ connectionLive() ? 'En vivo' : 'Conectando…' }}
         </span>
+        @if (connectionLive()) {
+          <span class="chip">
+            <app-icono nombre="usuarios" [tamano]="14" />
+            {{ viewerCount() === 1 ? 'Solo tú ahora' : viewerCount() + ' personas viendo' }}
+          </span>
+        }
+        <span>Demo pública: cualquiera puede editarlo, y vuelve a sus tareas iniciales cada día.</span>
       </p>
     </div>
 
-    <div class="header-actions">
-      <button
-        type="button"
-        class="info-toggle"
-        (click)="showInfo.set(!showInfo())"
-        [attr.aria-expanded]="showInfo()"
-      >
-        {{ showInfo() ? 'Ocultar detalles ▲' : 'ℹ️ ¿Cómo funciona? ▼' }}
-      </button>
-
-      <form class="add-task-form" (ngSubmit)="addTask()">
-        <label class="sr-only" for="nueva-tarea">Título de la nueva tarea</label>
-        <input
-          id="nueva-tarea"
-          type="text"
-          placeholder="Ej.: Revisar el PR…"
-          [(ngModel)]="newTaskTitle"
-          name="newTaskTitle"
-          autocomplete="off"
-        />
-        <button type="submit">Agregar</button>
-      </form>
+    <div class="input-icono buscador">
+      <app-icono nombre="buscar" [tamano]="16" />
+      <label class="sr-only" for="buscar-tarea">Buscar tareas</label>
+      <input
+        id="buscar-tarea"
+        class="input"
+        type="search"
+        placeholder="Buscar tareas…"
+        autocomplete="off"
+        [ngModel]="filtro()"
+        (ngModelChange)="filtro.set($event)"
+      />
     </div>
   </header>
 
-  <div class="info-panel" *ngIf="showInfo()">
-    <h2>¿Cómo funciona este tablero?</h2>
-    <p>
-      Es un mini-sistema de microservicios: <strong>Angular</strong> en el frontend y un backend
-      <strong>reactivo</strong> en Spring Boot (WebFlux + R2DBC), pensado para no bloquear hilos
-      mientras espera a la base de datos.
-    </p>
-    <ul>
-      <li>
-        <strong>Tiempo real sin refrescar:</strong> cada vez que alguien crea, mueve o borra una
-        tarea, el backend emite un evento por <em>Server-Sent Events (SSE)</em> a todos los
-        navegadores conectados — por eso lo ves cambiar al instante en cualquier pestaña, incluso
-        desde otro país.
-      </li>
-      <li>
-        <strong>Drag &amp; drop persistente:</strong> al soltar una tarjeta, el frontend reordena
-        localmente y confirma el nuevo orden con el backend en una sola llamada por lote.
-      </li>
-      <li>
-        <strong>Demo público moderado:</strong> como no hay login, cada visitante se identifica por
-        IP para limitar cuántas tareas puede crear, y hay un filtro de lenguaje ofensivo con
-        avisos progresivos antes de bloquear.
-      </li>
-      <li>
-        <strong>Desplegado gratis:</strong> frontend en Vercel, backend (Docker) en Render, y
-        Postgres en Neon.
-      </li>
-    </ul>
-    <p class="info-repo">
-      Código fuente:
-      <a href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">
-        github.com/BorisHernan/taskflow-pro-suite
-      </a>
-    </p>
-    <p class="info-links">
-      API en vivo:
-      <a [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">Swagger / OpenAPI</a>
-      ·
-      <a [href]="backendBaseUrl + '/actuator/health'" target="_blank" rel="noopener">Health check</a>
-    </p>
-  </div>
-
-  <div class="demo-notice">
-    🌎 Este tablero es un <strong>demo público en vivo</strong>: cualquier visitante en el mundo puede
-    crear o mover tareas en tiempo real — si ves una tarea que no reconoces, probablemente la agregó
-    otra persona. El contenido se modera automáticamente y el tablero se limpia una vez al día. Sé
-    respetuoso 🙂
-  </div>
-
-  <div class="error-banner" role="alert" *ngIf="errorMessage()">{{ errorMessage() }}</div>
-
-  <div class="board" cdkDropListGroup>
-    <div class="column" *ngFor="let status of statuses">
-      <div class="column-header" [attr.data-status]="status">
-        <span>{{ statusLabels[status] }}</span>
-        <span class="count">{{ tasksByStatus(status).length }}</span>
-      </div>
-
-      <div
-        class="column-body"
-        cdkDropList
-        [id]="'list-' + status"
-        [cdkDropListData]="tasksByStatus(status)"
-        [cdkDropListConnectedTo]="connectedLists()"
-        (cdkDropListDropped)="onDrop($event, status)"
-      >
-        <div class="card" *ngFor="let task of tasksByStatus(status)" cdkDrag>
-          <div class="card-drag-preview" *cdkDragPreview>{{ task.title }}</div>
-
-          <div class="card-content">
-            <p class="card-title">{{ task.title }}</p>
-            <p class="card-description" *ngIf="task.description">{{ task.description }}</p>
-          </div>
-
-          <button class="card-delete" (click)="deleteTask(task, $event)" aria-label="Eliminar tarea">
-            ×
-          </button>
-        </div>
-
-        <div class="empty-hint" *ngIf="tasksByStatus(status).length === 0">Sin tareas</div>
-      </div>
+  @if (errorMessage()) {
+    <div class="alerta alerta-error" role="alert">
+      <app-icono nombre="alerta" />
+      <span>{{ errorMessage() }}</span>
     </div>
+  }
+
+  <form class="nueva card" (ngSubmit)="addTask()">
+    <div class="nueva-fila">
+      <label class="sr-only" for="nueva-tarea">Título de la nueva tarea</label>
+      <input
+        id="nueva-tarea"
+        class="input"
+        type="text"
+        placeholder="¿Qué hay que hacer? Ej.: Revisar el PR…"
+        autocomplete="off"
+        maxlength="120"
+        [(ngModel)]="newTaskTitle"
+        name="newTaskTitle"
+      />
+      <button type="button" class="btn btn-ghost" (click)="mostrarDescripcion.set(!mostrarDescripcion())" [attr.aria-expanded]="mostrarDescripcion()">
+        {{ mostrarDescripcion() ? 'Sin descripción' : 'Agregar descripción' }}
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="!newTaskTitle.trim()">
+        <app-icono nombre="mas" [tamano]="16" />
+        Agregar tarea
+      </button>
+    </div>
+    @if (mostrarDescripcion()) {
+      <label class="sr-only" for="nueva-descripcion">Descripción</label>
+      <textarea
+        id="nueva-descripcion"
+        class="input"
+        placeholder="Detalles opcionales…"
+        maxlength="300"
+        [(ngModel)]="newTaskDescription"
+        name="newTaskDescription"
+      ></textarea>
+    }
+  </form>
+
+  @if (filtrando()) {
+    <p class="aviso-filtro">
+      <app-icono nombre="info" [tamano]="16" />
+      Mostrando las tareas que coinciden con “{{ filtro().trim() }}”. Mientras buscas, arrastrar está pausado.
+      <button type="button" class="btn btn-sm btn-ghost" (click)="filtro.set('')">Limpiar búsqueda</button>
+    </p>
+  }
+
+  <div class="tablero" cdkDropListGroup>
+    @for (status of statuses; track status) {
+      <section class="columna" [attr.data-status]="status" [attr.aria-labelledby]="'col-' + status">
+        <header class="columna-cabecera">
+          <span class="columna-marca"></span>
+          <h2 [id]="'col-' + status">{{ statusLabels[status] }}</h2>
+          <span class="chip">{{ totalDe(status) }}</span>
+        </header>
+
+        <div
+          class="columna-cuerpo"
+          cdkDropList
+          [id]="'list-' + status"
+          [cdkDropListData]="tasksByStatus(status)"
+          [cdkDropListConnectedTo]="connectedLists()"
+          [cdkDropListDisabled]="filtrando()"
+          (cdkDropListDropped)="onDrop($event, status)"
+        >
+          @for (task of tasksByStatus(status); track task.id) {
+            <article class="tarjeta" cdkDrag>
+              <div class="tarjeta-arrastre" *cdkDragPreview>{{ task.title }}</div>
+              <div class="tarjeta-placeholder" *cdkDragPlaceholder></div>
+
+              <h3 class="tarjeta-titulo">{{ task.title }}</h3>
+              @if (task.description) {
+                <p class="tarjeta-descripcion">{{ task.description }}</p>
+              }
+
+              <div class="tarjeta-acciones">
+                @if (columnaVecina(status, -1); as anterior) {
+                  <button type="button" class="btn btn-icon btn-sm" (click)="moverA(task, -1)" [attr.aria-label]="'Mover a ' + statusLabels[anterior]">
+                    <app-icono nombre="izquierda" [tamano]="16" />
+                  </button>
+                }
+                @if (columnaVecina(status, 1); as siguiente) {
+                  <button type="button" class="btn btn-icon btn-sm" (click)="moverA(task, 1)" [attr.aria-label]="'Mover a ' + statusLabels[siguiente]">
+                    <app-icono nombre="derecha" [tamano]="16" />
+                  </button>
+                }
+                <button type="button" class="btn btn-icon btn-sm btn-danger-hover eliminar" (click)="deleteTask(task)" [attr.aria-label]="'Eliminar ' + task.title">
+                  <app-icono nombre="basura" [tamano]="16" />
+                </button>
+              </div>
+            </article>
+          } @empty {
+            <div class="vacio">
+              @if (cargando()) {
+                Cargando tareas…
+              } @else if (filtrando()) {
+                Nada coincide en esta columna.
+              } @else {
+                Sin tareas. Arrastra una aquí.
+              }
+            </div>
+          }
+        </div>
+      </section>
+    }
   </div>
-</div>
+</main>
+
+@if (pendienteBorrar(); as borrada) {
+  <div class="toast" role="status">
+    <span>Eliminaste “{{ borrada.title }}”.</span>
+    <button type="button" class="btn btn-sm" (click)="deshacerBorrado()">
+      <app-icono nombre="deshacer" [tamano]="15" />
+      Deshacer
+    </button>
+  </div>
+}

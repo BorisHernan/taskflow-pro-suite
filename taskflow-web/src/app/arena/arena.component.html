@@ -1,97 +1,120 @@
-<div class="arena-page">
-  <!-- Pantalla de nombre -->
-  <div class="name-screen tf-dotted-bg" *ngIf="gameState() === 'name'">
-    <div class="deco-blob deco-blob-1"></div>
-    <div class="deco-blob deco-blob-2"></div>
-    <div class="deco-blob deco-blob-3"></div>
+<div class="arena">
+  @switch (gameState()) {
+    <!-- Inicio -->
+    @case ('name') {
+      <main class="page pantalla">
+        <section class="tarjeta card" aria-labelledby="arena-titulo">
+          <span class="tarjeta-icono"><app-icono nombre="arena" [tamano]="26" /></span>
+          <h1 id="arena-titulo" class="page-title">Arena</h1>
+          <p class="tarjeta-texto">
+            Un mini agar.io multijugador en tiempo real. Juegas contra otros visitantes y contra bots que
+            huyen, cazan y buscan comida por su cuenta.
+          </p>
 
-    <div class="name-card tf-card">
-      <div class="name-card-icon">🕹️</div>
-      <h1>Arena Lite</h1>
-      <p class="subtitle">
-        Un mini agar.io: crece comiendo pellets y círculos más pequeños. Siempre hay unos cuantos
-        bots dando vueltas para que nunca juegues solo de verdad.
-      </p>
+          @if (errorMessage()) {
+            <div class="alerta alerta-error" role="alert">
+              <app-icono nombre="alerta" />
+              <span>{{ errorMessage() }}</span>
+            </div>
+          }
 
-      <div class="feature-pills">
-        <span class="pill">🤖 Bots con IA</span>
-        <span class="pill">⚡ Tiempo real</span>
-        <span class="pill">🏆 Logros</span>
-      </div>
+          <form class="nombre" (ngSubmit)="play()">
+            <label for="nombre-jugador">Tu nombre de jugador</label>
+            <div class="nombre-fila">
+              <input
+                id="nombre-jugador"
+                class="input"
+                type="text"
+                placeholder="Ej.: NullPointer…"
+                [(ngModel)]="nameInput"
+                name="nameInput"
+                maxlength="16"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button type="submit" class="btn btn-primary" [disabled]="!nameInput.trim()">Entrar a jugar</button>
+            </div>
+          </form>
 
-      <div class="error-banner" role="alert" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+          <ul class="reglas">
+            <li><app-icono nombre="derecha" [tamano]="16" />Mueve el mouse o el dedo: tu círculo lo sigue.</li>
+            <li><app-icono nombre="rayo" [tamano]="16" />Come puntos y círculos al menos un 15 % más chicos que tú.</li>
+            <li><app-icono nombre="trofeo" [tamano]="16" />Llega a tamaño 2000 y ganas la partida.</li>
+          </ul>
+        </section>
+      </main>
+    }
 
-      <form class="name-form" (ngSubmit)="play()">
-        <label class="sr-only" for="nombre-jugador">Tu nombre de jugador</label>
-        <input
-          id="nombre-jugador"
-          type="text"
-          placeholder="Tu nombre…"
-          spellcheck="false"
-          [(ngModel)]="nameInput"
-          name="nameInput"
-          maxlength="16"
-          autocomplete="off"
-        />
-        <button type="submit">Jugar</button>
-      </form>
-    </div>
-  </div>
+    <!-- Partida -->
+    @case ('playing') {
+      <section class="juego" aria-label="Partida en curso">
+        <canvas #canvas (pointermove)="onPointerMove($event)" (pointerdown)="onPointerMove($event)" aria-label="Mapa de la arena"></canvas>
 
-  <!-- Pantalla de juego -->
-  <div class="game-screen" *ngIf="gameState() === 'playing'">
-    <canvas #canvas (mousemove)="onPointerMove($event)"></canvas>
+        <div class="hud panel-juego">
+          <p class="hud-tamano">{{ myRadius() }}</p>
+          <p class="hud-etiqueta">Tu tamaño · récord {{ maxRadiusThisSession() }}</p>
+          @if (miPuesto(); as p) {
+            <p class="hud-puesto">Puesto {{ p.puesto }} de {{ p.total }}</p>
+          }
+        </div>
 
-    <div class="hud">
-      <div class="hud-size">Tamaño: {{ myRadius() }}</div>
-      <div class="hud-record">Récord de la sesión: {{ maxRadiusThisSession() }}</div>
-    </div>
+        <aside class="ranking panel-juego" aria-labelledby="ranking-titulo">
+          <h2 id="ranking-titulo"><app-icono nombre="corona" [tamano]="15" />Ranking</h2>
+          <ol>
+            @for (blob of leaderboard(); track blob.id; let i = $index) {
+              <li [class.yo]="blob.id === miId()">
+                <span class="puesto">{{ i + 1 }}</span>
+                <span class="nombre-blob">{{ blob.name }}</span>
+                @if (blob.bot) {
+                  <span class="etiqueta-bot">bot</span>
+                }
+                <span class="tamano">{{ blob.radius | number: '1.0-0' }}</span>
+              </li>
+            }
+          </ol>
+        </aside>
 
-    <div class="leaderboard">
-      <h3>Ranking</h3>
-      <div class="leaderboard-row" *ngFor="let blob of leaderboard(); let i = index">
-        <span class="rank">{{ i + 1 }}</span>
-        <span class="lb-name">{{ blob.bot ? '🤖 ' : '' }}{{ blob.name }}</span>
-        <span class="lb-size">{{ blob.radius | number: '1.0-0' }}</span>
-      </div>
-    </div>
+        @if (toast()) {
+          <p class="aviso-juego" role="status">{{ toast() }}</p>
+        }
+      </section>
+    }
 
-    <div class="toast" *ngIf="toast()">{{ toast() }}</div>
-  </div>
+    <!-- Fin: te comieron -->
+    @case ('dead') {
+      <main class="page pantalla">
+        <section class="tarjeta card fin" aria-labelledby="fin-titulo">
+          <span class="tarjeta-icono icono-peligro"><app-icono nombre="calavera" [tamano]="26" /></span>
+          <h1 id="fin-titulo" class="page-title">Te comieron</h1>
+          @if (deathInfo(); as info) {
+            <p class="fin-dato">Llegaste a tamaño <strong>{{ info.size }}</strong></p>
+            @if (info.isRecord) {
+              <p class="chip chip-success">Nuevo récord de la sesión</p>
+            }
+          }
+          <div class="fin-acciones">
+            <button type="button" class="btn btn-primary btn-lg" (click)="playAgain()">Jugar de nuevo</button>
+            <button type="button" class="btn btn-secondary btn-lg" (click)="backToNameScreen()">Cambiar nombre</button>
+          </div>
+        </section>
+      </main>
+    }
 
-  <!-- Pantalla de muerte -->
-  <div class="death-screen tf-dotted-bg" *ngIf="gameState() === 'dead' && deathInfo() as info">
-    <div class="deco-blob deco-blob-1 deco-blob-danger"></div>
-    <div class="deco-blob deco-blob-2 deco-blob-danger"></div>
-
-    <div class="death-card tf-card">
-      <div class="name-card-icon">💀</div>
-      <h1>Te comieron</h1>
-      <p class="death-size">Llegaste a tamaño {{ info.size }}</p>
-      <p class="death-record" *ngIf="info.isRecord">¡Nuevo récord de la sesión! 🏆</p>
-      <div class="death-actions">
-        <button class="btn-primary" (click)="playAgain()">Jugar de nuevo</button>
-        <button class="btn-secondary" (click)="backToNameScreen()">Cambiar nombre</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Pantalla de victoria -->
-  <div class="death-screen victory-screen tf-dotted-bg" *ngIf="gameState() === 'won'">
-    <div class="deco-blob deco-blob-1 deco-blob-gold"></div>
-    <div class="deco-blob deco-blob-2 deco-blob-gold"></div>
-    <div class="deco-blob deco-blob-3 deco-blob-gold"></div>
-
-    <div class="death-card tf-card">
-      <div class="name-card-icon">🏆</div>
-      <h1>¡Ganaste!</h1>
-      <p class="death-size">
-        Llegaste al tamaño máximo (2000) — la partida se acabó ahí para que nadie farmee sin límite.
-      </p>
-      <div class="death-actions">
-        <button class="btn-primary" (click)="playAgain()">Jugar de nuevo</button>
-        <button class="btn-secondary" (click)="backToNameScreen()">Cambiar nombre</button>
-      </div>
-    </div>
-  </div>
+    <!-- Fin: victoria -->
+    @case ('won') {
+      <main class="page pantalla">
+        <section class="tarjeta card fin" aria-labelledby="ganaste-titulo">
+          <span class="tarjeta-icono icono-exito"><app-icono nombre="trofeo" [tamano]="26" /></span>
+          <h1 id="ganaste-titulo" class="page-title">¡Ganaste!</h1>
+          <p class="fin-dato">
+            Llegaste al tamaño máximo (2000). La partida termina ahí para que nadie crezca sin límite.
+          </p>
+          <div class="fin-acciones">
+            <button type="button" class="btn btn-primary btn-lg" (click)="playAgain()">Jugar de nuevo</button>
+            <button type="button" class="btn btn-secondary btn-lg" (click)="backToNameScreen()">Cambiar nombre</button>
+          </div>
+        </section>
+      </main>
+    }
+  }
 </div>

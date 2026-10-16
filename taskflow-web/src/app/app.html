@@ -1,23 +1,24 @@
 <header class="app-header">
   <nav class="app-nav" aria-label="Principal">
     <a class="app-marca" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <img src="favicon.svg" alt="" width="26" height="26" />
       TaskFlow
     </a>
 
     <div class="app-nav-links">
-      <a routerLink="/tablero" routerLinkActive="active">Tablero</a>
-      <a routerLink="/tienda" routerLinkActive="active">Tienda</a>
-      <a routerLink="/estadisticas" routerLinkActive="active">Estadísticas</a>
-      <a routerLink="/arena" routerLinkActive="active">Arena</a>
+      <a routerLink="/tablero" routerLinkActive="active"><app-icono nombre="tablero" [tamano]="17" />Tablero</a>
+      <a routerLink="/tienda" routerLinkActive="active"><app-icono nombre="tienda" [tamano]="17" />Tienda</a>
+      <a routerLink="/estadisticas" routerLinkActive="active"><app-icono nombre="estadisticas" [tamano]="17" />Estadísticas</a>
+      <a routerLink="/arena" routerLinkActive="active"><app-icono nombre="arena" [tamano]="17" />Arena</a>
     </div>
 
     <button
       type="button"
-      class="theme-toggle"
+      class="btn btn-icon theme-toggle"
       (click)="themeService.toggle()"
       [attr.aria-label]="themeService.theme() === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
     >
-      <span aria-hidden="true">{{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}</span>
+      <app-icono [nombre]="themeService.theme() === 'dark' ? 'sol' : 'luna'" />
     </button>
   </nav>
 

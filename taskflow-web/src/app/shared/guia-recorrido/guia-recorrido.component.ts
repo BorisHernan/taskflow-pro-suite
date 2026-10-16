@@ -5,6 +5,7 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { RECORRIDO, urlArchivo } from '../recorrido';
 import { RegistroEventosService } from '../registro-eventos.service';
+import { IconoComponent } from '../icono/icono.component';
 
 /**
  * Barra "Paso n de 4" en cada demo (qué probar aquí y a dónde ir después) y
@@ -13,7 +14,7 @@ import { RegistroEventosService } from '../registro-eventos.service';
 @Component({
   selector: 'app-guia-recorrido',
   standalone: true,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, IconoComponent],
   templateUrl: './guia-recorrido.component.html',
   styleUrl: './guia-recorrido.component.scss',
 })

@@ -7,7 +7,7 @@
 .home {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 72px 24px 64px;
+  padding: 72px var(--gutter) 64px;
   color: var(--text-primary);
 }
 
@@ -64,38 +64,6 @@ h2 {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 36px;
-}
-
-.btn-principal,
-.btn-secundario {
-  display: inline-flex;
-  align-items: center;
-  min-height: 48px;
-  padding: 0 22px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.btn-principal {
-  background: var(--accent);
-  color: #fff;
-
-  &:hover {
-    background: var(--accent-hover);
-  }
-}
-
-.btn-secundario {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-primary);
-
-  &:hover {
-    border-color: var(--text-muted);
-  }
 }
 
 .estado {
@@ -295,18 +263,23 @@ h2 {
   }
 }
 
-.stack-links,
-.contacto-links {
+.stack-links {
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
   margin: 28px 0 0;
-  font-size: 16px;
 
   a {
     color: var(--accent);
     font-weight: 600;
   }
+}
+
+.contacto-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 24px 0 0;
 }
 
 /* ── Contacto ─────────────────────────────────────────── */
@@ -334,7 +307,7 @@ h2 {
   }
 
   .home {
-    padding: 40px 16px 48px;
+    padding: 40px var(--gutter) 48px;
   }
 
   .hero,
@@ -353,6 +326,10 @@ h2 {
 
   .paso {
     padding: 20px;
+  }
+
+  .contacto-links .btn {
+    flex: 1 1 100%;
   }
 
   .stack-lista div {

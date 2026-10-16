@@ -1,17 +1,23 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Subject, takeUntil } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { STATUS_LABELS, STATUSES, Task, TaskPositionUpdate, TaskStatus } from '../models/task.model';
 import { TaskService } from '../services/task.service';
+import { IconoComponent } from '../shared/icono/icono.component';
+
+const ESPERA_DESHACER_MS = 5000;
+
+/** Minúsculas y sin tildes, para que "autenticacion" encuentre "autenticación". */
+function normalizar(texto: string): string {
+  return texto.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+}
 
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule],
+  imports: [FormsModule, DragDropModule, IconoComponent],
   templateUrl: './kanban-board.component.html',
   styleUrl: './kanban-board.component.scss',
 })
@@ -20,12 +26,21 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
   statusLabels = STATUS_LABELS;
 
   tasks = signal<Task[]>([]);
-  newTaskTitle = '';
+  cargando = signal(true);
   connectionLive = signal(false);
   errorMessage = signal<string | null>(null);
-  showInfo = signal(false);
   viewerCount = signal(1);
-  backendBaseUrl = environment.apiUrl.replace(/\/api\/tasks\/?$/, '');
+
+  newTaskTitle = '';
+  newTaskDescription = '';
+  mostrarDescripcion = signal(false);
+
+  filtro = signal('');
+  filtrando = computed(() => this.filtro().trim().length > 0);
+
+  // Tarea borrada en pantalla que todavía se puede recuperar con "Deshacer".
+  pendienteBorrar = signal<Task | null>(null);
+  private borrarTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
   private destroy$ = new Subject<void>();
   private errorTimeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -47,7 +62,7 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
             this.loadAll();
           } else if (event.type === 'DELETED') {
             this.removeTask(event.task!.id!);
-          } else {
+          } else if (event.task?.id !== this.pendienteBorrar()?.id) {
             this.mergeTask(event.task!);
           }
         },
@@ -55,19 +70,31 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Si se sale con un borrado pendiente, se confirma: lo que el usuario ve ya no la tiene.
+    this.confirmarBorrado();
     this.destroy$.next();
     this.destroy$.complete();
     clearTimeout(this.errorTimeoutId);
   }
 
   tasksByStatus(status: TaskStatus): Task[] {
+    const texto = normalizar(this.filtro().trim());
     return this.tasks()
       .filter((t) => t.status === status)
+      .filter((t) => !texto || normalizar(`${t.title} ${t.description ?? ''}`).includes(texto))
       .sort((a, b) => a.position - b.position);
+  }
+
+  totalDe(status: TaskStatus): number {
+    return this.tasks().filter((t) => t.status === status).length;
   }
 
   connectedLists(): string[] {
     return this.statuses.map((s) => 'list-' + s);
+  }
+
+  columnaVecina(status: TaskStatus, delta: -1 | 1): TaskStatus | null {
+    return this.statuses[this.statuses.indexOf(status) + delta] ?? null;
   }
 
   onDrop(event: CdkDragDrop<Task[]>, targetStatus: TaskStatus): void {
@@ -76,36 +103,81 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
+      transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
     }
 
-    // Reindexa las posiciones (1..n) de cada columna afectada por el drop,
-    // no solo la tarea movida, para que el orden se mantenga consistente.
-    const reindexed: Task[] = event.container.data.map((t, i) => ({
-      ...t,
-      status: targetStatus,
-      position: i + 1,
-    }));
-
+    // Reindexa las posiciones (1..n) de cada columna afectada, no solo la tarea movida.
+    const reindexed: Task[] = event.container.data.map((t, i) => ({ ...t, status: targetStatus, position: i + 1 }));
     if (event.previousContainer !== event.container) {
-      reindexed.push(
-        ...event.previousContainer.data.map((t, i) => ({ ...t, position: i + 1 }))
-      );
+      reindexed.push(...event.previousContainer.data.map((t, i) => ({ ...t, position: i + 1 })));
     }
 
-    // Actualiza el estado local al instante (optimista) y confirma con el backend.
-    reindexed.forEach((t) => this.mergeTask(t));
+    this.guardarOrden(reindexed, previousSnapshot);
+  }
 
-    const updates: TaskPositionUpdate[] = reindexed.map((t) => ({
-      id: t.id!,
-      status: t.status,
-      position: t.position,
-    }));
+  /** Alternativa al drag & drop (teclado y celular): manda la tarea al final de la columna vecina. */
+  moverA(task: Task, delta: -1 | 1): void {
+    const destino = this.columnaVecina(task.status, delta);
+    if (!destino || !task.id) return;
+
+    const previousSnapshot = this.tasks();
+    const origen = this.tasks()
+      .filter((t) => t.status === task.status && t.id !== task.id)
+      .sort((a, b) => a.position - b.position)
+      .map((t, i) => ({ ...t, position: i + 1 }));
+    const movida = { ...task, status: destino, position: this.totalDe(destino) + 1 };
+
+    this.guardarOrden([movida, ...origen], previousSnapshot);
+  }
+
+  addTask(): void {
+    const title = this.newTaskTitle.trim();
+    if (!title) return;
+    const description = this.newTaskDescription.trim() || undefined;
+
+    this.taskService.create({ title, description, status: 'TODO', position: this.totalDe('TODO') + 1 }).subscribe({
+      next: (created) => this.mergeTask(created),
+      error: (err) => this.showError(this.extractErrorMessage(err, 'No se pudo crear la tarea.')),
+    });
+
+    this.newTaskTitle = '';
+    this.newTaskDescription = '';
+    this.mostrarDescripcion.set(false);
+  }
+
+  deleteTask(task: Task): void {
+    if (!task.id) return;
+    this.confirmarBorrado();
+    this.removeTask(task.id);
+    this.pendienteBorrar.set(task);
+    this.borrarTimeoutId = setTimeout(() => this.confirmarBorrado(), ESPERA_DESHACER_MS);
+  }
+
+  deshacerBorrado(): void {
+    const task = this.pendienteBorrar();
+    if (!task) return;
+    clearTimeout(this.borrarTimeoutId);
+    this.pendienteBorrar.set(null);
+    this.mergeTask(task);
+  }
+
+  private confirmarBorrado(): void {
+    const task = this.pendienteBorrar();
+    if (!task?.id) return;
+    clearTimeout(this.borrarTimeoutId);
+    this.pendienteBorrar.set(null);
+    this.taskService.delete(task.id).subscribe({
+      error: (err) => {
+        this.mergeTask(task);
+        this.showError(this.extractErrorMessage(err, 'No se pudo eliminar la tarea.'));
+      },
+    });
+  }
+
+  private guardarOrden(cambios: Task[], previousSnapshot: Task[]): void {
+    // Actualiza la pantalla al instante (optimista) y confirma con el backend en una sola llamada.
+    cambios.forEach((t) => this.mergeTask(t));
+    const updates: TaskPositionUpdate[] = cambios.map((t) => ({ id: t.id!, status: t.status, position: t.position }));
 
     this.taskService.reorder(updates).subscribe({
       error: (err) => {
@@ -115,33 +187,16 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
     });
   }
 
-  addTask(): void {
-    const title = this.newTaskTitle.trim();
-    if (!title) return;
-
-    this.taskService
-      .create({ title, status: 'TODO', position: this.tasksByStatus('TODO').length + 1 })
-      .subscribe({
-        next: (created) => this.mergeTask(created),
-        error: (err) => this.showError(this.extractErrorMessage(err, 'No se pudo crear la tarea.')),
-      });
-
-    this.newTaskTitle = '';
-  }
-
-  deleteTask(task: Task, event: MouseEvent): void {
-    event.stopPropagation();
-    if (!task.id) return;
-    this.taskService.delete(task.id).subscribe({
-      next: () => this.removeTask(task.id!),
-      error: (err) => this.showError(this.extractErrorMessage(err, 'No se pudo eliminar la tarea.')),
-    });
-  }
-
   private loadAll(): void {
     this.taskService.getAll().subscribe({
-      next: (tasks) => this.tasks.set(tasks),
-      error: () => this.showError('No se pudieron cargar las tareas. Verifica que el backend esté corriendo.'),
+      next: (tasks) => {
+        this.tasks.set(tasks);
+        this.cargando.set(false);
+      },
+      error: () => {
+        this.cargando.set(false);
+        this.showError('No se pudieron cargar las tareas. El servidor gratuito puede estar despertando: reintenta en unos segundos.');
+      },
     });
   }
 

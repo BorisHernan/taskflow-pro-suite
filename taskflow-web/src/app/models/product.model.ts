@@ -1,3 +1,6 @@
+/** Con esta cantidad o menos, el producto se marca como "por agotarse" (tienda y estadísticas). */
+export const STOCK_BAJO = 5;
+
 export interface Product {
   id: number;
   name: string;
