@@ -123,8 +123,9 @@ Como el tablero y la tienda son de escritura/uso libre sin login, la única señ
   la IP para crear/editar.
 - **Límite de tareas por IP** (por defecto 50): al superarlo se borran todas las tareas de esa IP, para que un
   solo visitante no pueda llenar el tablero para todos.
-- **Reset diario automático** (03:00 UTC) que restaura el tablero y el stock a los datos semilla, y le da un
-  reinicio limpio a los contadores de moderación.
+- **Mantenimiento diario** (03:00 UTC) que **no borra historial**: tareas, reseñas y visitas se conservan.
+  Solo repone el stock de la tienda, vuelve a sembrar el tablero si alguien lo dejó vacío y limpia los
+  contadores de moderación.
 
 ### Arquitectura
 
@@ -222,7 +223,7 @@ taskflow-pro/
 │   │   ├── controller/    # REST + SSE del tablero
 │   │   ├── arena/         # Motor del mini juego + WebSocket
 │   │   ├── store/         # Tienda simulada (stock real)
-│   │   ├── demo/          # Moderación, rate limiting, reset diario, estadísticas
+│   │   ├── demo/          # Moderación, rate limiting, mantenimiento diario, estadísticas
 │   │   └── model/ repository/ config/ exception/
 │   └── src/test/java/...  # JUnit + Reactor Test + Mockito
 ├── taskflow-web/          # Frontend: Angular standalone + signals
@@ -361,8 +362,8 @@ identity signal available:
   creating/editing.
 - **Per-IP task limit** (50 by default): going over it wipes that IP's tasks, so a single visitor can't fill up
   the board for everyone.
-- **Automatic daily reset** (03:00 UTC) that restores the board and stock to seed data and clears the
-  moderation counters for a clean slate.
+- **Daily maintenance** (03:00 UTC) that **keeps all history**: tasks, reviews and visits are never purged.
+  It only restocks the store, reseeds the board if someone emptied it and clears the moderation counters.
 
 ### Architecture
 

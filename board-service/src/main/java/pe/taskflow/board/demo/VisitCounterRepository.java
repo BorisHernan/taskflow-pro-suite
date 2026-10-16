@@ -26,9 +26,4 @@ public interface VisitCounterRepository extends ReactiveCrudRepository<VisitCoun
             WHERE id = 1 AND EXISTS (SELECT 1 FROM inserted)
             """)
     Mono<Integer> incrementIfNewVisitorToday(String ip);
-
-    /** Se llama desde el reset diario: las filas de días pasados ya cumplieron su función. */
-    @Modifying
-    @Query("DELETE FROM visit_log WHERE visit_date < CURRENT_DATE")
-    Mono<Integer> deleteOldVisitLogEntries();
 }
