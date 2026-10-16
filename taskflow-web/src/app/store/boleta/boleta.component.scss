@@ -1,0 +1,144 @@
+:host {
+  display: block;
+}
+
+.fila-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+
+  &.total {
+    margin-top: 6px;
+    font-weight: 800;
+  }
+}
+
+/* ── Boleta ────────────────────────────────────────────── */
+
+.boleta-contenedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding-top: 8px;
+}
+
+.boleta-exito {
+  text-align: center;
+
+  h2 {
+    margin: 12px 0 4px;
+    font-size: var(--fs-xl);
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+}
+
+.boleta-check {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.boleta {
+  width: min(380px, 100%);
+  padding: 28px 24px;
+  background: #fffef9;
+  color: #1f2328;
+  border-radius: 4px;
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-mono);
+  animation: tf-receipt-print 0.4s var(--ease);
+  transform-origin: top center;
+  /* Borde inferior dentado, como un ticket cortado. */
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 16px 51% repeat-x,
+    linear-gradient(#000 0 0) top / 100% calc(100% - 7px) no-repeat;
+}
+
+.boleta-cabecera {
+  text-align: center;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px dashed #9aa1aa;
+
+  p {
+    margin: 0;
+  }
+}
+
+.boleta-tienda {
+  font-size: var(--fs-base);
+  font-weight: 700;
+}
+
+.boleta-falsa {
+  margin-top: 4px !important;
+  font-size: 11px;
+  color: #b42818;
+}
+
+.boleta-meta {
+  margin-top: 6px !important;
+  font-size: var(--fs-xs);
+  color: #57606a;
+}
+
+.boleta-lineas {
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed #9aa1aa;
+}
+
+.boleta-linea {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  font-size: 13px;
+}
+
+.boleta-totales .fila-total {
+  color: #1f2328;
+  font-size: 13px;
+
+  &.total {
+    font-size: var(--fs-base);
+  }
+}
+
+.boleta-gracias {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: var(--fs-xs);
+}
+
+.boleta-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* ── Impresión: solo la boleta ─────────────────────────── */
+
+@media print {
+  .no-imprimir {
+    display: none !important;
+  }
+
+  .boleta {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    mask: none;
+    animation: none;
+  }
+}

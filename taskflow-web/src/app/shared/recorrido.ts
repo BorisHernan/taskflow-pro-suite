@@ -50,8 +50,8 @@ public Flux<ServerSentEvent<TaskEvent>> stream(ServerWebExchange exchange) {
     ruta: '/tienda',
     demo: 'tienda',
     titulo: 'Tienda con stock compartido',
-    queEs: 'Carrito, cupones y boleta simulados, con stock real en la base de datos.',
-    pruebaEsto: 'Compra algo con el cupón PORTAFOLIO15 y mira cómo baja el stock para todos.',
+    queEs: 'Catálogo de 36 productos con categorías, reseñas moderadas, carrito y boleta. El pago es simulado; el stock es real.',
+    pruebaEsto: 'Abre un producto, deja una reseña y compra con el cupón PORTAFOLIO15: el stock baja para todos.',
     tecnica: 'SSE + R2DBC sobre PostgreSQL',
     comoFunciona:
       'La compra es una cadena reactiva: busca el producto, valida el stock, lo descuenta y lo guarda sin bloquear hilos. Si no alcanza, responde 409. El producto actualizado se publica por SSE y el stock baja en todas las pestañas abiertas.',

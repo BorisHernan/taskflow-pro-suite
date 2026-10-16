@@ -35,7 +35,7 @@ export class GuiaRecorridoComponent {
 
   readonly indice = computed(() => {
     const ruta = this.url().split(/[?#]/)[0];
-    return RECORRIDO.findIndex((p) => p.ruta === ruta);
+    return RECORRIDO.findIndex((p) => p.ruta === ruta || (p.ruta !== '/' && ruta.startsWith(p.ruta + '/')));
   });
 
   readonly paso = computed(() => RECORRIDO[this.indice()] ?? null);

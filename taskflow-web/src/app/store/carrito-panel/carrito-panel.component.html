@@ -1,0 +1,112 @@
+<dialog #dialogo class="panel" aria-labelledby="carrito-titulo" (close)="cerrar()" (click)="clicFondo($event)">
+  <div class="panel-contenido">
+    <header class="panel-cabecera">
+      <h2 id="carrito-titulo">
+        <app-icono nombre="carrito" [tamano]="20" />
+        Tu carrito
+        @if (carrito.unidades() > 0) {
+          <span class="chip chip-accent">{{ carrito.unidades() }}</span>
+        }
+      </h2>
+      <button type="button" class="btn btn-icon" (click)="cerrar()" aria-label="Cerrar el carrito">
+        <app-icono nombre="cerrar" />
+      </button>
+    </header>
+
+    @if (carrito.items().length === 0) {
+      <div class="vacio panel-vacio">
+        <span class="vacio-icono"><app-icono nombre="carrito" [tamano]="32" [grosor]="1.5" /></span>
+        <strong>Tu carrito está vacío</strong>
+        Explora el catálogo y agrega lo que te guste.
+        <button type="button" class="btn btn-secondary" (click)="cerrar()">Seguir comprando</button>
+      </div>
+    } @else {
+      <ul class="items">
+        @for (item of carrito.items(); track item.product.id; let i = $index) {
+          <li class="item entrar" [style.--i]="i">
+            <a class="item-icono" [routerLink]="['/tienda/producto', item.product.id]" (click)="cerrar()" [attr.aria-label]="'Ver ' + item.product.name">
+              <app-product-icon [icon]="item.product.icon || ''" [size]="24" />
+            </a>
+            <div class="item-info">
+              <span class="item-nombre">{{ item.product.name }}</span>
+              <span class="item-unitario">{{ item.product.price | soles }} c/u</span>
+            </div>
+            <button type="button" class="btn btn-icon btn-sm btn-danger-hover item-quitar" (click)="carrito.quitar(item)" [attr.aria-label]="'Quitar ' + item.product.name">
+              <app-icono nombre="basura" [tamano]="15" />
+            </button>
+            <div class="item-cantidad">
+              <button type="button" class="btn btn-icon btn-sm" (click)="cambiar(item, -1)" [attr.aria-label]="'Quitar uno de ' + item.product.name">
+                <app-icono nombre="menos" [tamano]="14" />
+              </button>
+              <span aria-live="polite">{{ item.quantity }}</span>
+              <button type="button" class="btn btn-icon btn-sm" (click)="cambiar(item, 1)" [attr.aria-label]="'Agregar otro ' + item.product.name">
+                <app-icono nombre="mas" [tamano]="14" />
+              </button>
+            </div>
+            <span class="item-total">{{ item.product.price * item.quantity | soles }}</span>
+          </li>
+        }
+      </ul>
+
+      <footer class="panel-pie">
+        <div class="cupon">
+          @if (carrito.cupon(); as c) {
+            <div class="cupon-aplicado">
+              <app-icono nombre="cupon" [tamano]="16" />
+              <span>Cupón <strong>{{ c.code }}</strong>: {{ c.discount * 100 }} % menos</span>
+              <button type="button" class="btn btn-sm btn-ghost" (click)="carrito.quitarCupon()">Quitar</button>
+            </div>
+          } @else {
+            <form class="cupon-form" (ngSubmit)="aplicarCupon()">
+              <label class="sr-only" for="codigo-cupon">Código de cupón</label>
+              <input id="codigo-cupon" class="input" type="text" placeholder="Código de cupón…" [(ngModel)]="codigoCupon" name="codigoCupon" autocomplete="off" spellcheck="false" />
+              <button type="submit" class="btn btn-secondary">Aplicar</button>
+            </form>
+            <button type="button" class="btn btn-sm btn-ghost cupon-ver" (click)="verCupones = !verCupones" [attr.aria-expanded]="verCupones">
+              {{ verCupones ? 'Ocultar cupones' : '¿Qué cupones hay?' }}
+            </button>
+            @if (verCupones) {
+              <ul class="cupon-lista">
+                @for (c of carrito.cuponesDisponibles; track c.code) {
+                  <li>
+                    <button type="button" class="btn btn-sm btn-secondary" (click)="aplicarCupon(c.code)">{{ c.code }}</button>
+                    <span>{{ c.discount * 100 }} % de descuento</span>
+                  </li>
+                }
+              </ul>
+            }
+          }
+        </div>
+
+        <div class="totales">
+          <div class="fila-total">
+            <span>Subtotal</span>
+            <span>{{ carrito.subtotal() | soles }}</span>
+          </div>
+          @if (carrito.descuento() > 0) {
+            <div class="fila-total descuento">
+              <span>Descuento</span>
+              <span>− {{ carrito.descuento() | soles }}</span>
+            </div>
+          }
+          <div class="fila-total total">
+            <span>Total</span>
+            <span>{{ carrito.total() | soles }}</span>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-success btn-lg pagar" [disabled]="carrito.pagando()" (click)="pagar()">
+          @if (carrito.pagando()) {
+            Procesando…
+          } @else {
+            Pagar {{ carrito.total() | soles }}
+          }
+        </button>
+        <p class="garantia">
+          <app-icono nombre="garantia" [tamano]="14" />
+          Pago simulado: el stock baja de verdad, tu tarjeta no.
+        </p>
+      </footer>
+    }
+  </div>
+</dialog>

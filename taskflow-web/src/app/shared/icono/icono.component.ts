@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import type { IconNode } from 'lucide';
 import { ICONOS, NombreIcono } from './iconos';
 
 /** Icono SVG de lucide. Decorativo (aria-hidden): el texto accesible va en el botón o enlace que lo contiene. */
@@ -45,9 +46,13 @@ import { ICONOS, NombreIcono } from './iconos';
   `,
 })
 export class IconoComponent {
-  readonly nombre = input.required<NombreIcono>();
+  readonly nombre = input<NombreIcono>();
+  /** Icono de lucide pasado directo, para los que viven en un chunk lazy (p. ej. productos). */
+  readonly icono = input<IconNode>();
   readonly tamano = input(18);
   readonly grosor = input(2);
 
-  readonly nodos = computed(() => ICONOS[this.nombre()] as unknown as [string, Record<string, string>][]);
+  readonly nodos = computed(
+    () => (this.icono() ?? ICONOS[this.nombre() ?? 'paquete']) as unknown as [string, Record<string, string>][],
+  );
 }
