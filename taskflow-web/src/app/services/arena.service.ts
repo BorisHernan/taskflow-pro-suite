@@ -21,7 +21,7 @@ export class ArenaService {
   private enviados = 0;
   private resumen?: ReturnType<typeof setInterval>;
 
-  connect(name: string): ArenaConnection {
+  connect(name: string, skin = 'clasico'): ArenaConnection {
     // Cierra cualquier conexión anterior (p. ej. si el jugador murió y no se
     // había desconectado todavía) para no dejar sockets huérfanos abiertos.
     this.disconnect();
@@ -32,7 +32,7 @@ export class ArenaService {
     const victory$ = new Subject<void>();
     const closed$ = new Subject<CloseEvent>();
 
-    const socket = new WebSocket(this.buildWsUrl(name));
+    const socket = new WebSocket(this.buildWsUrl(name, skin));
     this.socket = socket;
     this.anotar('salida', `conexión abierta a /ws/arena como "${name}"`);
     this.resumen = setInterval(() => {
@@ -81,6 +81,14 @@ export class ArenaService {
     }
   }
 
+  /** Dividirse (espacio) o expulsar masa (W). */
+  accion(accion: 'dividir' | 'expulsar'): void {
+    if (this.socket?.readyState === WebSocket.OPEN) {
+      this.socket.send(JSON.stringify({ accion }));
+      this.anotar('salida', `acción · ${accion}`);
+    }
+  }
+
   disconnect(): void {
     this.socket?.close();
     this.socket = undefined;
@@ -90,9 +98,9 @@ export class ArenaService {
     this.registro.registrar({ demo: 'arena', canal: 'WebSocket', direccion, detalle });
   }
 
-  private buildWsUrl(name: string): string {
+  private buildWsUrl(name: string, skin: string): string {
     const httpBase = environment.apiUrl.replace(/\/api\/tasks\/?$/, '');
     const wsBase = httpBase.replace(/^http/, 'ws');
-    return `${wsBase}/ws/arena?name=${encodeURIComponent(name)}`;
+    return `${wsBase}/ws/arena?name=${encodeURIComponent(name)}&skin=${encodeURIComponent(skin)}`;
   }
 }

@@ -4,7 +4,9 @@
     @case ('name') {
       <main class="page pantalla">
         <section class="tarjeta card" aria-labelledby="arena-titulo">
-          <span class="tarjeta-icono"><app-icono nombre="arena" [tamano]="26" /></span>
+          <div class="vista-previa">
+            <canvas #preview width="120" height="120" aria-hidden="true"></canvas>
+          </div>
           <h1 id="arena-titulo" class="page-title">Arena</h1>
           <p class="tarjeta-texto">
             Un mini agar.io multijugador en tiempo real. Juegas contra otros visitantes y contra bots que
@@ -19,6 +21,19 @@
           }
 
           <form class="nombre" (ngSubmit)="play()">
+            <fieldset class="skins">
+              <legend>Elige tu skin</legend>
+              <div class="skins-lista">
+                @for (s of skins; track s.clave) {
+                  <label class="skin" [class.activa]="skin() === s.clave">
+                    <input type="radio" name="skin" class="sr-only" [value]="s.clave" [checked]="skin() === s.clave" (change)="elegirSkin(s.clave)" />
+                    <span class="skin-muestra" [attr.data-skin]="s.clave" aria-hidden="true"></span>
+                    {{ s.nombre }}
+                  </label>
+                }
+              </div>
+            </fieldset>
+
             <label for="nombre-jugador">Tu nombre de jugador</label>
             <div class="nombre-fila">
               <input
@@ -37,8 +52,15 @@
           </form>
 
           <ul class="reglas">
-            <li><app-icono nombre="derecha" [tamano]="16" />Mueve el mouse o el dedo: tu círculo lo sigue.</li>
+            <li><app-icono nombre="derecha" [tamano]="16" />Mueve el mouse o el dedo: tus células lo siguen.</li>
             <li><app-icono nombre="rayo" [tamano]="16" />Come puntos y círculos al menos un 15 % más chicos que tú.</li>
+            <li><app-icono nombre="azar" [tamano]="16" /><span><kbd>Espacio</kbd> te divides para atrapar a otros · <kbd>W</kbd> expulsas masa. Tras 10 s tus células se vuelven a juntar.</span></li>
+            <li class="reglas-power">
+              @for (p of powerups | keyvalue; track p.key) {
+                <span><b [style.color]="p.value.color">{{ p.value.simbolo }}</b> {{ p.value.nombre }}</span>
+              }
+              <span class="reglas-power-texto">duran 8 s</span>
+            </li>
             <li><app-icono nombre="trofeo" [tamano]="16" />Llega a tamaño 2000 y ganas la partida.</li>
           </ul>
         </section>
@@ -52,31 +74,58 @@
 
         <div class="hud panel-juego">
           <p class="hud-tamano">{{ myRadius() }}</p>
-          <p class="hud-etiqueta">Tu tamaño · récord {{ maxRadiusThisSession() }}</p>
+          <p class="hud-etiqueta">
+            Tu tamaño · récord {{ maxRadiusThisSession() }}
+            @if (celulas() > 1) {
+              · {{ celulas() }} células
+            }
+          </p>
           @if (miPuesto(); as p) {
             <p class="hud-puesto">Puesto {{ p.puesto }} de {{ p.total }}</p>
+          }
+          @for (e of efectosActivos(); track e.clave) {
+            <div class="efecto" [style.--color]="e.color">
+              <span>{{ e.simbolo }} {{ e.nombre }}</span>
+              <span class="efecto-barra"><span [style.width.%]="e.restante * 100"></span></span>
+            </div>
           }
         </div>
 
         <aside class="ranking panel-juego" aria-labelledby="ranking-titulo">
           <h2 id="ranking-titulo"><app-icono nombre="corona" [tamano]="15" />Ranking</h2>
           <ol>
-            @for (blob of leaderboard(); track blob.id; let i = $index) {
-              <li [class.yo]="blob.id === miId()">
+            @for (j of leaderboard(); track j.ownerId; let i = $index) {
+              <li [class.yo]="j.ownerId === miId()">
                 <span class="puesto">{{ i + 1 }}</span>
-                <span class="nombre-blob">{{ blob.name }}</span>
-                @if (blob.bot) {
+                <span class="nombre-blob">{{ j.name }}</span>
+                @if (j.bot) {
                   <span class="etiqueta-bot">bot</span>
                 }
-                <span class="tamano">{{ blob.radius | number: '1.0-0' }}</span>
+                <span class="tamano">{{ j.tamano | number: '1.0-0' }}</span>
               </li>
             }
           </ol>
         </aside>
 
+        <ul class="avisos" aria-live="polite">
+          @for (a of avisos(); track a.id) {
+            <li [class.mio]="a.mio">{{ a.texto }}</li>
+          }
+        </ul>
+
         @if (toast()) {
           <p class="aviso-juego" role="status">{{ toast() }}</p>
         }
+
+        <div class="controles-juego">
+          <p class="atajos"><kbd>Espacio</kbd> dividirse · <kbd>W</kbd> expulsar masa</p>
+          <button type="button" class="boton-accion" (pointerdown)="$event.stopPropagation()" (click)="accion('expulsar')" aria-label="Expulsar masa">
+            W
+          </button>
+          <button type="button" class="boton-accion dividir" (pointerdown)="$event.stopPropagation()" (click)="accion('dividir')" aria-label="Dividirse">
+            <app-icono nombre="azar" [tamano]="20" />
+          </button>
+        </div>
       </section>
     }
 
@@ -94,7 +143,7 @@
           }
           <div class="fin-acciones">
             <button type="button" class="btn btn-primary btn-lg" (click)="playAgain()">Jugar de nuevo</button>
-            <button type="button" class="btn btn-secondary btn-lg" (click)="backToNameScreen()">Cambiar nombre</button>
+            <button type="button" class="btn btn-secondary btn-lg" (click)="backToNameScreen()">Cambiar nombre o skin</button>
           </div>
         </section>
       </main>
@@ -111,7 +160,7 @@
           </p>
           <div class="fin-acciones">
             <button type="button" class="btn btn-primary btn-lg" (click)="playAgain()">Jugar de nuevo</button>
-            <button type="button" class="btn btn-secondary btn-lg" (click)="backToNameScreen()">Cambiar nombre</button>
+            <button type="button" class="btn btn-secondary btn-lg" (click)="backToNameScreen()">Cambiar nombre o skin</button>
           </div>
         </section>
       </main>

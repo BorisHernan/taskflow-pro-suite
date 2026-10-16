@@ -9,8 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Estado del arena en memoria (no se persiste): jugadores, bots y pellets.
- * Limitado a pocos participantes a la vez para no exigir mucho al plan free.
+ * Estado del arena en memoria (no se persiste): células de jugadores, bots y
+ * pellets. `players` guarda células: un jugador dividido tiene varias con el
+ * mismo ownerId (la primera usa el id del jugador).
  */
 @Component
 public class ArenaState {
@@ -23,6 +24,12 @@ public class ArenaState {
     public static final double PELLET_RADIUS = 4;
     public static final double BIG_PELLET_RADIUS = 10;
     public static final double BIG_PELLET_CHANCE = 0.08;
+    public static final double MASA_RADIUS = 12;
+    public static final double POWERUP_RADIUS = 14;
+    public static final int POWERUP_COUNT = 10;
+    public static final int MAX_MASA = 150;
+    public static final List<String> SKINS = List.of("clasico", "sandia", "planeta", "galaxia", "dona", "ojo", "bug");
+    private static final List<String> POWERUPS = List.of(Pellet.VELOCIDAD, Pellet.ESCUDO, Pellet.IMAN);
     // Al llegar acá se acaba la partida: para un jugador es una victoria, para
     // un bot simplemente se "retira" y aparece uno nuevo — evita que farmear
     // sin límite vuelva aburrido el resto del arena para todos.
@@ -47,10 +54,28 @@ public class ArenaState {
     }
 
     public Blob addPlayer(String name) {
+        return addPlayer(name, "clasico");
+    }
+
+    public Blob addPlayer(String name, String skin) {
         Blob blob = randomBlob(UUID.randomUUID().toString(), false, name);
+        blob.setSkin(SKINS.contains(skin) ? skin : "clasico");
         ubicarLejosDeOtros(blob);
         players.put(blob.getId(), blob);
         return blob;
+    }
+
+    /** Células de un jugador (más de una si se dividió). */
+    public List<Blob> cellsOf(String ownerId) {
+        return players.values().stream().filter(b -> b.getOwnerId().equals(ownerId)).toList();
+    }
+
+    public void addCell(Blob cell) {
+        players.put(cell.getId(), cell);
+    }
+
+    public void removeCell(String cellId) {
+        players.remove(cellId);
     }
 
     /**
@@ -87,8 +112,9 @@ public class ArenaState {
                 .orElse(Double.MAX_VALUE);
     }
 
-    public void removePlayer(String id) {
-        players.remove(id);
+    /** Saca al jugador entero: todas sus células. */
+    public void removePlayer(String ownerId) {
+        players.values().removeIf(b -> b.getOwnerId().equals(ownerId));
     }
 
     public Blob getPlayer(String id) {
@@ -118,20 +144,34 @@ public class ArenaState {
         bots.put(id, randomBlob(id, true, BotNames.random()));
     }
 
+    /** Repone la comida común y los power-ups por separado (la masa expulsada no cuenta). */
     public void ensurePelletPopulation() {
-        while (pellets.size() < MAX_PELLETS) {
-            String id = UUID.randomUUID().toString();
-            boolean big = ThreadLocalRandom.current().nextDouble() < BIG_PELLET_CHANCE;
-            pellets.put(id, new Pellet(id, randomCoordinate(), randomCoordinate(), big));
+        long comunes = pellets.values().stream().filter(p -> !p.esPowerUp() && !Pellet.MASA.equals(p.tipo())).count();
+        for (long i = comunes; i < MAX_PELLETS; i++) {
+            String tipo = ThreadLocalRandom.current().nextDouble() < BIG_PELLET_CHANCE ? Pellet.GRANDE : Pellet.NORMAL;
+            addPellet(tipo, randomCoordinate(), randomCoordinate());
+        }
+        long powerUps = pellets.values().stream().filter(Pellet::esPowerUp).count();
+        for (long i = powerUps; i < POWERUP_COUNT; i++) {
+            addPellet(POWERUPS.get(ThreadLocalRandom.current().nextInt(POWERUPS.size())), randomCoordinate(), randomCoordinate());
         }
     }
 
-    public ArenaSnapshot snapshot() {
+    private void addPellet(String tipo, double x, double y) {
+        String id = UUID.randomUUID().toString();
+        pellets.put(id, new Pellet(id, x, y, tipo));
+    }
+
+    public long masaEnElMapa() {
+        return pellets.values().stream().filter(p -> Pellet.MASA.equals(p.tipo())).count();
+    }
+
+    public ArenaSnapshot snapshot(List<ArenaEvent> eventos) {
         List<BlobView> blobs = java.util.stream.Stream
                 .concat(players.values().stream(), bots.values().stream())
                 .map(BlobView::from)
                 .toList();
-        return new ArenaSnapshot(blobs, List.copyOf(pellets.values()), WORLD_SIZE);
+        return new ArenaSnapshot(blobs, List.copyOf(pellets.values()), WORLD_SIZE, List.copyOf(eventos));
     }
 
     private Blob randomBlob(String id, boolean bot, String name) {
@@ -141,7 +181,7 @@ public class ArenaState {
         return new Blob(id, bot, name, color, randomCoordinate(), randomCoordinate(), START_RADIUS);
     }
 
-    private double randomCoordinate() {
+    double randomCoordinate() {
         return ThreadLocalRandom.current().nextDouble(0, WORLD_SIZE);
     }
 }
