@@ -1,187 +1,266 @@
-<div class="store-page">
-  <header class="store-header">
+<main class="page">
+  <header class="page-header no-imprimir">
     <div>
-      <h1>🛒 Tienda del portafolio</h1>
-      <p class="subtitle">
-        <span class="dot" [class.live]="connectionLive()"></span>
-        {{ connectionLive() ? 'Stock en vivo' : 'Conectando…' }}
+      <h1 class="page-title">Tienda</h1>
+      <p class="page-subtitle">
+        <span class="chip" [class.chip-success]="connectionLive()">
+          <span class="punto" [class.en-vivo]="connectionLive()"></span>
+          {{ connectionLive() ? 'Stock en vivo' : 'Conectando…' }}
+        </span>
+        <span>La compra es simulada, pero el stock es real y compartido entre todos los visitantes.</span>
       </p>
     </div>
 
-    <button
-      type="button"
-      class="info-toggle"
-      (click)="showInfo.set(!showInfo())"
-      [attr.aria-expanded]="showInfo()"
-    >
-      {{ showInfo() ? 'Ocultar detalles ▲' : 'ℹ️ ¿Cómo funciona? ▼' }}
-    </button>
+    @if (!receipt()) {
+      <div class="filtros">
+        <div class="input-icono">
+          <app-icono nombre="buscar" [tamano]="16" />
+          <label class="sr-only" for="buscar-producto">Buscar productos</label>
+          <input
+            id="buscar-producto"
+            class="input"
+            type="search"
+            placeholder="Buscar productos…"
+            autocomplete="off"
+            [ngModel]="busqueda()"
+            (ngModelChange)="busqueda.set($event)"
+          />
+        </div>
+        <label class="sr-only" for="ordenar">Ordenar por</label>
+        <select id="ordenar" class="input" [ngModel]="orden()" (ngModelChange)="orden.set($event)">
+          <option value="destacados">Destacados</option>
+          <option value="precio-asc">Precio: menor a mayor</option>
+          <option value="precio-desc">Precio: mayor a menor</option>
+          <option value="stock">Stock: los que se agotan primero</option>
+        </select>
+      </div>
+    }
   </header>
 
-  <div class="info-panel" *ngIf="showInfo()">
-    <h2>¿Cómo funciona esta tienda?</h2>
-    <p>
-      Es un flujo de compra simulado para mostrar cómo se construye un carrito, cupones y una boleta —
-      pero no todo es de mentira:
-    </p>
-    <ul>
-      <li>
-        <strong>Catálogo, carrito, cupones y boleta:</strong> viven en el navegador. No hay pasarela de
-        pago ni tarjetas reales, y no se guarda ninguna "orden" en ningún lado.
-      </li>
-      <li>
-        <strong>El stock sí es real:</strong> cada compra descuenta unidades de verdad en la base de
-        datos, y lo ves bajar en vivo en cualquier pestaña o dispositivo — el mismo mecanismo de
-        Server-Sent Events del tablero Kanban, aplicado aquí.
-      </li>
-      <li>
-        <strong>Cupones fijos:</strong> son un puñado de códigos predefinidos (los ves con el botón
-        "¿Qué cupones hay?" en el carrito), no un sistema de descuentos real.
-      </li>
-      <li>
-        <strong>Se repone solo:</strong> el stock vuelve a sus valores iniciales una vez al día, para que
-        la demo no se agote.
-      </li>
-    </ul>
-    <p class="info-links">
-      API en vivo:
-      <a [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">Swagger / OpenAPI</a>
-    </p>
-  </div>
-
-  <div class="store-notice" *ngIf="!receipt()">
-    🎭 Bienvenido a la tienda simulada: agrega productos al carrito, prueba un cupón y paga para ver tu
-    boleta (decorada, pero de mentira 😄). Lo único real es el <strong>stock</strong> — se descuenta de
-    verdad y en vivo para todos los visitantes, igual que el tablero.
-  </div>
-
-  <div class="error-banner" role="alert" *ngIf="errorMessage()">{{ errorMessage() }}</div>
-
-  <!-- Vista de boleta -->
-  <div class="receipt-wrapper" *ngIf="receipt() as r">
-    <div class="receipt">
-      <div class="receipt-header">
-        <p class="receipt-store">🧾 TaskFlow App Store</p>
-        <p class="receipt-fake">*** Boleta de demostración — no es un comprobante real ***</p>
-        <p class="receipt-meta">N° {{ r.number }} · {{ r.date | date: 'dd/MM/yyyy HH:mm' }}</p>
-      </div>
-
-      <div class="receipt-lines">
-        <div class="receipt-line" *ngFor="let line of r.lines">
-          <span class="line-name">{{ line.name }} × {{ line.quantity }}</span>
-          <span class="line-total">{{ line.lineTotal | soles }}</span>
-        </div>
-      </div>
-
-      <div class="receipt-totals">
-        <div class="totals-row">
-          <span>Subtotal</span>
-          <span>{{ r.subtotal | soles }}</span>
-        </div>
-        <div class="totals-row" *ngIf="r.discount > 0">
-          <span>Descuento ({{ r.couponCode }})</span>
-          <span>- {{ r.discount | soles }}</span>
-        </div>
-        <div class="totals-row total">
-          <span>Total</span>
-          <span>{{ r.total | soles }}</span>
-        </div>
-      </div>
-
-      <p class="receipt-thanks">¡Gracias por tu compra simulada! 🎉</p>
+  @if (errorMessage()) {
+    <div class="alerta alerta-error no-imprimir" role="alert">
+      <app-icono nombre="alerta" />
+      <span>{{ errorMessage() }}</span>
     </div>
+  }
 
-    <button class="btn-primary" (click)="newPurchase()">Hacer otra compra</button>
-  </div>
-
-  <!-- Vista de catálogo + carrito -->
-  <div class="store-body" *ngIf="!receipt()">
-    <div class="catalog">
-      <div class="product-card" *ngFor="let product of products()">
-        <app-product-icon class="product-icon" [icon]="product.icon || ''" [size]="40"></app-product-icon>
-        <p class="product-name">{{ product.name }}</p>
-        <p class="product-description" *ngIf="product.description">{{ product.description }}</p>
-        <p class="product-price">{{ product.price | soles }}</p>
-        <p class="product-stock" [class.low]="product.stock <= 5">
-          {{ product.stock > 0 ? product.stock + ' en stock' : 'Agotado' }}
-        </p>
-        <button
-          class="btn-add"
-          [disabled]="product.stock === 0 || cartQuantity(product.id) >= product.stock"
-          (click)="addToCart(product)"
-        >
-          Agregar al carrito
-        </button>
+  @if (receipt(); as r) {
+    <!-- Boleta -->
+    <section class="boleta-contenedor" aria-labelledby="boleta-titulo">
+      <div class="boleta-exito no-imprimir">
+        <span class="boleta-check"><app-icono nombre="check" [tamano]="22" [grosor]="2.5" /></span>
+        <h2 id="boleta-titulo">¡Compra lista!</h2>
+        <p>El stock ya bajó para todos los visitantes. Esta es tu boleta de demostración.</p>
       </div>
-    </div>
 
-    <aside class="cart">
-      <h2>Tu carrito</h2>
+      <article class="boleta">
+        <header class="boleta-cabecera">
+          <p class="boleta-tienda">TaskFlow Store</p>
+          <p class="boleta-falsa">Boleta de demostración, no es un comprobante real</p>
+          <p class="boleta-meta">N.º {{ r.number }} · {{ r.date | date: 'dd/MM/yyyy HH:mm' }}</p>
+        </header>
 
-      <div class="cart-empty" *ngIf="cart().length === 0">Aún no has agregado nada.</div>
+        <div class="boleta-lineas">
+          @for (line of r.lines; track line.name) {
+            <div class="boleta-linea">
+              <span>{{ line.name }} × {{ line.quantity }}</span>
+              <span>{{ line.lineTotal | soles }}</span>
+            </div>
+          }
+        </div>
 
-      <div class="cart-items">
-        <div class="cart-item" *ngFor="let item of cart()">
-          <app-product-icon class="cart-item-icon" [icon]="item.product.icon || ''" [size]="20"></app-product-icon>
-          <span class="cart-item-name">{{ item.product.name }}</span>
-          <div class="cart-item-qty">
-            <button (click)="changeQuantity(item, -1)" aria-label="Quitar uno">−</button>
-            <span>{{ item.quantity }}</span>
-            <button (click)="changeQuantity(item, 1)" aria-label="Agregar uno">+</button>
+        <div class="boleta-totales">
+          <div class="fila-total">
+            <span>Subtotal</span>
+            <span>{{ r.subtotal | soles }}</span>
           </div>
-          <span class="cart-item-total">{{ (item.product.price * item.quantity) | soles }}</span>
-          <button class="cart-item-remove" (click)="removeFromCart(item)" aria-label="Eliminar">×</button>
+          @if (r.discount > 0) {
+            <div class="fila-total">
+              <span>Descuento ({{ r.couponCode }})</span>
+              <span>− {{ r.discount | soles }}</span>
+            </div>
+          }
+          <div class="fila-total total">
+            <span>Total</span>
+            <span>{{ r.total | soles }}</span>
+          </div>
         </div>
-      </div>
+        <p class="boleta-gracias">Gracias por tu compra simulada.</p>
+      </article>
 
-      <div class="coupon-box" *ngIf="cart().length > 0">
-        <div class="coupon-applied" *ngIf="appliedCoupon() as c">
-          <span>🎟️ Cupón {{ c.code }} aplicado (-{{ c.discount * 100 }}%)</span>
-          <button (click)="removeCoupon()">Quitar</button>
-        </div>
-        <form class="coupon-form" *ngIf="!appliedCoupon()" (ngSubmit)="applyCoupon()">
-          <label class="sr-only" for="codigo-cupon">Código de cupón</label>
-          <input id="codigo-cupon" type="text" placeholder="Ej.: PORTAFOLIO15" [(ngModel)]="couponInput" name="couponInput" autocomplete="off" spellcheck="false" />
-          <button type="submit">Aplicar</button>
-        </form>
-        <button
-          type="button"
-          class="coupon-toggle"
-          *ngIf="!appliedCoupon()"
-          (click)="showCoupons.set(!showCoupons())"
-        >
-          {{ showCoupons() ? 'Ocultar cupones' : '¿Qué cupones hay?' }}
+      <div class="boleta-acciones no-imprimir">
+        <button type="button" class="btn btn-secondary btn-lg" (click)="imprimirBoleta()">
+          <app-icono nombre="imprimir" />
+          Imprimir o guardar en PDF
         </button>
-        <ul class="coupon-list" *ngIf="showCoupons() && !appliedCoupon()">
-          <li *ngFor="let c of availableCoupons">
-            <code>{{ c.code }}</code> — {{ c.discount * 100 }}% de descuento
-          </li>
-        </ul>
+        <button type="button" class="btn btn-primary btn-lg" (click)="newPurchase()">Hacer otra compra</button>
       </div>
+    </section>
+  } @else {
+    <div class="tienda">
+      <!-- Catálogo -->
+      <section class="catalogo" aria-label="Catálogo">
+        @for (product of productosVisibles(); track product.id) {
+          <article class="producto card">
+            <div class="producto-icono">
+              <app-product-icon [icon]="product.icon || ''" [size]="34"></app-product-icon>
+            </div>
 
-      <div class="cart-totals" *ngIf="cart().length > 0">
-        <div class="totals-row">
-          <span>Subtotal</span>
-          <span>{{ subtotal() | soles }}</span>
-        </div>
-        <div class="totals-row" *ngIf="discountAmount() > 0">
-          <span>Descuento</span>
-          <span>- {{ discountAmount() | soles }}</span>
-        </div>
-        <div class="totals-row total">
-          <span>Total</span>
-          <span>{{ total() | soles }}</span>
-        </div>
+            <h2 class="producto-nombre">{{ product.name }}</h2>
+            @if (product.description) {
+              <p class="producto-descripcion">{{ product.description }}</p>
+            }
+
+            <div class="producto-pie">
+              <div class="producto-precio-fila">
+                <p class="producto-precio">{{ product.price | soles }}</p>
+                @if (cartQuantity(product.id) > 0) {
+                  <span class="chip chip-accent">{{ cartQuantity(product.id) }} en tu carrito</span>
+                }
+              </div>
+
+              <div class="stock" [class.bajo]="product.stock <= stockBajo">
+                <div class="stock-barra" aria-hidden="true">
+                  <span [style.width.%]="porcentajeStock(product.stock)"></span>
+                </div>
+                <span class="stock-texto">
+                  @if (product.stock === 0) {
+                    Agotado
+                  } @else if (product.stock <= stockBajo) {
+                    ¡Quedan {{ product.stock }}!
+                  } @else {
+                    {{ product.stock }} en stock
+                  }
+                </span>
+              </div>
+
+              <button
+                type="button"
+                class="btn btn-primary"
+                [disabled]="product.stock === 0 || cartQuantity(product.id) >= product.stock"
+                (click)="addToCart(product)"
+              >
+                @if (cartQuantity(product.id) > 0) {
+                  <app-icono nombre="mas" [tamano]="16" />
+                  Agregar otro
+                } @else {
+                  <app-icono nombre="carrito" [tamano]="16" />
+                  Agregar al carrito
+                }
+              </button>
+            </div>
+          </article>
+        } @empty {
+          <div class="vacio catalogo-vacio">
+            @if (products().length === 0) {
+              Cargando el catálogo…
+            } @else {
+              Ningún producto coincide con “{{ busqueda() }}”.
+              <button type="button" class="btn btn-sm btn-ghost" (click)="busqueda.set('')">Limpiar búsqueda</button>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Carrito -->
+      <aside class="carrito card" #carrito tabindex="-1" aria-labelledby="carrito-titulo">
+        <header class="carrito-cabecera">
+          <h2 id="carrito-titulo">Tu carrito</h2>
+          @if (unidadesEnCarrito() > 0) {
+            <span class="chip chip-accent">{{ unidadesEnCarrito() }} {{ unidadesEnCarrito() === 1 ? 'producto' : 'productos' }}</span>
+          }
+        </header>
+
+        @if (cart().length === 0) {
+          <div class="vacio">
+            <app-icono nombre="carrito" [tamano]="28" [grosor]="1.5" />
+            Aún no agregaste nada.
+          </div>
+        } @else {
+          <ul class="carrito-items">
+            @for (item of cart(); track item.product.id) {
+              <li class="item">
+                <app-product-icon class="item-icono" [icon]="item.product.icon || ''" [size]="20"></app-product-icon>
+                <div class="item-info">
+                  <span class="item-nombre">{{ item.product.name }}</span>
+                  <span class="item-unitario">{{ item.product.price | soles }} c/u</span>
+                </div>
+                <div class="item-cantidad">
+                  <button type="button" class="btn btn-icon btn-sm" (click)="changeQuantity(item, -1)" [attr.aria-label]="'Quitar uno de ' + item.product.name">
+                    <app-icono nombre="menos" [tamano]="14" />
+                  </button>
+                  <span aria-live="polite">{{ item.quantity }}</span>
+                  <button type="button" class="btn btn-icon btn-sm" (click)="changeQuantity(item, 1)" [attr.aria-label]="'Agregar otro ' + item.product.name">
+                    <app-icono nombre="mas" [tamano]="14" />
+                  </button>
+                </div>
+                <span class="item-total">{{ item.product.price * item.quantity | soles }}</span>
+                <button type="button" class="btn btn-icon btn-sm btn-danger-hover item-quitar" (click)="removeFromCart(item)" [attr.aria-label]="'Quitar ' + item.product.name + ' del carrito'">
+                  <app-icono nombre="cerrar" [tamano]="14" />
+                </button>
+              </li>
+            }
+          </ul>
+
+          <div class="cupon">
+            @if (appliedCoupon(); as c) {
+              <div class="cupon-aplicado">
+                <app-icono nombre="cupon" [tamano]="16" />
+                <span>Cupón <strong>{{ c.code }}</strong>: {{ c.discount * 100 }} % de descuento</span>
+                <button type="button" class="btn btn-sm btn-ghost" (click)="removeCoupon()">Quitar</button>
+              </div>
+            } @else {
+              <form class="cupon-form" (ngSubmit)="applyCoupon()">
+                <label class="sr-only" for="codigo-cupon">Código de cupón</label>
+                <input id="codigo-cupon" class="input" type="text" placeholder="Código de cupón…" [(ngModel)]="couponInput" name="couponInput" autocomplete="off" spellcheck="false" />
+                <button type="submit" class="btn btn-secondary">Aplicar</button>
+              </form>
+              <button type="button" class="btn btn-sm btn-ghost cupon-ver" (click)="showCoupons.set(!showCoupons())" [attr.aria-expanded]="showCoupons()">
+                {{ showCoupons() ? 'Ocultar cupones' : '¿Qué cupones hay?' }}
+              </button>
+              @if (showCoupons()) {
+                <ul class="cupon-lista">
+                  @for (c of availableCoupons; track c.code) {
+                    <li>
+                      <button type="button" class="btn btn-sm btn-secondary" (click)="couponInput = c.code; applyCoupon()">{{ c.code }}</button>
+                      <span>{{ c.discount * 100 }} % de descuento</span>
+                    </li>
+                  }
+                </ul>
+              }
+            }
+          </div>
+
+          <div class="totales">
+            <div class="fila-total">
+              <span>Subtotal</span>
+              <span>{{ subtotal() | soles }}</span>
+            </div>
+            @if (discountAmount() > 0) {
+              <div class="fila-total descuento">
+                <span>Descuento</span>
+                <span>− {{ discountAmount() | soles }}</span>
+              </div>
+            }
+            <div class="fila-total total">
+              <span>Total</span>
+              <span>{{ total() | soles }}</span>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-success btn-lg pagar" [disabled]="isCheckingOut" (click)="checkout()">
+            {{ isCheckingOut ? 'Procesando…' : 'Pagar ' }}{{ isCheckingOut ? '' : (total() | soles) }}
+          </button>
+        }
+      </aside>
+    </div>
+
+    <!-- Celular: resumen flotante que lleva al carrito -->
+    @if (unidadesEnCarrito() > 0) {
+      <div class="resumen-movil">
+        <span><strong>{{ unidadesEnCarrito() }}</strong> en el carrito · {{ total() | soles }}</span>
+        <button type="button" class="btn btn-primary" (click)="irAlCarrito()">Ver carrito</button>
       </div>
-
-      <button
-        class="btn-primary"
-        *ngIf="cart().length > 0"
-        [disabled]="isCheckingOut"
-        (click)="checkout()"
-      >
-        {{ isCheckingOut ? 'Procesando…' : 'Pagar' }}
-      </button>
-    </aside>
-  </div>
-</div>
+    }
+  }
+</main>

@@ -1,66 +1,89 @@
-<div class="dashboard-page">
-  <header class="dashboard-header">
+<main class="page">
+  <header class="page-header">
     <div>
-      <h1>📊 Estadísticas</h1>
-      <p class="subtitle">Contadores del demo, en vivo desde el último despliegue del backend.</p>
+      <h1 class="page-title">Estadísticas</h1>
+      <p class="page-subtitle">
+        Lo que pasa en la demo, contado por el backend con Micrometer.
+        @if (ultimaActualizacion()) {
+          <span class="chip">Actualizado {{ haceCuanto() }}</span>
+        }
+      </p>
     </div>
-    <button type="button" class="btn-refresh" [disabled]="loading()" (click)="refresh()">
-      {{ loading() ? 'Cargando…' : '🔄 Actualizar' }}
-    </button>
+
+    <div class="controles">
+      <label class="interruptor">
+        <input
+          type="checkbox"
+          role="switch"
+          [ngModel]="autoActualizar()"
+          (ngModelChange)="alternarAutoActualizar($event)"
+        />
+        <span class="interruptor-pista" aria-hidden="true"></span>
+        Actualizar cada 15 s
+      </label>
+      <button type="button" class="btn btn-secondary" [disabled]="loading()" (click)="refresh()">
+        <app-icono nombre="refrescar" [tamano]="16" [class.girando]="loading()" />
+        {{ loading() ? 'Actualizando…' : 'Actualizar' }}
+      </button>
+    </div>
   </header>
 
-  <div class="dashboard-notice">
-    ℹ️ La mayoría de estos contadores vive en memoria en el backend y se reinicia con cada despliegue.
-    La excepción es "Visitas totales (histórico)": esa sí está guardada en la base de datos y no se pierde.
-  </div>
+  @if (errorMessage()) {
+    <div class="alerta alerta-error" role="alert">
+      <app-icono nombre="alerta" />
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
 
-  <div class="error-banner" role="alert" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+  <section class="kpis" aria-label="Indicadores">
+    @for (kpi of kpis; track kpi.clave) {
+      <article class="kpi card" [class.kpi-destacado]="kpi.persistido">
+        <span class="kpi-icono"><app-icono [nombre]="kpi.icono" [tamano]="20" /></span>
+        <p class="kpi-valor">
+          @if (kpi.moneda) {
+            {{ animatedStats()[kpi.clave] | soles }}
+          } @else {
+            {{ formatear(kpi, animatedStats()[kpi.clave]) }}
+          }
+        </p>
+        <p class="kpi-etiqueta">{{ kpi.etiqueta }}</p>
+        @if (kpi.persistido) {
+          <span class="chip chip-accent kpi-nota">Guardado en PostgreSQL: 1 por persona al día</span>
+        }
+      </article>
+    }
+  </section>
 
-  <div class="kpi-grid" *ngIf="stats() as loaded">
-    <div class="kpi-card">
-      <span class="kpi-icon">📝</span>
-      <span class="kpi-value">{{ animatedStats().tasksCreated }}</span>
-      <span class="kpi-label">Tareas creadas</span>
-    </div>
-    <div class="kpi-card">
-      <span class="kpi-icon">🛍️</span>
-      <span class="kpi-value">{{ animatedStats().purchases }}</span>
-      <span class="kpi-label">Compras realizadas</span>
-    </div>
-    <div class="kpi-card">
-      <span class="kpi-icon">📦</span>
-      <span class="kpi-value">{{ animatedStats().unitsSold }}</span>
-      <span class="kpi-label">Unidades vendidas</span>
-    </div>
-    <div class="kpi-card">
-      <span class="kpi-icon">💰</span>
-      <span class="kpi-value">{{ animatedStats().revenue | soles }}</span>
-      <span class="kpi-label">Ingresos simulados</span>
-    </div>
-    <div class="kpi-card">
-      <span class="kpi-icon">👀</span>
-      <span class="kpi-value">{{ animatedStats().totalVisitors }}</span>
-      <span class="kpi-label">Conexiones desde el último deploy</span>
-    </div>
-    <div class="kpi-card kpi-card-persisted">
-      <span class="kpi-icon">💾</span>
-      <span class="kpi-value">{{ animatedStats().totalVisitsAllTime }}</span>
-      <span class="kpi-label">Visitas totales (histórico)</span>
-    </div>
-  </div>
+  <p class="nota">
+    <app-icono nombre="info" [tamano]="16" />
+    Salvo las visitas totales, los contadores viven en memoria del backend y se reinician en cada despliegue.
+  </p>
 
-  <div class="stock-panel" *ngIf="stockBars().length > 0">
-    <h2>Stock actual de la tienda</h2>
-    <div class="stock-row" *ngFor="let bar of stockBars()">
-      <span class="stock-name">{{ bar.product.name }}</span>
-      <div class="stock-bar-track">
-        <div
-          class="stock-bar-fill"
-          [class.low]="bar.product.stock <= 5"
-          [style.width.%]="bar.percent"
-        ></div>
-      </div>
-      <span class="stock-count">{{ bar.product.stock }}</span>
-    </div>
-  </div>
-</div>
+  @if (stockBars().length > 0) {
+    <section class="stock card" aria-labelledby="stock-titulo">
+      <header class="stock-cabecera">
+        <h2 id="stock-titulo">Stock de la tienda</h2>
+        @if (productosBajos() > 0) {
+          <span class="chip chip-warning">
+            {{ productosBajos() }} {{ productosBajos() === 1 ? 'producto por agotarse' : 'productos por agotarse' }}
+          </span>
+        } @else {
+          <span class="chip chip-success">Todo con stock</span>
+        }
+      </header>
+      <p class="stock-ayuda">Ordenado de menor a mayor: lo que se está por agotar queda arriba.</p>
+
+      <ul class="barras">
+        @for (bar of stockBars(); track bar.product.id) {
+          <li class="barra" [class.bajo]="bar.product.stock <= stockBajo">
+            <span class="barra-nombre" [title]="bar.product.name">{{ bar.product.name }}</span>
+            <div class="barra-pista" aria-hidden="true">
+              <span [style.width.%]="bar.percent"></span>
+            </div>
+            <span class="barra-valor">{{ bar.product.stock }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</main>

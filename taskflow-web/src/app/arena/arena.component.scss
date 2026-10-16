@@ -1,315 +1,282 @@
 :host {
   display: block;
-  font-family: 'Segoe UI', Roboto, sans-serif;
 }
 
-.arena-page {
-  min-height: calc(100vh - 50px);
+/* ── Pantallas de inicio y fin ─────────────────────────── */
+
+.pantalla {
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - 160px);
 }
 
-.name-screen,
-.death-screen {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 24px;
-  background: var(--bg-gradient);
-  min-height: calc(100vh - 50px);
-  animation: tf-fade-in 0.35s ease;
-  overflow: hidden;
+.tarjeta {
+  width: min(520px, 100%);
+  padding: 36px;
 }
 
-.deco-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.55;
-  pointer-events: none;
-  animation: tf-float 9s ease-in-out infinite;
-  z-index: 0;
+.tarjeta-icono {
+  display: inline-grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 16px;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
-.deco-blob-1 {
-  width: 280px;
-  height: 280px;
-  background: var(--accent);
-  top: -70px;
-  left: -70px;
+.icono-peligro {
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 
-.deco-blob-2 {
-  width: 220px;
-  height: 220px;
-  background: var(--success);
-  bottom: -50px;
-  right: -30px;
-  animation-delay: -3s;
+.icono-exito {
+  background: var(--warning-bg);
+  color: var(--warning);
 }
 
-.deco-blob-3 {
-  width: 180px;
-  height: 180px;
-  background: #ffab00;
-  bottom: 60px;
-  left: 8%;
-  animation-delay: -6s;
-}
-
-.deco-blob-danger {
-  background: var(--danger) !important;
-}
-
-.deco-blob-gold {
-  background: #ffab00 !important;
-}
-
-.name-card,
-.death-card {
-  position: relative;
-  z-index: 1;
-  max-width: 480px;
-  width: 100%;
-  padding: 48px 36px;
-  text-align: center;
-  animation: tf-fade-in-up 0.4s ease;
-}
-
-.name-card-icon {
-  font-size: 46px;
-  margin-bottom: 8px;
-}
-
-.name-card h1 {
-  margin: 0 0 8px;
-  font-size: 28px;
-  color: var(--text-primary);
-}
-
-.name-card .subtitle {
-  color: var(--text-secondary);
-  font-size: 14px;
+.tarjeta-texto {
+  margin: 10px 0 24px;
   line-height: 1.6;
-  margin-bottom: 18px;
+  color: var(--text-secondary);
 }
 
-.feature-pills {
+.nombre {
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+}
+
+.nombre-fila {
   display: flex;
   gap: 8px;
+
+  .input {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.reglas {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 20px 0 0;
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 10px;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+  }
+
+  app-icono {
+    margin-top: 2px;
+    color: var(--accent);
+  }
+}
+
+.fin {
+  text-align: center;
+
+  .chip {
+    margin: 4px 0 0;
+  }
+}
+
+.fin-dato {
+  margin: 10px 0 8px;
+  font-size: var(--fs-lg);
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.fin-acciones {
+  display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 22px;
-
-  .pill {
-    background: var(--surface-alt);
-    color: var(--text-secondary);
-    border-radius: 20px;
-    padding: 6px 12px;
-    font-size: 12px;
-    font-weight: 500;
-  }
+  gap: 12px;
+  margin-top: 28px;
 }
 
-.error-banner {
-  background: var(--danger-bg);
-  border: 1px solid var(--danger-border);
-  color: var(--danger-text);
-  border-radius: 6px;
-  padding: 10px 14px;
-  font-size: 13px;
-  margin-bottom: 16px;
-  animation: tf-slide-down 0.25s ease;
-}
+/* ── Partida ───────────────────────────────────────────── */
 
-.name-form {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-
-  input {
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 14px;
-    min-width: 220px;
-    background: var(--surface);
-    color: var(--text-primary);
-
-    &:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
-    }
-  }
-
-  button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    background: var(--accent);
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s ease, transform 0.15s ease;
-
-    &:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-    }
-  }
-}
-
-.game-screen {
+.juego {
   position: relative;
-  width: 100%;
-  height: calc(100vh - 50px);
+  height: calc(100vh - 146px);
+  min-height: 420px;
   overflow: hidden;
+  background: #0d1117;
 }
 
 canvas {
+  display: block;
   width: 100%;
   height: 100%;
-  display: block;
   cursor: crosshair;
+  /* Sin esto, arrastrar el dedo hace scroll o zoom en vez de mover el blob. */
+  touch-action: none;
+}
+
+/* Paneles sobre el canvas: el juego siempre es oscuro, sin importar el tema. */
+.panel-juego {
+  position: absolute;
+  top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: rgba(13, 17, 23, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e8ecf3;
+  pointer-events: none;
+  backdrop-filter: blur(6px);
+
+  p {
+    margin: 0;
+  }
 }
 
 .hud {
-  position: absolute;
-  top: 16px;
   left: 16px;
-  background: rgba(13, 17, 23, 0.7);
-  color: #e6edf3;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  pointer-events: none;
-
-  .hud-size {
-    font-size: 18px;
-    font-weight: 700;
-  }
-
-  .hud-record {
-    margin-top: 2px;
-    opacity: 0.8;
-  }
 }
 
-.leaderboard {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(13, 17, 23, 0.7);
-  color: #e6edf3;
-  padding: 12px 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  min-width: 170px;
-  pointer-events: none;
+.hud-tamano {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
 
-  h3 {
+.hud-etiqueta,
+.hud-puesto {
+  margin-top: 4px !important;
+  font-size: var(--fs-xs);
+  color: #a3adbd;
+  font-variant-numeric: tabular-nums;
+}
+
+.ranking {
+  right: 16px;
+  min-width: 210px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     margin: 0 0 8px;
     font-size: 13px;
+    color: #f5b041;
+  }
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    margin: 0 -6px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+
+    &.yo {
+      background: rgba(91, 140, 255, 0.25);
+      font-weight: 700;
+    }
   }
 }
 
-.leaderboard-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 0;
-
-  .rank {
-    width: 14px;
-    opacity: 0.7;
-  }
-
-  .lb-name {
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .lb-size {
-    font-weight: 600;
-  }
+.puesto {
+  width: 14px;
+  color: #6b7689;
+  font-variant-numeric: tabular-nums;
 }
 
-.toast {
-  position: absolute;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(54, 179, 126, 0.9);
-  color: white;
-  padding: 10px 18px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  animation: tf-slide-down 0.3s ease;
-  pointer-events: none;
+.nombre-blob {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.death-card h1 {
-  margin: 0 0 12px;
-  font-size: 28px;
-  color: var(--text-primary);
+.etiqueta-bot {
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  color: #a3adbd;
+  font-size: 11px;
 }
 
-.death-card .death-size {
-  color: var(--text-secondary);
-  font-size: 15px;
-  line-height: 1.5;
-  margin: 0 0 4px;
-}
-
-.death-card .death-record {
-  color: var(--success);
+.tamano {
   font-weight: 700;
-  margin: 8px 0 20px;
+  font-variant-numeric: tabular-nums;
 }
 
-.victory-screen .death-card h1 {
-  color: #ffab00;
-}
-
-.death-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.btn-primary {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
+.aviso-juego {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  margin: 0;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
   background: var(--success);
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease;
-
-  &:hover {
-    background: var(--success-hover);
-    transform: translateY(-1px);
-  }
+  color: #fff;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: tf-toast 0.25s var(--ease);
 }
 
-.btn-secondary {
-  padding: 10px 20px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface);
-  color: var(--text-primary);
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.15s ease;
+@media (max-width: 640px) {
+  .tarjeta {
+    padding: 24px 20px;
+  }
 
-  &:hover {
-    background: var(--surface-alt);
+  .nombre-fila {
+    flex-direction: column;
+  }
+
+  .juego {
+    height: calc(100vh - 240px);
+  }
+
+  .panel-juego {
+    top: 10px;
+    padding: 8px 10px;
+  }
+
+  .hud {
+    left: 10px;
+  }
+
+  .hud-tamano {
+    font-size: 22px;
+  }
+
+  /* En el celular el ranking ocupa demasiado: solo el top 3. */
+  .ranking {
+    right: 10px;
+    min-width: 0;
+    width: 150px;
+
+    li:nth-child(n + 4) {
+      display: none;
+    }
   }
 }

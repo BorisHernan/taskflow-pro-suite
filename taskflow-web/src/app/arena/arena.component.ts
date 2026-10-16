@@ -1,9 +1,10 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ArenaSnapshot, BlobView } from '../models/arena.model';
 import { ArenaService } from '../services/arena.service';
+import { IconoComponent } from '../shared/icono/icono.component';
 
 type GameState = 'name' | 'playing' | 'dead' | 'won';
 
@@ -17,7 +18,7 @@ const EAT_JUMP_THRESHOLD = 1.05;
 @Component({
   selector: 'app-arena',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [DecimalPipe, FormsModule, IconoComponent],
   templateUrl: './arena.component.html',
   styleUrl: './arena.component.scss',
 })
@@ -32,8 +33,10 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
   leaderboard = signal<BlobView[]>([]);
   toast = signal<string | null>(null);
   deathInfo = signal<{ size: number; isRecord: boolean } | null>(null);
+  miId = signal<string | null>(null);
+  // Tu puesto entre todos (jugadores y bots), para mostrarlo aunque no estés en el top 5.
+  miPuesto = signal<{ puesto: number; total: number } | null>(null);
 
-  private myId: string | null = null;
   private latestSnapshot: ArenaSnapshot | null = null;
   private welcomeSub?: Subscription;
   private snapshotSub?: Subscription;
@@ -70,7 +73,8 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
 
     this.errorMessage.set(null);
     this.deathInfo.set(null);
-    this.myId = null;
+    this.miId.set(null);
+    this.miPuesto.set(null);
     this.previousRadius = START_RADIUS;
     this.eatCount = 0;
     this.myRadius.set(START_RADIUS);
@@ -79,7 +83,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
 
     this.gameState.set('playing');
 
-    this.welcomeSub = welcome$.subscribe((msg) => (this.myId = msg.id));
+    this.welcomeSub = welcome$.subscribe((msg) => this.miId.set(msg.id));
     this.snapshotSub = snapshots$.subscribe((snapshot) => this.onSnapshot(snapshot));
     this.deathSub = death$.subscribe(() => this.onDeath());
     this.victorySub = victory$.subscribe(() => this.onVictory());
@@ -102,7 +106,8 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
     this.gameState.set('name');
   }
 
-  onPointerMove(event: MouseEvent): void {
+  // pointermove cubre mouse, dedo y lápiz: en el celular el blob sigue al dedo.
+  onPointerMove(event: PointerEvent): void {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -126,7 +131,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
       if (me.radius > this.previousRadius * EAT_JUMP_THRESHOLD) {
         this.eatCount++;
         if (this.eatCount === 1) {
-          this.showToast('¡Te comiste algo! 🎉');
+          this.showToast('¡Te comiste algo!');
         }
       }
       this.previousRadius = me.radius;
@@ -136,13 +141,14 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
         this.maxRadiusThisSession.set(Math.round(me.radius));
       }
       if (me.radius >= START_RADIUS * 2 && this.maxRadiusThisSession() < START_RADIUS * 2 + 1) {
-        this.showToast('¡Duplicaste tu tamaño! 🎉');
+        this.showToast('¡Duplicaste tu tamaño!');
       }
     }
 
-    this.leaderboard.set(
-      [...snapshot.blobs].sort((a, b) => b.radius - a.radius).slice(0, 5)
-    );
+    const ranking = [...snapshot.blobs].sort((a, b) => b.radius - a.radius);
+    this.leaderboard.set(ranking.slice(0, 5));
+    const puesto = ranking.findIndex((b) => b.id === this.miId()) + 1;
+    this.miPuesto.set(puesto > 0 ? { puesto, total: ranking.length } : null);
   }
 
   private onDeath(): void {
@@ -183,8 +189,9 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
   }
 
   private findMe(): BlobView | undefined {
-    if (!this.myId || !this.latestSnapshot) return undefined;
-    return this.latestSnapshot.blobs.find((b) => b.id === this.myId);
+    const id = this.miId();
+    if (!id || !this.latestSnapshot) return undefined;
+    return this.latestSnapshot.blobs.find((b) => b.id === id);
   }
 
   private startRenderLoop(): void {
@@ -244,7 +251,7 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
 
     const sorted = [...snapshot.blobs].sort((a, b) => a.radius - b.radius);
     for (const blob of sorted) {
-      this.drawBlob(ctx, blob, blob.id === this.myId);
+      this.drawBlob(ctx, blob, blob.id === this.miId());
     }
 
     ctx.restore();
@@ -289,8 +296,8 @@ export class ArenaComponent implements AfterViewInit, OnDestroy {
       ctx.stroke();
     }
 
-    const label = (blob.bot ? '🤖 ' : '') + blob.name;
-    ctx.font = `${Math.max(11, Math.min(16, blob.radius / 2))}px 'Segoe UI', sans-serif`;
+    const label = blob.name;
+    ctx.font = `600 ${Math.max(11, Math.min(16, blob.radius / 2))}px 'Plus Jakarta Sans', 'Segoe UI', sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#ffffff';

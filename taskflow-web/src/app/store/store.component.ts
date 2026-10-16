@@ -1,18 +1,20 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, computed, signal, viewChild } from '@angular/core';
 import { SolesPipe } from '../shared/soles.pipe';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Subject, firstValueFrom, takeUntil } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { CartItem, Product, ReceiptData, VALID_COUPONS } from '../models/product.model';
+import { CartItem, Product, ReceiptData, STOCK_BAJO, VALID_COUPONS } from '../models/product.model';
 import { ProductService } from '../services/product.service';
 import { ProductIconComponent } from './product-icon/product-icon.component';
+import { IconoComponent } from '../shared/icono/icono.component';
+
+type Orden = 'destacados' | 'precio-asc' | 'precio-desc' | 'stock';
 
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [SolesPipe, CommonModule, FormsModule, ProductIconComponent],
+  imports: [SolesPipe, DatePipe, FormsModule, ProductIconComponent, IconoComponent],
   templateUrl: './store.component.html',
   styleUrl: './store.component.scss',
 })
@@ -24,10 +26,34 @@ export class StoreComponent implements OnInit, OnDestroy {
   receipt = signal<ReceiptData | null>(null);
   appliedCoupon = signal<{ code: string; discount: number } | null>(null);
   showCoupons = signal(false);
-  showInfo = signal(false);
   couponInput = '';
   isCheckingOut = false;
-  backendBaseUrl = environment.apiUrl.replace(/\/api\/tasks\/?$/, '');
+  readonly stockBajo = STOCK_BAJO;
+
+  busqueda = signal('');
+  orden = signal<Orden>('destacados');
+  private stockMaximo = computed(() => Math.max(1, ...this.products().map((p) => p.stock)));
+
+  readonly productosVisibles = computed(() => {
+    const texto = this.busqueda().trim().toLowerCase();
+    const lista = this.products().filter(
+      (p) => !texto || `${p.name} ${p.description ?? ''}`.toLowerCase().includes(texto),
+    );
+    switch (this.orden()) {
+      case 'precio-asc':
+        return [...lista].sort((a, b) => a.price - b.price);
+      case 'precio-desc':
+        return [...lista].sort((a, b) => b.price - a.price);
+      case 'stock':
+        return [...lista].sort((a, b) => a.stock - b.stock);
+      default:
+        return lista;
+    }
+  });
+
+  readonly unidadesEnCarrito = computed(() => this.cart().reduce((n, i) => n + i.quantity, 0));
+
+  private readonly carritoRef = viewChild<ElementRef<HTMLElement>>('carrito');
 
   readonly availableCoupons = Object.entries(VALID_COUPONS).map(([code, discount]) => ({
     code,
@@ -171,6 +197,22 @@ export class StoreComponent implements OnInit, OnDestroy {
 
   newPurchase(): void {
     this.receipt.set(null);
+  }
+
+  /** Porcentaje de la barra de stock, relativo al producto con más unidades. */
+  porcentajeStock(stock: number): number {
+    return Math.round((stock / this.stockMaximo()) * 100);
+  }
+
+  imprimirBoleta(): void {
+    window.print();
+  }
+
+  /** Celular: el carrito queda debajo del catálogo; el resumen flotante lleva hasta él. */
+  irAlCarrito(): void {
+    const carrito = this.carritoRef()?.nativeElement;
+    carrito?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    carrito?.focus({ preventScroll: true });
   }
 
   private buildReceipt(items: CartItem[]): void {

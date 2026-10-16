@@ -11,8 +11,12 @@
       </p>
 
       <div class="hero-acciones">
-        <a class="btn-principal" routerLink="/tablero">Empezar el recorrido</a>
-        <a class="btn-secundario" href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">
+        <a class="btn btn-primary btn-lg" routerLink="/tablero">
+          Empezar el recorrido
+          <app-icono nombre="derecha" [tamano]="18" />
+        </a>
+        <a class="btn btn-secondary btn-lg" href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">
+          <app-icono nombre="github" [tamano]="18" />
           Ver el código en GitHub
         </a>
       </div>
@@ -124,9 +128,9 @@
     <h2 id="contacto-titulo">¿Conversamos?</h2>
     <p class="seccion-texto">Disponible para trabajo 100 % remoto desde Lima, Perú.</p>
     <p class="contacto-links">
-      <a href="mailto:mdrncastro@gmail.com">mdrncastro&#64;gmail.com</a>
-      <a href="https://www.linkedin.com/in/boris-hernan-dev" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="https://github.com/BorisHernan" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-primary" href="mailto:mdrncastro@gmail.com"><app-icono nombre="correo" [tamano]="17" />mdrncastro&#64;gmail.com</a>
+      <a class="btn btn-secondary" href="https://www.linkedin.com/in/boris-hernan-dev" target="_blank" rel="noopener"><app-icono nombre="linkedin" [tamano]="17" />LinkedIn</a>
+      <a class="btn btn-secondary" href="https://github.com/BorisHernan" target="_blank" rel="noopener"><app-icono nombre="github" [tamano]="17" />GitHub</a>
     </p>
   </footer>
 </main>
