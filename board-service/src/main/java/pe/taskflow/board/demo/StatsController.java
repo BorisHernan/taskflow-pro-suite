@@ -11,14 +11,21 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/stats")
 @RequiredArgsConstructor
-@Tag(name = "Stats", description = "Contadores del demo (tareas, ventas, visitantes) desde el último despliegue")
+@Tag(name = "Stats", description = "Contadores del demo e historial agregado para los gráficos")
 public class StatsController {
 
     private final DemoStatsService statsService;
+    private final HistorialStatsService historialService;
 
     @Operation(summary = "Contadores acumulados del demo")
     @GetMapping
     public Mono<StatsSnapshot> stats() {
         return statsService.snapshot();
+    }
+
+    @Operation(summary = "Series y agrupaciones para los gráficos (visitas, ventas, tareas, reseñas, stock)")
+    @GetMapping("/historial")
+    public Mono<HistorialStats> historial() {
+        return historialService.historial();
     }
 }

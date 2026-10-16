@@ -18,7 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import pe.taskflow.board.demo.ContentModerationService;
-import pe.taskflow.board.util.ClientIpResolver;
 import pe.taskflow.board.demo.DemoStatsService;
 import pe.taskflow.board.util.ClientIpResolver;
 import reactor.core.publisher.Flux;
@@ -29,9 +28,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
- * Tienda simulada del portafolio: el catálogo, carrito, cupones y boleta son
- * de mentira (viven en el frontend), pero el stock es real y compartido —
- * varios visitantes viendo la tienda a la vez ven el mismo stock bajar en vivo.
+ * Tienda simulada del portafolio: carrito, cupones y boleta viven en el frontend,
+ * pero el stock es real y compartido (baja en vivo para todos), cada compra queda
+ * en el historial y las reseñas se moderan.
  */
 @RestController
 @RequestMapping("/api/products")
@@ -44,6 +43,7 @@ public class ProductController {
     private final DemoStatsService statsService;
     private final ProductReviewRepository reviewRepository;
     private final ContentModerationService moderationService;
+    private final PurchaseRepository purchaseRepository;
 
     static final int MAX_RESENAS_POR_IP_AL_DIA = 5;
 
@@ -92,6 +92,15 @@ public class ProductController {
                     product.setStock(product.getStock() - request.quantity());
                     return productRepository.save(product);
                 })
+                .flatMap(saved -> purchaseRepository.save(Purchase.builder()
+                                .productId(saved.getId())
+                                .productName(saved.getName())
+                                .category(saved.getCategory())
+                                .quantity(request.quantity())
+                                .total(saved.getPrice().multiply(BigDecimal.valueOf(request.quantity())))
+                                .createdAt(LocalDateTime.now())
+                                .build())
+                        .thenReturn(saved))
                 .doOnSuccess(saved -> {
                     eventPublisher.publish(saved);
                     BigDecimal lineTotal = saved.getPrice().multiply(BigDecimal.valueOf(request.quantity()));
