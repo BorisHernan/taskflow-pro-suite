@@ -2,3 +2,8 @@
 *.iml
 .DS_Store
 .env
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
+# Skills de Claude Code: herramientas locales de desarrollo
+.claude/
+skills-lock.json

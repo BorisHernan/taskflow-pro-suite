@@ -4,7 +4,7 @@
       <h1>TaskFlow App</h1>
       <p class="subtitle">
         <span class="dot" [class.live]="connectionLive()"></span>
-        {{ connectionLive() ? 'Conectado en tiempo real' : 'Conectando...' }}
+        {{ connectionLive() ? 'Conectado en tiempo real' : 'Conectando…' }}
         <span class="viewer-count" *ngIf="connectionLive()">
           · 👀 {{ viewerCount() }} {{ viewerCount() === 1 ? 'persona viendo esto ahora' : 'personas viendo esto ahora' }}
         </span>
@@ -22,11 +22,14 @@
       </button>
 
       <form class="add-task-form" (ngSubmit)="addTask()">
+        <label class="sr-only" for="nueva-tarea">Título de la nueva tarea</label>
         <input
+          id="nueva-tarea"
           type="text"
-          placeholder="Nueva tarea..."
+          placeholder="Ej.: Revisar el PR…"
           [(ngModel)]="newTaskTitle"
           name="newTaskTitle"
+          autocomplete="off"
         />
         <button type="submit">Agregar</button>
       </form>
@@ -63,8 +66,8 @@
     </ul>
     <p class="info-repo">
       Código fuente:
-      <a href="https://github.com/BorisHernan/Proyecto_Portafolio" target="_blank" rel="noopener">
-        github.com/BorisHernan/Proyecto_Portafolio
+      <a href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">
+        github.com/BorisHernan/taskflow-pro-suite
       </a>
     </p>
     <p class="info-links">
@@ -82,7 +85,7 @@
     respetuoso 🙂
   </div>
 
-  <div class="error-banner" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+  <div class="error-banner" role="alert" *ngIf="errorMessage()">{{ errorMessage() }}</div>
 
   <div class="board" cdkDropListGroup>
     <div class="column" *ngFor="let status of statuses">

@@ -29,18 +29,13 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('renderiza la navegación con los 4 enlaces principales', async () => {
+  it('renderiza la navegación con las 4 demos', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     const links = Array.from(compiled.querySelectorAll('.app-nav-links a')).map((a) => a.textContent?.trim());
 
-    expect(links).toEqual([
-      '📋 Tablero Kanban',
-      '🛒 Tienda',
-      '📊 Estadísticas',
-      '🕹️ Arena',
-    ]);
+    expect(links).toEqual(['Tablero', 'Tienda', 'Estadísticas', 'Arena']);
   });
 
   it('el botón de tema alterna el tema al hacer click', async () => {
