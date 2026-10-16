@@ -51,7 +51,8 @@ Tres columnas (Por hacer / En progreso / Hecho) con **drag & drop** para mover t
 dentro de una misma columna. Cualquiera puede crear, editar, mover o borrar tareas — es un demo público sin
 login. Cada cambio se transmite **en tiempo real por Server-Sent Events** a todas las pestañas/navegadores
 conectados: abrí la demo en dos pestañas y movés una tarjeta en una, aparece movida en la otra al instante, sin
-refrescar. Como es de escritura libre, tiene sus propios controles de abuso (ver más abajo).
+refrescar. El botón **Sorpréndeme** crea al instante una tarea realista al azar. Como es de escritura libre,
+tiene sus propios controles de abuso (ver más abajo).
 
 <p>
   <img src="docs/screenshots/kanban-light.png" width="49%" alt="Tablero Kanban, modo claro">
@@ -67,6 +68,12 @@ los visitantes conectados a la vez. Si comprás algo, el stock baja para todo el
 nadie tenga que refrescar. Existe para mostrar un patrón distinto al del tablero: acá el "tiempo real" es
 principalmente de lectura (stock bajando), no de edición colaborativa.
 
+Funciona como una tienda real: **36 productos** con categorías, búsqueda, orden y paginación (todo en la URL, así
+el "atrás" del navegador funciona), una **página por producto** con detalle, productos relacionados y
+**reseñas con estrellas** (distribución por puntaje, filtro y formulario moderado: filtro de lenguaje, 3 avisos y
+máximo 5 reseñas por día por IP) y el carrito como **panel lateral** compartido entre páginas. Cada compra queda
+guardada para siempre en la tabla `purchases`.
+
 <p>
   <img src="docs/screenshots/tienda-dark.png" width="49%" alt="Tienda, catálogo y carrito, modo oscuro">
   <img src="docs/screenshots/tienda-light.png" width="49%" alt="Tienda, catálogo y carrito, modo claro">
@@ -78,10 +85,14 @@ principalmente de lectura (stock bajando), no de edición colaborativa.
 
 #### 📊 Estadísticas (`/estadisticas`) — observabilidad del propio demo
 
-Un dashboard con contadores en vivo: tareas creadas, compras, unidades vendidas, ingresos simulados y
-visitantes totales desde el último despliegue. Los números se animan al cargar y también quedan expuestos como
-métricas reales de Micrometer en `/actuator/metrics`, para mostrar que no es solo un número bonito en pantalla
-sino algo instrumentado de verdad.
+Un dashboard que muestra cómo resumir datos y presentarlos de forma interactiva. PostgreSQL agrupa con
+`GROUP BY` y al navegador solo le llegan unas decenas de filas, que se dibujan como **gráficos SVG hechos a mano**
+(sin librerías): visitas y ventas por día (área y barras, con tooltip y navegación por teclado), donas de
+ingresos por categoría y del estado del tablero, ranking de productos, distribución de reseñas e inventario por
+categoría. Cada gráfico tiene un botón **"¿Cómo leerlo?"** que explica qué muestra y la consulta SQL que lo
+alimenta, y una **lectura automática** con lo importante ("Tecnología concentra el 45 % de los ingresos").
+Compras, ingresos y visitas salen del historial en Postgres; los contadores también se exponen en Micrometer
+(`/actuator/metrics`).
 
 <p>
   <img src="docs/screenshots/stats-light.png" width="49%" alt="Dashboard de estadísticas, modo claro">
@@ -97,6 +108,11 @@ nunca estés solo. Llegar a un tamaño de 2000 termina la partida con victoria �
 que nadie pueda "farmear" sin límite y aburrir al resto. Es el único menú por **WebSocket** en vez de SSE, porque
 acá el cliente también tiene que mandarle continuamente su posición al servidor (con SSE, que es unidireccional,
 esto no se podría).
+
+Tiene las mecánicas clásicas: **7 skins** dibujadas con canvas, **dividirse** (Espacio) en hasta 8 células que se
+vuelven a fusionar a los 10 s, **expulsar masa** (W) y **power-ups** de velocidad, escudo e imán. Para que se
+sienta fluido con solo 10 estados por segundo, el cliente **interpola** las posiciones a 60 fps y suma cámara
+suave, estela, partículas al comer, avisos de quién se comió a quién y un minimapa.
 
 <p>
   <img src="docs/screenshots/arena-inicio-dark.png" width="49%" alt="Arena, pantalla de nombre, modo oscuro">
@@ -292,7 +308,7 @@ Three columns (To do / In progress / Done) with **drag & drop** to move tasks be
 within one. Anyone can create, edit, move, or delete tasks — it's a public demo, no login. Every change is
 broadcast **in real time over Server-Sent Events** to every connected tab/browser: open the demo in two tabs,
 drag a card in one, and it moves in the other instantly, no refresh. Since it's open for anyone to write to, it
-has its own abuse controls (see below).
+has its own abuse controls (see below). The **Surprise me** button instantly adds a random, realistic task.
 
 <p>
   <img src="docs/screenshots/kanban-light.png" width="49%" alt="Kanban board, light mode">
@@ -308,6 +324,11 @@ something and the stock drops for everyone instantly, no refresh required anywhe
 different pattern than the board: here "real-time" is mostly read-side (stock going down), not collaborative
 editing.
 
+It works like a real store: **36 products** with categories, search, sorting and pagination (all in the URL,
+so the browser's back button works), a **page per product** with details, related products and **star
+reviews** (rating breakdown, filter, and a moderated form: profanity filter, 3 strikes and 5 reviews per IP per
+day), plus the cart as a **side panel** shared across pages. Every purchase is stored forever in `purchases`.
+
 <p>
   <img src="docs/screenshots/tienda-dark.png" width="49%" alt="Store, catalog and cart, dark mode">
   <img src="docs/screenshots/tienda-light.png" width="49%" alt="Store, catalog and cart, light mode">
@@ -319,9 +340,12 @@ editing.
 
 #### 📊 Stats (`/estadisticas`) — observability of the demo itself
 
-A dashboard with live counters: tasks created, purchases, units sold, simulated revenue, and total visitors
-since the last deploy. The numbers animate on load and are also exposed as real Micrometer metrics at
-`/actuator/metrics`, to show it's not just a pretty number on screen but something actually instrumented.
+A dashboard about summarizing data and presenting it interactively. PostgreSQL aggregates with `GROUP BY`,
+so the browser only receives a few dozen rows, drawn as **hand-made SVG charts** (no chart library): visits and
+sales per day (area and bars, with tooltips and keyboard navigation), donuts for revenue by category and board
+status, a product ranking, review distribution and inventory by category. Each chart has a **"How to read
+it"** button explaining what it shows and the SQL behind it, plus an **automatic insight** sentence. Purchases,
+revenue and visits come from the Postgres history; counters are also exposed via Micrometer.
 
 <p>
   <img src="docs/screenshots/stats-light.png" width="49%" alt="Stats dashboard, light mode">
@@ -336,6 +360,11 @@ is close, hunt if something smaller is close, otherwise chase the nearest pellet
 Reaching size 2000 ends the match with a win — a deliberate cap so no one can farm indefinitely and bore
 everyone else. It's the only menu built on a **WebSocket** instead of SSE, because here the client also has to
 continuously send its position to the server (SSE is one-way, so it wouldn't work for this).
+
+It has the classic mechanics: **7 canvas-drawn skins**, **splitting** (Space) into up to 8 cells that merge back
+after 10 s, **ejecting mass** (W) and **speed, shield and magnet power-ups**. To feel smooth with only 10 states
+per second, the client **interpolates** positions at 60 fps and adds a smooth camera, trails, particles,
+a kill feed and a minimap.
 
 <p>
   <img src="docs/screenshots/arena-inicio-dark.png" width="49%" alt="Arena, name screen, dark mode">
