@@ -1,5 +1,6 @@
 package pe.taskflow.board.store;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,4 +30,12 @@ public class Product {
 
     // Clave de ícono (no un emoji): el frontend la mapea a un SVG propio.
     private String icon;
+
+    private String category;
+
+    private String details;
+
+    // Stock al que vuelve el producto en el reset diario; no se expone en la API.
+    @JsonIgnore
+    private Integer initialStock;
 }
