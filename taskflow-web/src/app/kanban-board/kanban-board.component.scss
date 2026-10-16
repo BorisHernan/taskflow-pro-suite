@@ -53,7 +53,7 @@
   background: var(--surface-alt);
 
   &[data-status='IN_PROGRESS'] {
-    --color-columna: var(--accent);
+    --color-columna: var(--seccion);
   }
 
   &[data-status='DONE'] {
@@ -182,7 +182,7 @@
   padding: 14px;
   border-radius: var(--radius);
   background: var(--surface);
-  border: 1px solid var(--accent);
+  border: 1px solid var(--seccion);
   box-shadow: var(--shadow-lg);
   font-size: var(--fs-sm);
   font-weight: 600;

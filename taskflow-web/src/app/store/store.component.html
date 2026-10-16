@@ -1,7 +1,10 @@
 <main class="page">
   <header class="page-header no-imprimir">
     <div>
-      <h1 class="page-title">Tienda</h1>
+      <div class="page-titulo-fila">
+        <span class="page-icono"><app-icono nombre="tienda" [tamano]="24" /></span>
+        <h1 class="page-title">Tienda</h1>
+      </div>
       <p class="page-subtitle">
         <span class="chip" [class.chip-success]="connectionLive()">
           <span class="punto" [class.en-vivo]="connectionLive()"></span>
@@ -100,8 +103,8 @@
     <div class="tienda">
       <!-- Catálogo -->
       <section class="catalogo" aria-label="Catálogo">
-        @for (product of productosVisibles(); track product.id) {
-          <article class="producto card">
+        @for (product of productosVisibles(); track product.id; let i = $index) {
+          <article class="producto card entrar" [style.--i]="i">
             <div class="producto-icono">
               <app-product-icon [icon]="product.icon || ''" [size]="34"></app-product-icon>
             </div>

@@ -23,7 +23,7 @@
   margin: 0;
   font-size: 13px;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--seccion);
 }
 
 .guia-prueba {
@@ -79,7 +79,7 @@
 .panel-tecnica {
   margin: 14px 0 0;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--seccion);
 }
 
 .panel-texto {
@@ -120,7 +120,7 @@
 
 .msg-canal {
   font-weight: 700;
-  color: var(--accent);
+  color: var(--seccion);
 
   &[data-canal='WebSocket'] {
     color: var(--success-text);
@@ -159,7 +159,7 @@
   display: inline-block;
   margin-top: 12px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--seccion);
 }
 
 @media (max-width: 600px) {

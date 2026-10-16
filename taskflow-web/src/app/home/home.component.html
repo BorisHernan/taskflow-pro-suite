@@ -73,7 +73,7 @@
 
     <ol class="pasos">
       @for (paso of pasos; track paso.ruta; let i = $index) {
-        <li class="paso">
+        <li class="paso entrar" [style.--i]="i" [attr.data-seccion]="paso.demo">
           <span class="paso-numero" aria-hidden="true">{{ i + 1 }}</span>
           <div class="paso-cuerpo">
             <h3>
