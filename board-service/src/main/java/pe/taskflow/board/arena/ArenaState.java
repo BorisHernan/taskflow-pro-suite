@@ -15,8 +15,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @Component
 public class ArenaState {
 
-    public static final double WORLD_SIZE = 2000;
-    public static final int MAX_PELLETS = 150;
+    public static final double WORLD_SIZE = 4000;
+    public static final int MAX_PELLETS = 350;
     public static final int BOT_COUNT = 6;
     public static final int MAX_PLAYERS = 20;
     public static final double START_RADIUS = 20;
@@ -27,6 +27,9 @@ public class ArenaState {
     // un bot simplemente se "retira" y aparece uno nuevo — evita que farmear
     // sin límite vuelva aburrido el resto del arena para todos.
     public static final double MAX_RADIUS = 2000;
+    // Distancia mínima al borde de cualquier otro círculo al aparecer.
+    public static final double MARGEN_APARICION = 150;
+    private static final int INTENTOS_APARICION = 60;
 
     private static final List<String> PLAYER_COLORS = List.of(
             "#ff5630", "#36b37e", "#0052cc", "#ffab00", "#6554c0", "#00b8d9", "#de350b", "#00875a"
@@ -45,8 +48,43 @@ public class ArenaState {
 
     public Blob addPlayer(String name) {
         Blob blob = randomBlob(UUID.randomUUID().toString(), false, name);
+        ubicarLejosDeOtros(blob);
         players.put(blob.getId(), blob);
         return blob;
+    }
+
+    /**
+     * Prueba posiciones al azar y se queda con la primera que deja al menos
+     * MARGEN_APARICION hasta el borde de cualquier otro círculo; si ninguna
+     * alcanza, con la más despejada. Así no se nace dentro de un bot gigante.
+     */
+    private void ubicarLejosDeOtros(Blob nuevo) {
+        double mejorX = nuevo.getX();
+        double mejorY = nuevo.getY();
+        double mejorHolgura = holgura(mejorX, mejorY);
+
+        for (int i = 0; i < INTENTOS_APARICION && mejorHolgura < MARGEN_APARICION; i++) {
+            double x = randomCoordinate();
+            double y = randomCoordinate();
+            double h = holgura(x, y);
+            if (h > mejorHolgura) {
+                mejorX = x;
+                mejorY = y;
+                mejorHolgura = h;
+            }
+        }
+        nuevo.setX(mejorX);
+        nuevo.setY(mejorY);
+        nuevo.setTargetX(mejorX);
+        nuevo.setTargetY(mejorY);
+    }
+
+    /** Distancia desde (x, y) hasta el borde del círculo más cercano; infinita si no hay ninguno. */
+    private double holgura(double x, double y) {
+        return java.util.stream.Stream.concat(players.values().stream(), bots.values().stream())
+                .mapToDouble(b -> Math.hypot(b.getX() - x, b.getY() - y) - b.getRadius())
+                .min()
+                .orElse(Double.MAX_VALUE);
     }
 
     public void removePlayer(String id) {
