@@ -52,8 +52,8 @@
   height: 88px;
   margin-bottom: 14px;
   border-radius: var(--radius);
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--seccion-suave);
+  color: var(--seccion);
 }
 
 .producto-nombre {
@@ -188,7 +188,7 @@
   grid-area: icono;
   align-self: start;
   margin-top: 2px;
-  color: var(--accent);
+  color: var(--seccion);
 }
 
 .item-info {

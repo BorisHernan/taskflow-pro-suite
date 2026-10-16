@@ -22,8 +22,8 @@
   height: 52px;
   margin-bottom: 16px;
   border-radius: var(--radius);
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--seccion-suave);
+  color: var(--seccion);
 }
 
 .icono-peligro {
@@ -79,7 +79,7 @@
 
   app-icono {
     margin-top: 2px;
-    color: var(--accent);
+    color: var(--seccion);
   }
 }
 

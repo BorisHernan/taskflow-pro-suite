@@ -28,7 +28,7 @@
   text-decoration: none;
 
   &:hover {
-    color: var(--accent);
+    color: var(--seccion);
   }
 }
 
@@ -56,8 +56,17 @@
     }
 
     &.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
+      color: var(--seccion);
+      border-bottom-color: var(--seccion);
+    }
+  }
+}
+
+/* Cada pestaña lleva su icono en el color de su sección, aunque no esté activa. */
+.app-nav-links a {
+  @each $s in tablero, tienda, estadisticas, arena {
+    &[data-seccion='#{$s}'] app-icono {
+      color: var(--c-#{$s});
     }
   }
 }

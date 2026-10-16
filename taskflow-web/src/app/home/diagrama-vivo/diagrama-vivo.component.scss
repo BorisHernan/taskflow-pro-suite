@@ -36,7 +36,7 @@
 }
 
 .nodo-api {
-  border-color: var(--accent);
+  border-color: var(--seccion);
 }
 
 /* Tramo vertical de alto fijo: el pulso lo cruza entero con transform (cqh). */
@@ -73,7 +73,7 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--seccion);
   animation: subir 0.9s ease-in-out forwards;
 }
 

@@ -6,15 +6,15 @@
 
 @mixin tema-oscuro {
   color-scheme: dark;
-  --bg: #0b0f17;
-  --surface: #121826;
-  --surface-alt: #1a2233;
-  --surface-hover: #212b3f;
-  --text-primary: #e8ecf3;
-  --text-secondary: #a3adbd;
-  --text-muted: #6b7689;
-  --border: #263042;
-  --border-strong: #36425a;
+  --bg: #0e0f13;
+  --surface: #17181e;
+  --surface-alt: #1f2129;
+  --surface-hover: #282a34;
+  --text-primary: #ededf2;
+  --text-secondary: #a6a8b6;
+  --text-muted: #6f7180;
+  --border: #2b2d37;
+  --border-strong: #3b3e4b;
   --accent: #5b8cff;
   --accent-hover: #7da3ff;
   --accent-soft: rgba(91, 140, 255, 0.14);
@@ -37,13 +37,19 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 8px 24px -12px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 24px 48px -20px rgba(0, 0, 0, 0.7);
+
+  --c-tablero: #60a5fa;
+  --c-tienda: #a78bfa;
+  --c-estadisticas: #2dd4bf;
+  --c-arena: #fb7185;
+  --c-inicio: #fbbf24;
 }
 
 :root {
   color-scheme: light;
 
   /* Color */
-  --bg: #f6f7f9;
+  --bg: #f7f7f9;
   --surface: #ffffff;
   --surface-alt: #eef0f4;
   --surface-hover: #e6e9ef;
@@ -74,6 +80,15 @@
   --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06);
   --shadow-md: 0 8px 24px -12px rgba(17, 24, 39, 0.18);
   --shadow-lg: 0 24px 48px -20px rgba(17, 24, 39, 0.25);
+
+  /* Identidad de cada sección: su color aparece en el encabezado, iconos,
+     botón principal y pestaña activa, para que cada pantalla se sienta propia. */
+  --c-tablero: #2563eb;
+  --c-tienda: #7c3aed;
+  --c-estadisticas: #0d9488;
+  --c-arena: #e11d48;
+  --c-inicio: #d97706;
+  --seccion: var(--accent);
 
   /* Compatibilidad: el fondo ya no es un degradado, es plano. */
   --bg-gradient: var(--bg);
@@ -108,6 +123,29 @@
 
 :root[data-theme='dark'] {
   @include tema-oscuro;
+}
+
+/* La app marca la sección actual en <html> (data-seccion) según la ruta. */
+:root[data-seccion='inicio'] { --seccion: var(--c-inicio); }
+:root[data-seccion='tablero'] { --seccion: var(--c-tablero); }
+:root[data-seccion='tienda'] { --seccion: var(--c-tienda); }
+:root[data-seccion='estadisticas'] { --seccion: var(--c-estadisticas); }
+:root[data-seccion='arena'] { --seccion: var(--c-arena); }
+
+:root {
+  --seccion-suave: color-mix(in srgb, var(--seccion) 13%, transparent);
+  /* Texto sobre el color de sección: blanco en claro, casi negro en oscuro (los colores oscuros son claros). */
+  --seccion-tinta: #ffffff;
+}
+
+:root[data-theme='dark'] {
+  --seccion-tinta: #0e0f13;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --seccion-tinta: #0e0f13;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -164,7 +202,7 @@ h3 {
 /* ── Accesibilidad ─────────────────────────────────────────────────────── */
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--seccion);
   outline-offset: 2px;
 }
 
@@ -206,6 +244,24 @@ h3 {
   gap: 16px 24px;
   flex-wrap: wrap;
   margin-bottom: 24px;
+}
+
+.page-titulo-fila {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.page-icono {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--seccion);
+  color: var(--seccion-tinta);
+  box-shadow: 0 8px 20px -8px var(--seccion);
 }
 
 .page-title {
@@ -269,11 +325,11 @@ h3 {
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: var(--accent-ink);
+  background: var(--seccion);
+  color: var(--seccion-tinta);
 
   &:hover:not(:disabled) {
-    background: var(--accent-hover);
+    background: color-mix(in srgb, var(--seccion) 86%, var(--text-primary));
   }
 }
 
@@ -344,8 +400,8 @@ h3 {
 
   &:focus {
     outline: none;
-    border-color: var(--accent);
-    box-shadow: var(--ring);
+    border-color: var(--seccion);
+    box-shadow: 0 0 0 3px var(--seccion-suave);
   }
 }
 
@@ -414,8 +470,8 @@ select.input {
 }
 
 .chip-accent {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--seccion-suave);
+  color: var(--seccion);
 }
 
 /* Punto de estado de conexión (sin pulso en loop: solo color). */
@@ -608,4 +664,53 @@ select.input {
   body {
     background: #fff;
   }
+}
+
+/* ── Transición entre pestañas (View Transitions API) ──────────────────────
+   El encabezado tiene su propio nombre: queda fijo mientras el contenido
+   sale desvaneciéndose y el nuevo entra deslizándose. Navegadores sin
+   soporte (Firefox) simplemente cambian de página sin animación. */
+
+.app-header {
+  view-transition-name: encabezado;
+}
+
+::view-transition-old(root) {
+  animation: tf-vt-salir 0.18s var(--ease) both;
+}
+
+::view-transition-new(root) {
+  animation: tf-vt-entrar 0.32s var(--ease) both;
+}
+
+::view-transition-group(encabezado) {
+  animation-duration: 0.25s;
+}
+
+@keyframes tf-vt-salir {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes tf-vt-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(*) {
+    animation: none;
+  }
+}
+
+/* Entrada escalonada: el template fija --i (posición) en cada elemento. */
+.entrar {
+  animation: tf-entrar 0.45s var(--ease) backwards;
+  animation-delay: calc(min(var(--i, 0), 12) * 45ms);
 }

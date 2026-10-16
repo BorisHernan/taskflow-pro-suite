@@ -1,7 +1,10 @@
 <main class="page">
   <header class="page-header">
     <div>
-      <h1 class="page-title">Tablero</h1>
+      <div class="page-titulo-fila">
+        <span class="page-icono"><app-icono nombre="tablero" [tamano]="24" /></span>
+        <h1 class="page-title">Tablero</h1>
+      </div>
       <p class="page-subtitle">
         <span class="chip" [class.chip-success]="connectionLive()">
           <span class="punto" [class.en-vivo]="connectionLive()"></span>
@@ -99,8 +102,8 @@
           [cdkDropListDisabled]="filtrando()"
           (cdkDropListDropped)="onDrop($event, status)"
         >
-          @for (task of tasksByStatus(status); track task.id) {
-            <article class="tarjeta" cdkDrag>
+          @for (task of tasksByStatus(status); track task.id; let i = $index) {
+            <article class="tarjeta entrar" [style.--i]="i" cdkDrag>
               <div class="tarjeta-arrastre" *cdkDragPreview>{{ task.title }}</div>
               <div class="tarjeta-placeholder" *cdkDragPlaceholder></div>
 

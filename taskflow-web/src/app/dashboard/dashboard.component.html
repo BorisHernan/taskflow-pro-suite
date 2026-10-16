@@ -1,7 +1,10 @@
 <main class="page">
   <header class="page-header">
     <div>
-      <h1 class="page-title">Estadísticas</h1>
+      <div class="page-titulo-fila">
+        <span class="page-icono"><app-icono nombre="estadisticas" [tamano]="24" /></span>
+        <h1 class="page-title">Estadísticas</h1>
+      </div>
       <p class="page-subtitle">
         Lo que pasa en la demo, contado por el backend con Micrometer.
         @if (ultimaActualizacion()) {
@@ -36,8 +39,8 @@
   }
 
   <section class="kpis" aria-label="Indicadores">
-    @for (kpi of kpis; track kpi.clave) {
-      <article class="kpi card" [class.kpi-destacado]="kpi.persistido">
+    @for (kpi of kpis; track kpi.clave; let i = $index) {
+      <article class="kpi card entrar" [style.--i]="i" [class.kpi-destacado]="kpi.persistido">
         <span class="kpi-icono"><app-icono [nombre]="kpi.icono" [tamano]="20" /></span>
         <p class="kpi-valor">
           @if (kpi.moneda) {

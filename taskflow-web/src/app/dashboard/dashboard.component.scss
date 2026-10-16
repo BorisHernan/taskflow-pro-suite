@@ -53,7 +53,7 @@
 }
 
 .interruptor input:checked + .interruptor-pista {
-  background: var(--accent);
+  background: var(--seccion);
 
   &::after {
     transform: translateX(16px);
@@ -61,7 +61,7 @@
 }
 
 .interruptor input:focus-visible + .interruptor-pista {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--seccion);
   outline-offset: 2px;
 }
 
@@ -89,8 +89,8 @@
 }
 
 .kpi-destacado {
-  border-color: var(--accent);
-  background: linear-gradient(var(--accent-soft), var(--accent-soft)), var(--surface);
+  border-color: var(--seccion);
+  background: linear-gradient(var(--seccion-suave), var(--seccion-suave)), var(--surface);
 }
 
 .kpi-icono {
@@ -100,7 +100,7 @@
   height: 40px;
   border-radius: var(--radius);
   background: var(--surface-alt);
-  color: var(--accent);
+  color: var(--seccion);
 }
 
 .kpi-valor {
@@ -166,7 +166,7 @@
 }
 
 .barra {
-  --color-barra: var(--accent);
+  --color-barra: var(--seccion);
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr) 40px;
   align-items: center;
