@@ -137,8 +137,8 @@ Como el tablero y la tienda son de escritura/uso libre sin login, la única señ
 
 - **Filtro de lenguaje ofensivo** en tareas y en el nombre de jugador de Arena, con 3 avisos antes de bloquear
   la IP para crear/editar.
-- **Límite de tareas por IP** (por defecto 50): al superarlo se borran todas las tareas de esa IP, para que un
-  solo visitante no pueda llenar el tablero para todos.
+- **Límite de 10 tareas por visitante (IP)**: al llegar, solo se bloquea crear más; las que ya existen se
+  conservan, para que un solo visitante no pueda llenar el tablero para todos.
 - **Mantenimiento diario** (03:00 UTC) que **no borra historial**: tareas, reseñas y visitas se conservan.
   Solo repone el stock de la tienda, vuelve a sembrar el tablero si alguien lo dejó vacío y limpia los
   contadores de moderación.
@@ -221,9 +221,9 @@ Ambos corren automáticamente en cada push/PR a `main` vía GitHub Actions
 de romperse en silencio: moderación de contenido, límites de abuso por IP, reglas del juego (quién se come a
 quién, el tope de tamaño que termina la partida), y los servicios del frontend que hablan con el backend.
 
-> Escribiendo el test de rate-limiting encontré y corregí un bug real: el evento `RESET` que debía avisarle al
+> En una versión anterior (cuando el límite borraba las tareas), el test de rate-limiting destapó un bug real: el evento `RESET` que debía avisarle al
 > frontend que se borraron las tareas de una IP nunca se disparaba, porque estaba encadenado *después* de un
-> `Mono.error(...)` que ya había terminado el flujo en error. Quedó arreglado en `TaskController.java`.
+> `Mono.error(...)` que ya había terminado el flujo en error. Hoy el límite ya no borra nada.
 
 ### Despliegue gratuito
 
@@ -389,8 +389,8 @@ identity signal available:
 
 - **Profanity filter** on tasks and Arena player names, with 3 warnings before the IP gets blocked from
   creating/editing.
-- **Per-IP task limit** (50 by default): going over it wipes that IP's tasks, so a single visitor can't fill up
-  the board for everyone.
+- **10 tasks per visitor (IP)**: once reached, creating more is blocked; existing tasks are kept, so a single
+  visitor can't fill up the board for everyone.
 - **Daily maintenance** (03:00 UTC) that **keeps all history**: tasks, reviews and visits are never purged.
   It only restocks the store, reseeds the board if someone emptied it and clears the moderation counters.
 
@@ -441,9 +441,9 @@ Both run automatically on every push/PR to `main` via GitHub Actions
 silently: content moderation, per-IP abuse limits, game rules (who eats whom, the size cap that ends a match),
 and the frontend services that talk to the backend.
 
-> Writing the rate-limit test uncovered a real bug: the `RESET` event that's supposed to tell the frontend an
+> In an earlier version (when the limit wiped tasks), the rate-limit test uncovered a real bug: the `RESET` event that's supposed to tell the frontend an
 > IP's tasks were wiped never actually fired, because it was chained *after* a `Mono.error(...)` that had
-> already terminated the stream with an error. Fixed in `TaskController.java`.
+> already terminated the stream with an error. Today the limit no longer deletes anything.
 
 ### License
 

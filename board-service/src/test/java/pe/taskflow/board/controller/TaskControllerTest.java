@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class TaskControllerTest {
 
-    private static final int MAX_TASKS_PER_IP = 50;
+    private static final int MAX_TASKS_PER_IP = 10;
 
     @Mock
     private TaskRepository taskRepository;
@@ -113,13 +113,12 @@ class TaskControllerTest {
     }
 
     @Test
-    void borraTodasLasTareasDeLaIpAlAlcanzarElLimite() {
+    void alLlegarAlLimiteRechazaLaTareaSinBorrarLasExistentes() {
         Task incoming = Task.builder().title("otra mas").status("TODO").position(1).build();
 
         when(moderationService.isBlocked("7.7.7.7")).thenReturn(false);
         when(moderationService.findBlockedWord("otra mas", null)).thenReturn(Optional.empty());
         when(taskRepository.countByCreatedByIp("7.7.7.7")).thenReturn(Mono.just((long) MAX_TASKS_PER_IP));
-        when(taskRepository.deleteByCreatedByIp("7.7.7.7")).thenReturn(Mono.empty());
 
         var request = MockServerHttpRequest.post("/api/tasks")
                 .header("X-Forwarded-For", "7.7.7.7")
@@ -130,8 +129,8 @@ class TaskControllerTest {
                         && rse.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS)
                 .verify();
 
-        verify(taskRepository).deleteByCreatedByIp("7.7.7.7");
-        verify(eventPublisher).publish(TaskEventType.RESET, null);
+        verify(taskRepository, never()).save(any());
+        verify(eventPublisher, never()).publish(TaskEventType.RESET, null);
     }
 
     @Test
