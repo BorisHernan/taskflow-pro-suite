@@ -1,0 +1,126 @@
+<main class="gestion-pagina">
+  <header class="gestion-cabecera">
+    <div>
+      <h1 class="page-title">Inventario</h1>
+      <p>
+        Cuando una venta o una merma deja un producto en su mínimo, se crea sola una tarea de reposición.
+        Lo más urgente aparece primero.
+      </p>
+    </div>
+    <button type="button" class="btn btn-secondary" (click)="cargar()">Actualizar</button>
+  </header>
+
+  @if (aviso()) {
+    <p class="aviso-ok" role="status">{{ aviso() }}</p>
+  }
+  @if (error()) {
+    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
+  }
+
+  <div class="herramientas">
+    <div class="filtros" role="group" aria-label="Filtrar por estado">
+      <button type="button" [class.activo]="filtro() === 'alerta'" (click)="filtro.set('alerta')">Bajo el mínimo · {{ conteo().alerta }}</button>
+      <button type="button" [class.activo]="filtro() === 'agotados'" (click)="filtro.set('agotados')">Agotados · {{ conteo().agotados }}</button>
+      <button type="button" [class.activo]="filtro() === 'todos'" (click)="filtro.set('todos')">Todos · {{ conteo().todos }}</button>
+    </div>
+    <label class="sr-only" for="buscar-producto">Buscar producto</label>
+    <input id="buscar-producto" class="input buscar" type="search" placeholder="Buscar producto o categoría…" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+  </div>
+
+  <div class="bloque tabla-envoltura">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          @if (todas()) {
+            <th>Tienda</th>
+          }
+          <th>Stock</th>
+          <th class="num">Mínimo</th>
+          <th class="num">Objetivo</th>
+          <th>Estado</th>
+          <th><span class="sr-only">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (f of visibles(); track f.id) {
+          <tr>
+            <td>
+              <span class="producto">{{ f.producto }}</span>
+              <span class="suave">{{ f.categoria }} · {{ f.precio | soles }}</span>
+            </td>
+            @if (todas()) {
+              <td class="suave">{{ gestion.nombreTienda(f.tiendaId) }}</td>
+            }
+            <td>
+              <div class="nivel">
+                <strong>{{ f.stock }}</strong>
+                <span class="barra" [attr.data-estado]="f.estado"><span [style.width.%]="nivel(f)"></span></span>
+              </div>
+            </td>
+            <td class="num">{{ f.stockMinimo }}</td>
+            <td class="num">{{ f.stockObjetivo }}</td>
+            <td>
+              @if (f.pedidoEnCurso) {
+                <a class="estado azul" routerLink="../compras">Pedido en curso</a>
+              } @else {
+                <span class="estado" [class]="claseEstado(f.estado)">
+                  {{ f.estado === 'AGOTADO' ? 'Agotado' : f.estado === 'BAJO' ? 'Bajo el mínimo' : 'Normal' }}
+                </span>
+              }
+            </td>
+            <td class="acciones">
+              @if (!f.pedidoEnCurso) {
+                <button type="button" class="btn btn-sm btn-secondary" (click)="abrirPedido(f)">Pedir</button>
+              }
+              @if (sesion.esAdmin()) {
+                <button type="button" class="btn btn-sm btn-ghost" (click)="abrirNiveles(f)">Niveles</button>
+              }
+            </td>
+          </tr>
+          @if (pidiendo() === f.id) {
+            <tr class="panel">
+              <td [attr.colspan]="todas() ? 7 : 6">
+                <form class="formulario-linea" (ngSubmit)="pedir(f)">
+                  <label>
+                    Unidades a pedir
+                    <input class="input" type="number" name="cantidad" min="1" max="500" [(ngModel)]="cantidad" />
+                  </label>
+                  <p class="sugerencia">Sugerido: {{ f.stockObjetivo - f.stock }} para llegar al objetivo de {{ f.stockObjetivo }}.</p>
+                  <div class="botones">
+                    <button type="submit" class="btn btn-primary" [disabled]="cantidad < 1">Enviar pedido</button>
+                    <button type="button" class="btn btn-ghost" (click)="pidiendo.set(null)">Cancelar</button>
+                  </div>
+                </form>
+              </td>
+            </tr>
+          }
+          @if (editando() === f.id) {
+            <tr class="panel">
+              <td [attr.colspan]="todas() ? 7 : 6">
+                <form class="formulario-linea" (ngSubmit)="guardarNiveles(f)">
+                  <label>
+                    Stock mínimo
+                    <input class="input" type="number" name="minimo" min="0" [(ngModel)]="minimo" />
+                  </label>
+                  <label>
+                    Stock objetivo
+                    <input class="input" type="number" name="objetivo" min="1" [(ngModel)]="objetivo" />
+                  </label>
+                  <div class="botones">
+                    <button type="submit" class="btn btn-primary" [disabled]="objetivo <= minimo">Guardar</button>
+                    <button type="button" class="btn btn-ghost" (click)="editando.set(null)">Cancelar</button>
+                  </div>
+                </form>
+              </td>
+            </tr>
+          }
+        } @empty {
+          <tr>
+            <td colspan="7" class="suave">{{ cargando() ? 'Cargando inventario…' : 'Nada coincide con el filtro.' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</main>

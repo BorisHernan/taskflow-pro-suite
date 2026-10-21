@@ -10,10 +10,20 @@
           <span class="punto" [class.en-vivo]="catalogo.enVivo()"></span>
           {{ catalogo.enVivo() ? 'Stock en vivo' : 'Conectando…' }}
         </span>
-        <span>La compra es simulada, pero el stock es real y compartido entre todos los visitantes.</span>
+        <span>Retiro en tienda: ves y compras el stock real de la sede que elijas.</span>
       </p>
     </div>
-    <app-boton-carrito />
+    <div class="cabecera-acciones">
+      <label class="sede">
+        <span>Comprar en</span>
+        <select class="input" [value]="catalogo.sede()" (change)="catalogo.elegirSede(+$any($event.target).value)">
+          @for (t of catalogo.tiendas(); track t.id) {
+            <option [value]="t.id" [selected]="t.id === catalogo.sede()">{{ t.nombre }}</option>
+          }
+        </select>
+      </label>
+      <app-boton-carrito />
+    </div>
   </header>
 
   <!-- Banner de promociones -->

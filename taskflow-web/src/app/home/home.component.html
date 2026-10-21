@@ -1,136 +1,223 @@
 <main class="home">
-  <section class="hero" aria-labelledby="home-titulo">
-    <div class="hero-texto-col">
-      <h1 id="home-titulo">
-        Boris Medrano
-        <span class="hero-rol">Desarrollador Full Stack Java</span>
-      </h1>
-      <p class="hero-texto">
-        Más de 3 años construyendo sistemas con Spring Boot, WebFlux y Angular. Esta suite corre en
-        producción: lo que hagas aquí lo ven los demás visitantes al instante.
-      </p>
+  <!-- Portada: solo tipografía sobre el campo naranja -->
+  <section class="hero campo-naranja" aria-labelledby="home-titulo">
+    <h1 id="home-titulo" class="hero-nombre">
+      <span class="linea"><span data-linea style="--i: 0">Boris</span></span>
+      <span class="linea linea-derecha"><span data-linea style="--i: 1">Medrano</span></span>
+    </h1>
 
-      <div class="hero-acciones">
-        <a class="btn btn-primary btn-lg" routerLink="/tablero">
-          Empezar el recorrido
-          <app-icono nombre="derecha" [tamano]="18" />
-        </a>
-        <a class="btn btn-secondary btn-lg" href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">
-          <app-icono nombre="github" [tamano]="18" />
-          Ver el código en GitHub
-        </a>
-      </div>
-
-      <p class="estado" [attr.data-estado]="estado()" aria-live="polite">
-        <span class="estado-punto" aria-hidden="true"></span>
-        @switch (estado()) {
-          @case ('despertando') {
-            Despertando el servidor gratuito… la primera carga puede tardar hasta un minuto.
-          }
-          @case ('en-linea') {
-            Servidor en línea
-            @if (visitas() !== null) {
-              · {{ visitas() }} visitas a esta demo
+    <div class="hero-pie">
+      <div class="hero-texto">
+        <p>Full stack Java desde Lima. Esta página está conectada a mis sistemas, en vivo.</p>
+        <p class="estado" [attr.data-estado]="estado()" aria-live="polite">
+          @switch (estado()) {
+            @case ('despertando') {
+              Despertando el servidor gratuito; la primera vez tarda hasta un minuto.
+            }
+            @case ('en-linea') {
+              Servidor en línea
+              @if (visitas() !== null) {
+                · {{ visitas() }} visitas a la demo
+              }
+            }
+            @case ('sin-respuesta') {
+              El servidor no respondió todavía. Las demos se reconectan solas.
             }
           }
-          @case ('sin-respuesta') {
-            El servidor no respondió todavía. Las demos se reconectan solas en cuanto despierte.
-          }
-        }
+        </p>
+      </div>
+      <a class="accion" routerLink="/tablero">Probar el tablero</a>
+    </div>
+  </section>
+
+  <!-- Lo que está pasando en la demo ahora mismo -->
+  <section class="vivo campo-noche" aria-labelledby="vivo-titulo">
+    <div class="vivo-cifras" data-revelar>
+      <h2 id="vivo-titulo" class="sr-only">Ahora mismo en la demo</h2>
+      @if (vivo.conectados() !== null) {
+      <p class="cifra">
+        <span class="cifra-numero">{{ vivo.conectados() }}</span>
+        <span class="cifra-texto">
+          {{ vivo.conectados() === 1 ? 'persona conectada ahora, y eres tú.' : 'personas con la demo abierta en este momento.' }}
+        </span>
+      </p>
+      }
+      <p class="cifra">
+        <span class="cifra-numero">{{ visitas() ?? '–' }}</span>
+        <span class="cifra-texto">visitas guardadas en PostgreSQL desde que la publiqué.</span>
       </p>
     </div>
 
-    <section class="vivo" aria-labelledby="vivo-titulo">
-      <div class="vivo-cabecera">
-        <h2 id="vivo-titulo">Ahora mismo en la demo</h2>
-        @if (vivo.conectados(); as n) {
-          <p class="vivo-conectados">{{ n === 1 ? 'Solo tú por ahora' : n + ' personas conectadas' }}</p>
-        }
-      </div>
-
-      <app-diagrama-vivo [latido]="vivo.latido()"></app-diagrama-vivo>
-
+    <div class="vivo-registro" data-revelar>
+      <p class="vivo-lead">Lo último que hicieron los visitantes:</p>
       <ol class="vivo-lista" aria-live="polite">
         @for (a of vivo.actividad(); track a.id) {
           <li>
-            <span class="vivo-texto">{{ a.texto }}</span>
+            <span>{{ a.texto }}</span>
             <span class="vivo-hora">{{ haceCuanto(a.fecha) }}</span>
           </li>
         } @empty {
           <li class="vivo-vacio">
-            Todavía no pasó nada desde que llegaste.
-            <a routerLink="/tablero" target="_blank">Abre el tablero en otra pestaña</a>
-            y mueve una tarjeta: lo verás aparecer aquí y correr por el diagrama.
+            Nada todavía desde que llegaste.
+            <a routerLink="/tablero" target="_blank">Abre el tablero en otra pestaña</a>, mueve una tarjeta y vuelve:
+            aparecerá aquí sin recargar.
           </li>
         }
       </ol>
-    </section>
+      <app-diagrama-vivo [latido]="vivo.latido()"></app-diagrama-vivo>
+    </div>
   </section>
 
-  <section class="recorrido" aria-labelledby="recorrido-titulo">
-    <h2 id="recorrido-titulo">El recorrido, en {{ pasos.length }} pasos</h2>
-    <p class="seccion-texto">Cada demo muestra una técnica distinta. Sigue el orden o salta a la que te interese.</p>
+  <!-- Las demos: libro de registro con vista previa -->
+  <section class="demos campo-cielo" aria-labelledby="demos-titulo">
+    <div class="demos-columna" data-revelar>
+      <h2 id="demos-titulo">Cuatro demos en producción</h2>
+      <p class="demos-intro">Cada una muestra una técnica distinta. Todas comparten la misma base de datos y el mismo servidor.</p>
 
-    <ol class="pasos">
-      @for (paso of pasos; track paso.ruta; let i = $index) {
-        <li class="paso entrar" [style.--i]="i" [attr.data-seccion]="paso.demo">
-          <span class="paso-numero" aria-hidden="true">{{ i + 1 }}</span>
-          <div class="paso-cuerpo">
-            <h3>
-              <a [routerLink]="paso.ruta">{{ paso.titulo }}</a>
-            </h3>
-            <p>{{ paso.queEs }}</p>
-            <p class="paso-prueba"><strong>Prueba esto:</strong> {{ paso.pruebaEsto }}</p>
-            <p class="paso-tecnica">{{ paso.tecnica }}</p>
-          </div>
+      <ul class="libro" (mouseleave)="vistaPrevia.set(null)">
+        @for (paso of pasos; track paso.ruta; let i = $index) {
+          <li
+            class="libro-fila"
+            [class.atenuada]="vistaPrevia() !== null && vistaPrevia() !== i"
+            (mouseenter)="vistaPrevia.set(i)"
+            (focusin)="vistaPrevia.set(i)"
+          >
+            @if (i < 3) {
+              <img class="libro-foto-movil" [src]="capturas[i].src" [alt]="capturas[i].alt" width="1280" height="800" loading="lazy" decoding="async" />
+            }
+            <a class="libro-enlace" [routerLink]="paso.ruta">
+              <span class="libro-nombre">{{ nombresCortos[i] }}</span>
+              <span class="libro-tecnica">{{ paso.tecnica }}</span>
+              <span class="libro-estado">En vivo</span>
+            </a>
+            <p class="libro-prueba">{{ paso.pruebaEsto }}</p>
+          </li>
+        }
+        <li class="libro-fila" [class.atenuada]="vistaPrevia() !== null" >
+          <a class="libro-enlace" [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">
+            <span class="libro-nombre">API</span>
+            <span class="libro-tecnica">OpenAPI y Swagger UI</span>
+            <span class="libro-estado">Abrir</span>
+          </a>
+        </li>
+        <li class="libro-fila" [class.atenuada]="vistaPrevia() !== null">
+          <a class="libro-enlace" href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">
+            <span class="libro-nombre">Código</span>
+            <span class="libro-tecnica">GitHub, con README y CI</span>
+            <span class="libro-estado">Abrir</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <figure class="demos-vista" aria-hidden="true">
+      @for (c of capturas; track c.src; let i = $index) {
+        <img [src]="c.src" alt="" width="1280" height="800" loading="lazy" decoding="async" [class.visible]="(vistaPrevia() ?? 0) === i" />
+      }
+    </figure>
+  </section>
+
+  <!-- El camino de un cambio, en escalera -->
+  <section class="camino campo-cielo" aria-labelledby="camino-titulo">
+    <ol class="escalera">
+      @for (e of escalones; track e.linea; let i = $index) {
+        <li class="escalon" [style.--paso]="i" data-revelar>
+          @if (i === 0) {
+            <h2 id="camino-titulo" class="escalon-linea">{{ e.linea }}</h2>
+          } @else {
+            <p class="escalon-linea">{{ e.linea }}</p>
+          }
+          <p class="escalon-texto">{{ e.texto }}</p>
         </li>
       }
     </ol>
   </section>
 
-  <section class="stack" aria-labelledby="stack-titulo">
-    <h2 id="stack-titulo">Cómo está hecho</h2>
-    <p class="seccion-texto">
-      Un microservicio reactivo que no bloquea hilos mientras espera a la base de datos, con tiempo real
-      en las dos direcciones y controles de abuso para una demo pública sin login.
-    </p>
+  <!-- Lima, de noche -->
+  <figure class="lima">
+    <img
+      src="img/lima-seafront-by-night.jpg"
+      alt="La Costa Verde de Lima al anochecer, con las luces del malecón y el mar gris"
+      width="1024"
+      height="683"
+      loading="lazy"
+      decoding="async"
+    />
+    <figcaption>Lima, Costa Verde. Foto de Bex.Walton, CC BY 2.0.</figcaption>
+  </figure>
 
-    <dl class="stack-lista">
-      <div>
-        <dt>Backend</dt>
-        <dd>Java 21, Spring Boot 3, Spring WebFlux, R2DBC, Flyway</dd>
-      </div>
-      <div>
-        <dt>Frontend</dt>
-        <dd>Angular 22 con componentes standalone y signals, RxJS, SCSS</dd>
-      </div>
-      <div>
-        <dt>Tiempo real</dt>
-        <dd>Server-Sent Events para difundir cambios, WebSocket para el juego</dd>
-      </div>
-      <div>
-        <dt>Calidad</dt>
-        <dd>JUnit 5, Mockito, Reactor Test, Vitest y CI en GitHub Actions</dd>
-      </div>
-      <div>
-        <dt>Despliegue</dt>
-        <dd>Docker en Render, Vercel y PostgreSQL en Neon, todo en planes gratuitos</dd>
-      </div>
-    </dl>
+  <!-- Sobre mí: datos al costado, párrafo ancho -->
+  <section class="sobre campo-naranja" aria-label="Sobre mí">
+    <div class="sobre-fila" data-revelar>
+      <dl class="sobre-datos">
+        <div><dt>Vivo en</dt><dd>Lima, Perú</dd></div>
+        <div><dt>Trabajo</dt><dd>100 % remoto</dd></div>
+        <div><dt>Experiencia</dt><dd>Más de 3 años</dd></div>
+      </dl>
+      <p class="sobre-parrafo">
+        Soy Boris, desarrollador full stack con Java. Me gusta el backend que aguanta tráfico real: APIs
+        reactivas, tiempo real y bases de datos bien modeladas. Armé esta suite para que me veas trabajar
+        en lugar de leerlo en un CV: tiene tests, CI y controles de abuso porque cualquiera puede usarla.
+      </p>
+    </div>
 
-    <p class="stack-links">
-      <a [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">API documentada en Swagger</a>
-      <a href="https://github.com/BorisHernan/taskflow-pro-suite#readme" target="_blank" rel="noopener">README con la arquitectura</a>
-    </p>
+    <div class="sobre-fila" data-revelar>
+      <p class="sobre-rotulo">Con qué está hecha</p>
+      <div class="sobre-listas">
+        <ul>
+          @for (t of stackBackend; track t[0]) {
+            <li><span>{{ t[0] }}</span><span class="suave">{{ t[1] }}</span></li>
+          }
+        </ul>
+        <ul>
+          @for (t of stackFrontend; track t[0]) {
+            <li><span>{{ t[0] }}</span><span class="suave">{{ t[1] }}</span></li>
+          }
+        </ul>
+      </div>
+    </div>
   </section>
 
-  <footer class="contacto" aria-labelledby="contacto-titulo">
-    <h2 id="contacto-titulo">¿Conversamos?</h2>
-    <p class="seccion-texto">Disponible para trabajo 100 % remoto desde Lima, Perú.</p>
-    <p class="contacto-links">
-      <a class="btn btn-primary" href="mailto:mdrncastro@gmail.com"><app-icono nombre="correo" [tamano]="17" />mdrncastro&#64;gmail.com</a>
-      <a class="btn btn-secondary" href="https://www.linkedin.com/in/boris-hernan-dev" target="_blank" rel="noopener"><app-icono nombre="linkedin" [tamano]="17" />LinkedIn</a>
-      <a class="btn btn-secondary" href="https://github.com/BorisHernan" target="_blank" rel="noopener"><app-icono nombre="github" [tamano]="17" />GitHub</a>
-    </p>
+  <!-- Contacto: el correo como tipografía -->
+  <section class="contacto campo-noche" aria-labelledby="contacto-titulo">
+    <h2 id="contacto-titulo" class="contacto-frase">¿Buscas a alguien para tu equipo backend o full stack? Escríbeme.</h2>
+    <a class="contacto-correo" href="mailto:mdrncastro@gmail.com?subject=Hola%20Boris%2C%20vi%20TaskFlow">
+      <span>mdrncastro&#64;</span><span>gmail.com</span>
+    </a>
+    <div class="contacto-pie">
+      <p>Lima, Perú · remoto</p>
+      <p class="contacto-redes">
+        <a href="https://www.linkedin.com/in/boris-hernan-dev" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/BorisHernan" target="_blank" rel="noopener">GitHub</a>
+      </p>
+    </div>
+  </section>
+
+  <footer class="cierre campo-lima">
+    <div class="cierre-columnas">
+      <div>
+        <p class="fuerte">Demos</p>
+        @for (paso of pasos; track paso.ruta; let i = $index) {
+          <p><a [routerLink]="paso.ruta">{{ nombresCortos[i] }}</a></p>
+        }
+      </div>
+      <div>
+        <p class="fuerte">Código</p>
+        <p><a href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">Repositorio</a></p>
+        <p><a href="https://github.com/BorisHernan/taskflow-pro-suite#readme" target="_blank" rel="noopener">Arquitectura</a></p>
+        <p><a [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">API en Swagger</a></p>
+      </div>
+      <div>
+        <p class="fuerte">Contacto</p>
+        <p><a href="mailto:mdrncastro@gmail.com">mdrncastro&#64;gmail.com</a></p>
+        <p><a href="https://www.linkedin.com/in/boris-hernan-dev" target="_blank" rel="noopener">LinkedIn</a></p>
+      </div>
+      <div>
+        <p class="fuerte">Fotos</p>
+        <p>Costa Verde de Lima: Bex.Walton, CC BY 2.0, vía Flickr.</p>
+      </div>
+    </div>
+    <p class="cierre-marca" aria-hidden="true">Boris Medrano</p>
+    <p class="cierre-legal">© {{ anio }} Boris Medrano · Hecho con Spring WebFlux y Angular</p>
   </footer>
 </main>

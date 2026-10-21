@@ -45,6 +45,16 @@ import {
   Truck,
   Lock,
   LockOpen,
+  LayoutDashboard,
+  Boxes,
+  PackageX,
+  TriangleAlert,
+  Clock,
+  FileDown,
+  LogOut,
+  Store,
+  UserRound,
+  CircleCheck,
   type IconNode,
 } from 'lucide';
 
@@ -96,6 +106,16 @@ export const ICONOS = {
   azar: Shuffle,
   candado: Lock,
   candadoAbierto: LockOpen,
+  resumen: LayoutDashboard,
+  inventario: Boxes,
+  merma: PackageX,
+  incidencia: TriangleAlert,
+  reloj: Clock,
+  descargar: FileDown,
+  salir: LogOut,
+  sede: Store,
+  persona: UserRound,
+  hecho: CircleCheck,
 } satisfies Record<string, IconNode>;
 
 export type NombreIcono = keyof typeof ICONOS;

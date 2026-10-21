@@ -161,7 +161,7 @@
   span {
     min-width: 24px;
     text-align: center;
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--fs-sm);
     font-variant-numeric: tabular-nums;
   }
@@ -171,7 +171,7 @@
   grid-area: total;
   justify-self: end;
   font-size: var(--fs-sm);
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
@@ -251,7 +251,7 @@
   &.total {
     margin-top: 6px;
     font-size: var(--fs-xl);
-    font-weight: 800;
+    font-weight: 600;
     color: var(--text-primary);
   }
 }

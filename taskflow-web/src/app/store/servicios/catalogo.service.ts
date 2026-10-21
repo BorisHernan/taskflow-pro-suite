@@ -1,5 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, share, tap, timer } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { Observable, catchError, of, share, switchMap, tap, timer } from 'rxjs';
+import { Tienda } from '../../models/gestion.model';
 import { Product, RatingSummary } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 
@@ -10,6 +12,11 @@ import { ProductService } from '../../services/product.service';
 @Injectable({ providedIn: 'root' })
 export class CatalogoService {
   private readonly api = inject(ProductService);
+
+  /** Sede donde compra el visitante: el stock que ve y el que se descuenta son los de esa tienda. */
+  readonly sede = signal<number>(leerSede());
+  readonly tiendas = toSignal(this.api.getTiendas().pipe(catchError(() => of([] as Tienda[]))), { initialValue: [] as Tienda[] });
+  readonly nombreSede = computed(() => this.tiendas().find((t) => t.id === this.sede())?.nombre ?? '');
 
   readonly productos = signal<Product[]>([]);
   readonly valoraciones = signal<Record<number, RatingSummary>>({});
@@ -26,7 +33,8 @@ export class CatalogoService {
   });
 
   /** Abierto mientras alguna página de la tienda lo use (y 5 s más, para el cambio de página). */
-  readonly vivo$: Observable<Product> = this.api.streamUpdates().pipe(
+  readonly vivo$: Observable<Product> = toObservable(this.sede).pipe(
+    switchMap((tienda) => this.api.streamUpdates(tienda)),
     tap((actualizado) => {
       this.enVivo.set(true);
       this.productos.update((lista) => lista.map((p) => (p.id === actualizado.id ? actualizado : p)));
@@ -34,9 +42,20 @@ export class CatalogoService {
     share({ resetOnRefCountZero: () => timer(5000) }),
   );
 
+  elegirSede(id: number): void {
+    if (id === this.sede()) return;
+    this.sede.set(id);
+    try {
+      localStorage.setItem(CLAVE_SEDE, String(id));
+    } catch {}
+    this.productos.set([]);
+    this.enVivo.set(false);
+    this.cargar();
+  }
+
   cargar(): void {
     if (this.cargado()) return;
-    this.api.getAll().subscribe({
+    this.api.getAll(this.sede()).subscribe({
       next: (lista) => {
         this.productos.set(lista);
         this.error.set(null);
@@ -55,5 +74,15 @@ export class CatalogoService {
 
   producto(id: number): Product | undefined {
     return this.productos().find((p) => p.id === id);
+  }
+}
+
+const CLAVE_SEDE = 'taskflow-sede';
+
+function leerSede(): number {
+  try {
+    return Number(localStorage.getItem(CLAVE_SEDE)) || 1;
+  } catch {
+    return 1;
   }
 }

@@ -2,6 +2,7 @@ import { Injectable, computed, effect, inject, signal, untracked } from '@angula
 import { HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { CartItem, Product, ReceiptData, VALID_COUPONS } from '../../models/product.model';
+import { CatalogoService } from './catalogo.service';
 import { ProductService } from '../../services/product.service';
 
 const CLAVE_GUARDADO = 'taskflow-carrito';
@@ -12,6 +13,7 @@ export type Resultado = { ok: true } | { ok: false; mensaje: string };
 @Injectable({ providedIn: 'root' })
 export class CarritoService {
   private readonly api = inject(ProductService);
+  private readonly catalogo = inject(CatalogoService);
 
   readonly items = signal<CartItem[]>(leerGuardado());
   readonly cupon = signal<{ code: string; discount: number } | null>(null);
@@ -122,7 +124,7 @@ export class CarritoService {
     try {
       for (const item of items) {
         try {
-          await firstValueFrom(this.api.purchase(item.product.id, item.quantity));
+          await firstValueFrom(this.api.purchase(item.product.id, item.quantity, this.catalogo.sede()));
           comprados.push(item);
         } catch (err) {
           this.items.update((actual) => actual.filter((c) => !comprados.some((p) => p.product.id === c.product.id)));

@@ -57,12 +57,8 @@
   place-items: center;
   aspect-ratio: 1;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
   color: var(--seccion);
-  background:
-    radial-gradient(circle at 25% 20%, color-mix(in srgb, var(--seccion) 28%, transparent), transparent 55%),
-    radial-gradient(circle at 80% 85%, color-mix(in srgb, #db2777 18%, transparent), transparent 50%),
-    linear-gradient(135deg, var(--seccion-suave), var(--surface));
+  background: var(--seccion-suave);
   overflow: hidden;
 
   app-product-icon {
@@ -120,7 +116,7 @@
 .precio {
   margin: 4px 0 0;
   font-size: 34px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--seccion);
   font-variant-numeric: tabular-nums;
@@ -150,7 +146,7 @@
   align-items: center;
   gap: 8px;
   margin: 0;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--success-text);
 
   &.bajo {
@@ -202,7 +198,7 @@
   span {
     min-width: 28px;
     text-align: center;
-    font-weight: 800;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
 }
@@ -262,7 +258,7 @@
 .promedio-grande {
   margin: 0;
   font-size: 48px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -317,7 +313,7 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-weight: 700;
+  font-weight: 600;
 
   app-icono {
     color: #f59e0b;
@@ -407,7 +403,7 @@
 .etiqueta-estrellas {
   margin-left: 8px;
   font-size: var(--fs-sm);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-secondary);
 }
 
@@ -468,7 +464,7 @@
   border-radius: 50%;
   background: hsl(var(--tono) 70% 92%);
   color: hsl(var(--tono) 55% 35%);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 :host-context([data-theme='dark']) .avatar {
@@ -477,7 +473,7 @@
 }
 
 .resena-autor {
-  font-weight: 700;
+  font-weight: 600;
   font-size: var(--fs-sm);
 }
 

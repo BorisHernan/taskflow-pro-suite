@@ -25,22 +25,6 @@
   }
 }
 
-.sorpresa app-icono {
-  color: var(--seccion);
-}
-
-.sorpresa .girar {
-  animation: tirar-dado 0.5s var(--ease);
-}
-
-@keyframes tirar-dado {
-  50% {
-    transform: rotate(180deg) scale(1.3);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 
 .aviso-filtro {
   display: flex;
@@ -88,7 +72,7 @@
     flex: 1;
     margin: 0;
     font-size: var(--fs-base);
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: -0.01em;
   }
 
@@ -259,4 +243,96 @@
     flex: 0 0 85%;
     scroll-snap-align: start;
   }
+}
+
+.nueva-fila .prioridad-select {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.filtros-tipo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 16px;
+
+  button {
+    padding: 7px 12px;
+    border: 0;
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--text-primary);
+    }
+
+    &.activo {
+      background: var(--text-primary);
+      color: var(--bg);
+    }
+  }
+}
+
+.tarjeta[data-prioridad='ALTA'] {
+  box-shadow: inset 3px 0 0 var(--warning);
+}
+
+.tarjeta[data-prioridad='CRITICA'] {
+  box-shadow: inset 3px 0 0 var(--danger);
+}
+
+.tarjeta-etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 6px;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.etiqueta {
+  padding: 2px 7px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--surface-alt);
+  color: var(--text-secondary);
+
+  &[data-tipo='REPOSICION'] {
+    background: var(--info-bg);
+    color: var(--info-text);
+  }
+
+  &[data-tipo='INCIDENCIA'] {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+  }
+
+  &[data-tipo='TURNO'] {
+    background: var(--success-bg);
+    color: var(--success-text);
+  }
+
+  &.prioridad[data-prioridad='ALTA'] {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+  }
+
+  &.prioridad[data-prioridad='CRITICA'] {
+    background: var(--danger);
+    color: #ffffff;
+  }
+}
+
+.tarjeta-autor {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pedir {
+  margin-right: auto;
 }

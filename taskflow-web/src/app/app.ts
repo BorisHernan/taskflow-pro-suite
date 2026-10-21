@@ -3,10 +3,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { ThemeService } from './services/theme.service';
+import { SesionService } from './auth/sesion.service';
 import { GuiaRecorridoComponent } from './shared/guia-recorrido/guia-recorrido.component';
 import { IconoComponent } from './shared/icono/icono.component';
 
-const SECCIONES = ['tablero', 'tienda', 'estadisticas', 'arena'];
+const SECCIONES = ['gestion', 'tienda', 'arena', 'ingresar'];
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,8 @@ const SECCIONES = ['tablero', 'tienda', 'estadisticas', 'arena'];
   styleUrl: './app.scss'
 })
 export class App {
+  readonly sesion = inject(SesionService);
+
   constructor(public themeService: ThemeService) {
     // Marca la sección actual en <html>: el CSS toma de ahí el color de identidad de cada pantalla.
     const raiz = inject(DOCUMENT).documentElement;

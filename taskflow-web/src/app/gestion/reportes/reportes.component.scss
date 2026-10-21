@@ -1,0 +1,39 @@
+.rango {
+  max-width: 440px;
+}
+
+.reportes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px;
+    background: var(--surface);
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  p {
+    margin: 6px 0 0;
+    font-size: 14px;
+  }
+
+  .btn {
+    align-self: flex-start;
+  }
+}
+
+.suave {
+  color: var(--text-secondary);
+}

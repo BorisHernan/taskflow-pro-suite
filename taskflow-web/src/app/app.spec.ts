@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 import { App } from './app';
 
 describe('App', () => {
@@ -17,9 +18,10 @@ describe('App', () => {
       }),
     });
 
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient()],
     }).compileComponents();
   });
 
@@ -29,13 +31,13 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('renderiza la navegación con las 4 demos', async () => {
+  it('sin sesión la navegación ofrece ingresar, la tienda online y la arena', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     const links = Array.from(compiled.querySelectorAll('.app-nav-links a')).map((a) => a.textContent?.trim());
 
-    expect(links).toEqual(['Tablero', 'Tienda', 'Estadísticas', 'Arena']);
+    expect(links).toEqual(['Ingresar', 'Tienda online', 'Arena']);
   });
 
   it('el botón de tema alterna el tema al hacer click', async () => {

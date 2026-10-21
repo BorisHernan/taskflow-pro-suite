@@ -127,7 +127,7 @@
 .kpi-valor {
   margin: 14px 0 2px;
   font-size: 26px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.1;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -194,7 +194,7 @@
     color: var(--text-secondary);
     font: inherit;
     font-size: var(--fs-xs);
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s var(--ease);
 
@@ -232,7 +232,7 @@
   border-radius: 50%;
   background: var(--surface-alt);
   font-size: var(--fs-xs);
-  font-weight: 800;
+  font-weight: 600;
   color: var(--text-secondary);
 }
 
@@ -288,7 +288,7 @@
   display: grid;
   text-align: right;
   font-size: var(--fs-sm);
-  font-weight: 800;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 
   small {
@@ -345,7 +345,7 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-weight: 700;
+  font-weight: 600;
 
   app-icono {
     color: #f59e0b;

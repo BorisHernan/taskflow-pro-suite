@@ -2,9 +2,7 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  backdrop-filter: saturate(1.4) blur(10px);
-  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .app-nav {
@@ -21,9 +19,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
   text-decoration: none;
 
@@ -44,27 +42,29 @@
     align-items: center;
     gap: 8px;
     padding: 0 12px;
-    font-size: var(--fs-sm);
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 500;
     color: var(--text-secondary);
     text-decoration: none;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+    transition: color 0.15s var(--ease);
 
     &:hover {
       color: var(--text-primary);
     }
 
     &.active {
-      color: var(--seccion);
-      border-bottom-color: var(--seccion);
+      color: var(--text-primary);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 6px;
+      text-decoration-color: var(--seccion);
     }
   }
 }
 
 /* Cada pestaña lleva su icono en el color de su sección, aunque no esté activa. */
 .app-nav-links a {
-  @each $s in tablero, tienda, estadisticas, arena {
+  @each $s in gestion, tienda, arena {
     &[data-seccion='#{$s}'] app-icono {
       color: var(--c-#{$s});
     }
@@ -72,7 +72,7 @@
 }
 
 .theme-toggle {
-  border: 1px solid var(--border);
+  background: var(--surface-alt);
 }
 
 /* Celular: marca y tema arriba; las 4 secciones en su propia fila, con icono encima. */
@@ -100,7 +100,8 @@
       justify-content: center;
       gap: 3px;
       padding: 6px 2px 8px;
-      font-size: 12px;
+      font-size: 13px;
     }
   }
 }
+

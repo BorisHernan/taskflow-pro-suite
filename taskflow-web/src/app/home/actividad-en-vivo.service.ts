@@ -4,6 +4,7 @@ import { STATUS_LABELS, TaskEvent, TaskStatus } from '../models/task.model';
 import { Product } from '../models/product.model';
 import { ProductService } from '../services/product.service';
 import { TaskService } from '../services/task.service';
+import { SesionService } from '../auth/sesion.service';
 
 export interface Actividad {
   id: number;
@@ -24,6 +25,7 @@ const MAXIMO = 6;
 export class ActividadEnVivoService {
   private readonly taskService = inject(TaskService);
   private readonly productService = inject(ProductService);
+  private readonly sesion = inject(SesionService);
 
   readonly actividad = signal<Actividad[]>([]);
   readonly conectados = signal<number | null>(null);
@@ -36,12 +38,15 @@ export class ActividadEnVivoService {
   private siguienteId = 1;
 
   iniciar(): void {
-    this.subs.add(
-      this.taskService.getAll().subscribe((tareas) => {
-        tareas.forEach((t) => t.id != null && this.columnas.set(t.id, t.status));
-      }),
-    );
-    this.subs.add(this.taskService.streamUpdates().subscribe((e) => this.alEventoTarea(e)));
+    // Las tareas son privadas de cada tienda: sin sesión solo se escucha la tienda online.
+    if (this.sesion.activa()) {
+      this.subs.add(
+        this.taskService.getAll().subscribe((tareas) => {
+          tareas.forEach((t) => t.id != null && this.columnas.set(t.id, t.status));
+        }),
+      );
+      this.subs.add(this.taskService.streamUpdates().subscribe({ next: (e) => this.alEventoTarea(e), error: () => {} }));
+    }
     this.subs.add(this.productService.streamUpdates().subscribe((p) => this.alProducto(p)));
   }
 

@@ -1,42 +1,96 @@
 import { Routes } from '@angular/router';
+import { conSesion, soloAdmin } from './auth/guards';
 
 // Cada pantalla se carga recién al entrar (lazy): el bundle inicial solo trae la portada.
 export const routes: Routes = [
   {
     path: '',
-    title: 'TaskFlow App · Boris Medrano, Full Stack Java',
+    title: 'TaskFlow · Gestión de tiendas en tiempo real · Boris Medrano',
     loadComponent: () => import('./home/home.component').then((m) => m.HomeComponent),
   },
   {
-    path: 'tablero',
-    title: 'Tablero Kanban en tiempo real · TaskFlow App',
-    loadComponent: () => import('./kanban-board/kanban-board.component').then((m) => m.KanbanBoardComponent),
+    path: 'ingresar',
+    title: 'Ingresar · TaskFlow',
+    loadComponent: () => import('./auth/ingresar.component').then((m) => m.IngresarComponent),
+  },
+  {
+    path: 'gestion',
+    canActivate: [conSesion],
+    loadComponent: () => import('./gestion/gestion-layout.component').then((m) => m.GestionLayoutComponent),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'resumen' },
+      {
+        path: 'resumen',
+        title: 'Resumen · TaskFlow',
+        loadComponent: () => import('./gestion/resumen/resumen.component').then((m) => m.ResumenComponent),
+      },
+      {
+        path: 'tablero',
+        title: 'Tareas · TaskFlow',
+        loadComponent: () => import('./kanban-board/kanban-board.component').then((m) => m.KanbanBoardComponent),
+      },
+      {
+        path: 'inventario',
+        title: 'Inventario · TaskFlow',
+        loadComponent: () => import('./gestion/inventario/inventario.component').then((m) => m.InventarioComponent),
+      },
+      {
+        path: 'compras',
+        title: 'Compras · TaskFlow',
+        loadComponent: () => import('./gestion/compras/compras.component').then((m) => m.ComprasComponent),
+      },
+      {
+        path: 'mermas',
+        title: 'Mermas · TaskFlow',
+        loadComponent: () => import('./gestion/mermas/mermas.component').then((m) => m.MermasComponent),
+      },
+      {
+        path: 'incidencias',
+        title: 'Incidencias · TaskFlow',
+        loadComponent: () => import('./gestion/incidencias/incidencias.component').then((m) => m.IncidenciasComponent),
+      },
+      {
+        path: 'turnos',
+        title: 'Turnos · TaskFlow',
+        loadComponent: () => import('./gestion/turnos/turnos.component').then((m) => m.TurnosComponent),
+      },
+      {
+        path: 'estadisticas',
+        title: 'Estadísticas · TaskFlow',
+        canActivate: [soloAdmin],
+        loadComponent: () => import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
+      },
+      {
+        path: 'reportes',
+        title: 'Reportes · TaskFlow',
+        canActivate: [soloAdmin],
+        loadComponent: () => import('./gestion/reportes/reportes.component').then((m) => m.ReportesComponent),
+      },
+    ],
   },
   {
     path: 'tienda',
-    title: 'Tienda con stock en vivo · TaskFlow App',
+    title: 'Tienda online · TaskFlow',
     loadComponent: () => import('./store/store.component').then((m) => m.StoreComponent),
   },
   {
     path: 'tienda/producto/:id',
-    title: 'Producto · Tienda · TaskFlow App',
+    title: 'Producto · Tienda · TaskFlow',
     loadComponent: () =>
       import('./store/producto-detalle/producto-detalle.component').then((m) => m.ProductoDetalleComponent),
   },
   {
     path: 'tienda/boleta',
-    title: 'Tu boleta · Tienda · TaskFlow App',
+    title: 'Tu boleta · Tienda · TaskFlow',
     loadComponent: () => import('./store/boleta/boleta.component').then((m) => m.BoletaComponent),
   },
   {
-    path: 'estadisticas',
-    title: 'Estadísticas · TaskFlow App',
-    loadComponent: () => import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
-  },
-  {
     path: 'arena',
-    title: 'Arena Lite multijugador · TaskFlow App',
+    title: 'Arena multijugador · TaskFlow',
     loadComponent: () => import('./arena/arena.component').then((m) => m.ArenaComponent),
   },
+  // Enlaces viejos (README, CV): siguen funcionando.
+  { path: 'tablero', redirectTo: 'gestion/tablero' },
+  { path: 'estadisticas', redirectTo: 'gestion/estadisticas' },
   { path: '**', redirectTo: '' },
 ];

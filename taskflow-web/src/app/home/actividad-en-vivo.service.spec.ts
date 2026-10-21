@@ -5,6 +5,8 @@ import { TaskService } from '../services/task.service';
 import { ProductService } from '../services/product.service';
 import { Task, TaskEvent } from '../models/task.model';
 import { Product } from '../models/product.model';
+import { signal } from '@angular/core';
+import { SesionService } from '../auth/sesion.service';
 
 describe('ActividadEnVivoService', () => {
   let tareas$: Subject<TaskEvent>;
@@ -22,6 +24,7 @@ describe('ActividadEnVivoService', () => {
         ActividadEnVivoService,
         { provide: TaskService, useValue: { getAll: () => of([tarea(1, 'TODO'), tarea(2, 'TODO')]), streamUpdates: () => tareas$ } },
         { provide: ProductService, useValue: { streamUpdates: () => productos$ } },
+        { provide: SesionService, useValue: { activa: signal(true) } },
       ],
     });
     service = TestBed.inject(ActividadEnVivoService);

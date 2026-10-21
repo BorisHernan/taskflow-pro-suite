@@ -1,0 +1,112 @@
+.nota-admin {
+  padding: 14px 16px;
+  margin: 0 0 16px;
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+.turno-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  h2 {
+    margin: 4px 0 0;
+    font-size: 28px;
+    letter-spacing: -0.03em;
+  }
+}
+
+.etiqueta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  color: var(--success-text);
+}
+
+.suave {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.nota {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 20px 0 0;
+
+  div {
+    display: grid;
+    gap: 2px;
+    padding: 14px;
+    background: var(--surface-alt);
+  }
+
+  dt {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  span {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+}
+
+.cerrar {
+  margin-top: 20px;
+}
+
+.cierre {
+  background: var(--success-bg);
+
+  .cifras div {
+    background: var(--surface);
+  }
+}
+
+.pendientes {
+  margin: 14px 0 0;
+  font-size: 14px;
+  color: var(--warning-text);
+
+  &.ok {
+    color: var(--success-text);
+  }
+}
+
+.detalle td {
+  background: var(--surface-alt);
+
+  .cifras {
+    margin: 0;
+
+    div {
+      background: var(--surface);
+    }
+  }
+}
+
+@media (max-width: 760px) {
+  .cifras {
+    grid-template-columns: 1fr 1fr;
+  }
+}

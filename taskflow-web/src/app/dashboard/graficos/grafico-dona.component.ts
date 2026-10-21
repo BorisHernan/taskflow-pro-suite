@@ -69,7 +69,7 @@ const GROSOR = 22;
     .arco.atenuado { opacity: 0.3; }
     .arco.resaltado { stroke-width: 30; }
     text { transform: rotate(90deg); transform-origin: 100px 100px; }
-    .centro-valor { fill: var(--text-primary); font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .centro-valor { fill: var(--text-primary); font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
     .centro-etiqueta { fill: var(--text-muted); font-size: 11px; }
     .leyenda { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; min-width: 170px; flex: 1; }
     .leyenda button {
@@ -91,7 +91,7 @@ const GROSOR = 22;
     }
     .leyenda button.activo { background: var(--surface-hover); color: var(--text-primary); }
     .muestra { width: 12px; height: 12px; border-radius: 4px; }
-    .pct { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .pct { font-weight: 600; font-variant-numeric: tabular-nums; }
     @keyframes abrir { from { stroke-dasharray: 0 100; } }
     @media (prefers-reduced-motion: reduce) { .arco { animation: none; } }
   `,

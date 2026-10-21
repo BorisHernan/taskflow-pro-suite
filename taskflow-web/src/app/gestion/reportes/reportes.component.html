@@ -1,0 +1,43 @@
+<main class="gestion-pagina">
+  <header class="gestion-cabecera">
+    <div>
+      <h1 class="page-title">Reportes</h1>
+      <p>
+        Exporta en CSV {{ gestion.tiendaActiva() == null ? 'las tres tiendas' : gestion.nombreTienda(gestion.tiendaActiva()) }}.
+        Cambia la tienda en el menú de la izquierda.
+      </p>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
+  }
+
+  <section class="bloque">
+    <form class="formulario-linea rango">
+      <label>
+        Desde
+        <input class="input" type="date" name="desde" [(ngModel)]="desde" [max]="hasta" />
+      </label>
+      <label>
+        Hasta
+        <input class="input" type="date" name="hasta" [(ngModel)]="hasta" [min]="desde" />
+      </label>
+    </form>
+  </section>
+
+  <ul class="reportes">
+    @for (r of reportes; track r.tipo) {
+      <li>
+        <div>
+          <h2>{{ r.nombre }}</h2>
+          <p>{{ r.detalle }}</p>
+          <p class="suave">{{ r.usaFechas ? 'Del ' + desde + ' al ' + hasta : 'Estado actual, sin rango de fechas' }}</p>
+        </div>
+        <button type="button" class="btn btn-secondary" [disabled]="descargando() !== null" (click)="descargar(r)">
+          {{ descargando() === r.tipo ? 'Generando…' : 'Descargar CSV' }}
+        </button>
+      </li>
+    }
+  </ul>
+</main>

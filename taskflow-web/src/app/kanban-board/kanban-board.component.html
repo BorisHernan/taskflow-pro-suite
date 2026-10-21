@@ -1,22 +1,16 @@
-<main class="page">
+<main class="gestion-pagina">
   <header class="page-header">
     <div>
-      <div class="page-titulo-fila">
-        <span class="page-icono"><app-icono nombre="tablero" [tamano]="24" /></span>
-        <h1 class="page-title">Tablero</h1>
-      </div>
+      <h1 class="page-title">Tareas</h1>
       <p class="page-subtitle">
         <span class="chip" [class.chip-success]="connectionLive()">
           <span class="punto" [class.en-vivo]="connectionLive()"></span>
           {{ connectionLive() ? 'En vivo' : 'Conectando…' }}
         </span>
-        @if (connectionLive()) {
-          <span class="chip">
-            <app-icono nombre="usuarios" [tamano]="14" />
-            {{ viewerCount() === 1 ? 'Solo tú ahora' : viewerCount() + ' personas viendo' }}
-          </span>
-        }
-        <span>Demo pública: cualquiera puede editarlo y todo lo que se hace queda guardado.</span>
+        <span>
+          {{ todasLasTiendas() ? 'Todas las tiendas' : gestion.nombreTienda(gestion.tiendaActiva()) }}.
+          Las alertas de stock, incidencias graves y checklists de turno llegan solas.
+        </span>
       </p>
     </div>
 
@@ -49,28 +43,28 @@
         id="nueva-tarea"
         class="input"
         type="text"
-        placeholder="¿Qué hay que hacer? Ej.: Revisar el PR…"
+        [placeholder]="todasLasTiendas() ? 'Tarea general de la cadena…' : '¿Qué hay que hacer? Ej.: cambiar los precios de la vitrina…'"
         autocomplete="off"
         maxlength="120"
         [(ngModel)]="newTaskTitle"
         name="newTaskTitle"
       />
+      <label class="sr-only" for="nueva-prioridad">Prioridad</label>
+      <select id="nueva-prioridad" class="input prioridad-select" name="newTaskPrioridad" [(ngModel)]="newTaskPrioridad">
+        @for (p of prioridades; track p) {
+          <option [value]="p">Prioridad {{ nombrePrioridad[p].toLowerCase() }}</option>
+        }
+      </select>
       <button type="button" class="btn btn-ghost" (click)="mostrarDescripcion.set(!mostrarDescripcion())" [attr.aria-expanded]="mostrarDescripcion()">
-        {{ mostrarDescripcion() ? 'Sin descripción' : 'Agregar descripción' }}
+        {{ mostrarDescripcion() ? 'Sin detalle' : 'Agregar detalle' }}
       </button>
       <button type="submit" class="btn btn-primary" [disabled]="!newTaskTitle.trim()">
         <app-icono nombre="mas" [tamano]="16" />
         Agregar tarea
       </button>
-      <button type="button" class="btn btn-secondary sorpresa" (click)="sorprender()" title="Crea una tarea de ejemplo al azar">
-        @for (n of [dado()]; track n) {
-          <app-icono nombre="azar" [tamano]="16" [class.girar]="n > 0" />
-        }
-        Sorpréndeme
-      </button>
     </div>
     @if (mostrarDescripcion()) {
-      <label class="sr-only" for="nueva-descripcion">Descripción</label>
+      <label class="sr-only" for="nueva-descripcion">Detalle</label>
       <textarea
         id="nueva-descripcion"
         class="input"
@@ -82,11 +76,17 @@
     }
   </form>
 
+  <div class="filtros-tipo" role="group" aria-label="Filtrar por tipo">
+    @for (f of filtrosTipo; track f.clave) {
+      <button type="button" [class.activo]="filtroTipo() === f.clave" (click)="filtroTipo.set(f.clave)">{{ f.nombre }}</button>
+    }
+  </div>
+
   @if (filtrando()) {
     <p class="aviso-filtro">
       <app-icono nombre="info" [tamano]="16" />
-      Mostrando las tareas que coinciden con “{{ filtro().trim() }}”. Mientras buscas, arrastrar está pausado.
-      <button type="button" class="btn btn-sm btn-ghost" (click)="filtro.set('')">Limpiar búsqueda</button>
+      Mostrando solo lo que coincide con el filtro. Mientras filtras, arrastrar está pausado.
+      <button type="button" class="btn btn-sm btn-ghost" (click)="filtro.set(''); filtroTipo.set('todas')">Quitar filtros</button>
     </p>
   }
 
@@ -109,16 +109,34 @@
           (cdkDropListDropped)="onDrop($event, status)"
         >
           @for (task of tasksByStatus(status); track task.id; let i = $index) {
-            <article class="tarjeta entrar" [style.--i]="i" cdkDrag>
+            <article class="tarjeta entrar" [style.--i]="i" [attr.data-prioridad]="task.prioridad" cdkDrag>
               <div class="tarjeta-arrastre" *cdkDragPreview>{{ task.title }}</div>
               <div class="tarjeta-placeholder" *cdkDragPlaceholder></div>
+
+              <p class="tarjeta-etiquetas">
+                @if (task.tipo && task.tipo !== 'MANUAL') {
+                  <span class="etiqueta" [attr.data-tipo]="task.tipo">{{ nombreTipo[task.tipo] }}</span>
+                }
+                @if (task.prioridad && task.prioridad !== 'MEDIA') {
+                  <span class="etiqueta prioridad" [attr.data-prioridad]="task.prioridad">{{ nombrePrioridad[task.prioridad] }}</span>
+                }
+                @if (todasLasTiendas()) {
+                  <span class="etiqueta tienda">{{ task.tiendaId ? gestion.nombreTienda(task.tiendaId) : 'General' }}</span>
+                }
+              </p>
 
               <h3 class="tarjeta-titulo">{{ task.title }}</h3>
               @if (task.description) {
                 <p class="tarjeta-descripcion">{{ task.description }}</p>
               }
+              @if (task.asignadoA || task.creadoPor) {
+                <p class="tarjeta-autor">{{ task.asignadoA ? 'Responsable: ' + task.asignadoA : 'Creó ' + task.creadoPor }}</p>
+              }
 
               <div class="tarjeta-acciones">
+                @if (task.tipo === 'REPOSICION' && task.productoId && task.status === 'TODO') {
+                  <a class="btn btn-sm btn-secondary pedir" routerLink="../compras" [queryParams]="{ producto: task.productoId }">Pedir reposición</a>
+                }
                 @if (columnaVecina(status, -1); as anterior) {
                   <button type="button" class="btn btn-icon btn-sm" (click)="moverA(task, -1)" [attr.aria-label]="'Mover a ' + statusLabels[anterior]">
                     <app-icono nombre="izquierda" [tamano]="16" />
@@ -129,9 +147,11 @@
                     <app-icono nombre="derecha" [tamano]="16" />
                   </button>
                 }
-                <button type="button" class="btn btn-icon btn-sm btn-danger-hover eliminar" (click)="deleteTask(task)" [attr.aria-label]="'Eliminar ' + task.title">
-                  <app-icono nombre="basura" [tamano]="16" />
-                </button>
+                @if (puedeBorrar(task)) {
+                  <button type="button" class="btn btn-icon btn-sm btn-danger-hover eliminar" (click)="deleteTask(task)" [attr.aria-label]="'Eliminar ' + task.title">
+                    <app-icono nombre="basura" [tamano]="16" />
+                  </button>
+                }
               </div>
             </article>
           } @empty {

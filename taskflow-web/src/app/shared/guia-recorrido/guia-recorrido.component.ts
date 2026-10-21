@@ -35,6 +35,8 @@ export class GuiaRecorridoComponent {
 
   readonly indice = computed(() => {
     const ruta = this.url().split(/[?#]/)[0];
+    // Dentro de la gestión el sistema es una herramienta de trabajo: sin la barra del recorrido.
+    if (ruta.startsWith('/gestion')) return -1;
     return RECORRIDO.findIndex((p) => p.ruta === ruta || (p.ruta !== '/' && ruta.startsWith(p.ruta + '/')));
   });
 

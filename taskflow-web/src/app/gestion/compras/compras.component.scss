@@ -1,0 +1,65 @@
+.gasto {
+  margin: 0;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+}
+
+.nota-admin {
+  padding: 14px 16px;
+  margin: 0 0 16px;
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+.pedido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 12px 0;
+
+  & + & {
+    border-top: 1px solid var(--border);
+  }
+}
+
+.pedido-titulo {
+  margin: 0;
+  font-weight: 500;
+}
+
+.suave {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.costo {
+  font-variant-numeric: tabular-nums;
+}
+
+.pedido-acciones {
+  display: flex;
+  gap: 6px;
+}
+
+.rechazo {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .pedido {
+    grid-template-columns: 1fr auto;
+  }
+
+  .pedido-acciones,
+  .pedido > .estado {
+    grid-column: 1 / -1;
+  }
+}

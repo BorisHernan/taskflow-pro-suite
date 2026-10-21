@@ -1,0 +1,68 @@
+.total {
+  margin: 0;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+}
+
+.nota-admin {
+  padding: 14px 16px;
+  margin: 0 0 16px;
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+.aviso-robo {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--danger-text);
+}
+
+.columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.suave {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.motivo {
+  display: grid;
+  gap: 6px;
+  padding: 8px 0;
+}
+
+.motivo-fila {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.barra {
+  height: 8px;
+  background: var(--surface-alt);
+
+  span {
+    display: block;
+    height: 100%;
+    background: var(--c-tienda);
+  }
+}
+
+@media (max-width: 1000px) {
+  .columnas {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

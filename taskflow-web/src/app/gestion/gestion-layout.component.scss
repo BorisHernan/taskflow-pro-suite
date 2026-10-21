@@ -1,0 +1,118 @@
+.gestion {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  max-width: 1440px;
+  margin: 0 auto;
+  min-height: calc(100svh - 60px);
+}
+
+.lateral {
+  position: sticky;
+  top: 60px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: calc(100svh - 60px);
+  padding: 28px 16px 20px var(--gutter);
+  overflow-y: auto;
+}
+
+.perfil {
+  display: grid;
+  gap: 2px;
+}
+
+.perfil-nombre {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.perfil-rol {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.selector {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.sede {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--surface);
+  font-weight: 500;
+}
+
+.menu {
+  display: grid;
+  gap: 2px;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    color: var(--text-secondary);
+    font-size: 15px;
+    text-decoration: none;
+    transition: background-color 0.15s, color 0.15s;
+
+    &:hover {
+      background: var(--surface-alt);
+      color: var(--text-primary);
+    }
+
+    &.activo {
+      background: var(--text-primary);
+      color: var(--bg);
+    }
+  }
+}
+
+.salir {
+  margin-top: auto;
+  justify-content: flex-start;
+}
+
+.contenido {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .gestion {
+    grid-template-columns: 1fr;
+  }
+
+  .lateral {
+    position: static;
+    height: auto;
+    padding: 16px var(--gutter) 0;
+    gap: 12px;
+  }
+
+  .perfil,
+  .salir {
+    display: none;
+  }
+
+  .menu {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+
+    a {
+      flex-shrink: 0;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  }
+}

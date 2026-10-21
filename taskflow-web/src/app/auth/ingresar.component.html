@@ -1,0 +1,41 @@
+<main class="page ingresar">
+  <header class="ingresar-cabecera">
+    <h1 class="page-title">Entra a la gestión de tiendas</h1>
+    <p class="ingresar-lead">
+      Una cadena de tres tiendas en Lima. Cada rol ve una interfaz distinta: elige una cuenta para entrar con un clic.
+    </p>
+  </header>
+
+  @if (error()) {
+    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
+  }
+
+  <ul class="cuentas">
+    @for (c of cuentas; track c.usuario) {
+      <li>
+        <button type="button" class="cuenta" [class.admin]="c.usuario === 'admin'" (click)="entrarComo(c)" [disabled]="enviando() !== null">
+          <span class="cuenta-rol">{{ c.rol }}</span>
+          <span class="cuenta-nombre">{{ c.nombre }}</span>
+          <span class="cuenta-detalle">{{ c.detalle }}</span>
+          <span class="cuenta-accion">{{ enviando() === c.usuario ? 'Entrando…' : 'Entrar como ' + c.usuario }}</span>
+        </button>
+      </li>
+    }
+  </ul>
+
+  <form class="formulario card" (ngSubmit)="entrar()">
+    <h2>O con usuario y clave</h2>
+    <div class="campos">
+      <label>
+        Usuario
+        <input class="input" name="usuario" [(ngModel)]="usuario" autocomplete="username" spellcheck="false" />
+      </label>
+      <label>
+        Clave
+        <input class="input" type="password" name="clave" [(ngModel)]="clave" autocomplete="current-password" />
+      </label>
+      <button type="submit" class="btn btn-primary" [disabled]="!usuario.trim() || !clave || enviando() !== null">Entrar</button>
+    </div>
+    <p class="nota">Todas las cuentas de la demo usan la clave <strong>{{ claveDemo }}</strong>. Los datos son compartidos con otros visitantes.</p>
+  </form>
+</main>

@@ -1,9 +1,22 @@
-import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Subject, takeUntil } from 'rxjs';
-import { STATUS_LABELS, STATUSES, Task, TaskPositionUpdate, TaskStatus } from '../models/task.model';
+import {
+  NOMBRE_PRIORIDAD,
+  NOMBRE_TIPO,
+  Prioridad,
+  STATUS_LABELS,
+  STATUSES,
+  Task,
+  TaskPositionUpdate,
+  TaskStatus,
+  TipoTarea,
+} from '../models/task.model';
+import { SesionService } from '../auth/sesion.service';
+import { GestionService } from '../gestion/gestion.service';
 import { TaskService } from '../services/task.service';
 import { IconoComponent } from '../shared/icono/icono.component';
 
@@ -14,18 +27,35 @@ function normalizar(texto: string): string {
   return texto.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 }
 
-import { TAREAS_EJEMPLO } from './tareas-ejemplo';
+type FiltroTipo = 'todas' | 'urgentes' | TipoTarea;
 
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  imports: [FormsModule, DragDropModule, IconoComponent],
+  imports: [FormsModule, DragDropModule, IconoComponent, RouterLink],
   templateUrl: './kanban-board.component.html',
   styleUrl: './kanban-board.component.scss',
 })
 export class KanbanBoardComponent implements OnInit, OnDestroy {
   statuses = STATUSES;
   statusLabels = STATUS_LABELS;
+  readonly nombreTipo = NOMBRE_TIPO;
+  readonly nombrePrioridad = NOMBRE_PRIORIDAD;
+  readonly prioridades: Prioridad[] = ['BAJA', 'MEDIA', 'ALTA', 'CRITICA'];
+  readonly gestion = inject(GestionService);
+  readonly sesion = inject(SesionService);
+
+  /** Filtro por tipo de tarea: las automáticas (reposición, incidencias, checklist) o las urgentes. */
+  readonly filtroTipo = signal<FiltroTipo>('todas');
+  readonly filtrosTipo: { clave: FiltroTipo; nombre: string }[] = [
+    { clave: 'todas', nombre: 'Todas' },
+    { clave: 'urgentes', nombre: 'Urgentes' },
+    { clave: 'REPOSICION', nombre: 'Reposición' },
+    { clave: 'INCIDENCIA', nombre: 'Incidencias' },
+    { clave: 'TURNO', nombre: 'Checklist' },
+    { clave: 'MANUAL', nombre: 'Manuales' },
+  ];
+  readonly todasLasTiendas = computed(() => this.gestion.tiendaActiva() == null);
 
   tasks = signal<Task[]>([]);
   cargando = signal(true);
@@ -35,12 +65,11 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
 
   newTaskTitle = '';
   newTaskDescription = '';
+  newTaskPrioridad: Prioridad = 'MEDIA';
   mostrarDescripcion = signal(false);
-  /** Cuenta las tiradas del botón "Sorpréndeme" (reinicia la animación del dado). */
-  dado = signal(0);
 
   filtro = signal('');
-  filtrando = computed(() => this.filtro().trim().length > 0);
+  filtrando = computed(() => this.filtro().trim().length > 0 || this.filtroTipo() !== 'todas');
 
   // Tarea borrada en pantalla que todavía se puede recuperar con "Deshacer".
   pendienteBorrar = signal<Task | null>(null);
@@ -49,7 +78,18 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private errorTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
-  constructor(private taskService: TaskService) {}
+  constructor(private taskService: TaskService) {
+    // El admin cambia de tienda desde el menú: el tablero se recarga con la elegida.
+    let primera = true;
+    effect(() => {
+      this.gestion.tiendaActiva();
+      if (primera) {
+        primera = false;
+        return;
+      }
+      untracked(() => this.loadAll());
+    });
+  }
 
   ngOnInit(): void {
     this.loadAll();
@@ -83,14 +123,28 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
 
   tasksByStatus(status: TaskStatus): Task[] {
     const texto = normalizar(this.filtro().trim());
-    return this.tasks()
+    const tipo = this.filtroTipo();
+    return this.visibles()
       .filter((t) => t.status === status)
+      .filter((t) =>
+        tipo === 'todas' ? true : tipo === 'urgentes' ? t.prioridad === 'ALTA' || t.prioridad === 'CRITICA' : (t.tipo ?? 'MANUAL') === tipo,
+      )
       .filter((t) => !texto || normalizar(`${t.title} ${t.description ?? ''}`).includes(texto))
       .sort((a, b) => a.position - b.position);
   }
 
   totalDe(status: TaskStatus): number {
-    return this.tasks().filter((t) => t.status === status).length;
+    return this.visibles().filter((t) => t.status === status).length;
+  }
+
+  /** El stream trae las tareas de todas las tiendas que el usuario puede ver; aquí se deja la elegida. */
+  private visibles(): Task[] {
+    const tienda = this.gestion.tiendaActiva();
+    return tienda == null ? this.tasks() : this.tasks().filter((t) => t.tiendaId === tienda);
+  }
+
+  puedeBorrar(t: Task): boolean {
+    return this.sesion.esAdmin() || !t.tipo || t.tipo === 'MANUAL';
   }
 
   connectedLists(): string[] {
@@ -134,29 +188,27 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
     this.guardarOrden([movida, ...origen], previousSnapshot);
   }
 
-  /** Crea al instante una tarea de ejemplo que todavía no esté en el tablero. */
-  sorprender(): void {
-    const enTablero = new Set(this.tasks().map((t) => t.title));
-    const libres = TAREAS_EJEMPLO.filter((t) => !enTablero.has(t.title));
-    const elegida = (libres.length ? libres : TAREAS_EJEMPLO)[Math.floor(Math.random() * (libres.length || TAREAS_EJEMPLO.length))];
-    this.dado.update((n) => n + 1);
-    this.newTaskTitle = elegida.title;
-    this.newTaskDescription = elegida.description;
-    this.addTask();
-  }
-
   addTask(): void {
     const title = this.newTaskTitle.trim();
     if (!title) return;
     const description = this.newTaskDescription.trim() || undefined;
 
-    this.taskService.create({ title, description, status: 'TODO', position: this.totalDe('TODO') + 1 }).subscribe({
+    const nueva: Partial<Task> = {
+      title,
+      description,
+      status: 'TODO',
+      position: this.totalDe('TODO') + 1,
+      prioridad: this.newTaskPrioridad,
+      tiendaId: this.gestion.tiendaActiva(),
+    };
+    this.taskService.create(nueva).subscribe({
       next: (created) => this.mergeTask(created),
       error: (err) => this.showError(this.extractErrorMessage(err, 'No se pudo crear la tarea.')),
     });
 
     this.newTaskTitle = '';
     this.newTaskDescription = '';
+    this.newTaskPrioridad = 'MEDIA';
     this.mostrarDescripcion.set(false);
   }
 
@@ -203,7 +255,7 @@ export class KanbanBoardComponent implements OnInit, OnDestroy {
   }
 
   private loadAll(): void {
-    this.taskService.getAll().subscribe({
+    this.taskService.getAll(this.gestion.tiendaActiva()).subscribe({
       next: (tasks) => {
         this.tasks.set(tasks);
         this.cargando.set(false);

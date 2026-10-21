@@ -7,3 +7,6 @@
 # Skills de Claude Code: herramientas locales de desarrollo
 .claude/
 skills-lock.json
+
+# Archivos de trabajo del skill de diseño
+.taste-skill/

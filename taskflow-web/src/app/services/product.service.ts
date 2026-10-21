@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { NewReview, Product, RatingSummary, Review } from '../models/product.model';
+import { Tienda } from '../models/gestion.model';
 import { RegistroEventosService } from '../shared/registro-eventos.service';
 
 const API_URL = environment.apiUrl.replace(/\/api\/tasks\/?$/, '/api/products');
@@ -13,8 +14,13 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Product[]> {
-    return this.http.get<Product[]>(API_URL);
+  /** Catálogo con el stock de una sede. */
+  getAll(tienda: number): Observable<Product[]> {
+    return this.http.get<Product[]>(API_URL, { params: new HttpParams().set('tienda', tienda) });
+  }
+
+  getTiendas(): Observable<Tienda[]> {
+    return this.http.get<Tienda[]>(API_URL.replace(/\/api\/products$/, '/api/tiendas'));
   }
 
   getRatings(): Observable<RatingSummary[]> {
@@ -29,14 +35,14 @@ export class ProductService {
     return this.http.post<Review>(`${API_URL}/${id}/reviews`, review);
   }
 
-  purchase(id: number, quantity: number): Observable<Product> {
-    return this.http.post<Product>(`${API_URL}/${id}/purchase`, { quantity });
+  purchase(id: number, quantity: number, tiendaId: number): Observable<Product> {
+    return this.http.post<Product>(`${API_URL}/${id}/purchase`, { quantity, tiendaId });
   }
 
   /** Stock real y compartido: cualquier compra (de cualquier visitante) llega aquí en vivo. */
-  streamUpdates(): Observable<Product> {
+  streamUpdates(tienda = 1): Observable<Product> {
     return new Observable<Product>((subscriber) => {
-      const eventSource = new EventSource(`${API_URL}/stream`);
+      const eventSource = new EventSource(`${API_URL}/stream?tienda=${tienda}`);
 
       eventSource.onmessage = (event) => {
         const product: Product = JSON.parse(event.data);

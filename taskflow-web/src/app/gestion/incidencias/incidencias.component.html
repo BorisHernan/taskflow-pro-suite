@@ -1,0 +1,108 @@
+<main class="gestion-pagina">
+  <header class="gestion-cabecera">
+    <div>
+      <h1 class="page-title">Incidencias</h1>
+      <p>Equipos que fallan, problemas de seguridad, reclamos. Las de severidad alta o crítica crean una tarea en el tablero.</p>
+    </div>
+  </header>
+
+  @if (aviso()) {
+    <p class="aviso-ok" role="status">{{ aviso() }}</p>
+  }
+  @if (error()) {
+    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
+  }
+
+  @if (!todas()) {
+    <section class="bloque">
+      <h2>Reportar incidencia</h2>
+      <form class="formulario-linea" (ngSubmit)="reportar()">
+        <label class="ancho">
+          Qué pasó
+          <input class="input" name="titulo" maxlength="160" [(ngModel)]="titulo" placeholder="Ej.: el aire acondicionado no enfría" required />
+        </label>
+        <label>
+          Categoría
+          <select class="input" name="categoria" [(ngModel)]="categoria">
+            @for (c of categorias; track c) {
+              <option [value]="c">{{ nombreCategoria[c] }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Severidad
+          <select class="input" name="severidad" [(ngModel)]="severidad">
+            @for (s of severidades; track s) {
+              <option [value]="s">{{ nombreSeveridad[s] }}</option>
+            }
+          </select>
+        </label>
+        <label class="ancho">
+          Detalle (opcional)
+          <input class="input" name="descripcion" maxlength="1000" [(ngModel)]="descripcion" />
+        </label>
+        <button type="submit" class="btn btn-primary" [disabled]="!titulo.trim()">Reportar</button>
+      </form>
+    </section>
+  } @else {
+    <p class="nota-admin">Elige una tienda en el menú para reportar una incidencia a su nombre.</p>
+  }
+
+  <section class="bloque">
+    <h2>Sin resolver · {{ abiertas().length }}</h2>
+    @for (i of abiertas(); track i.id) {
+      <article class="incidencia">
+        <div>
+          <p class="titulo">
+            <span class="estado" [class]="claseSeveridad(i.severidad)">{{ nombreSeveridad[i.severidad] }}</span>
+            {{ i.titulo }}
+          </p>
+          <p class="suave">
+            {{ nombreCategoria[i.categoria] }} · {{ nombreEstado[i.estado] }} · {{ i.creadaEn | date: 'd MMM, HH:mm' }} · {{ i.reportadaPor }}
+            @if (todas()) { · {{ gestion.nombreTienda(i.tiendaId) }} }
+            @if (i.tareaId) { · <a routerLink="../tablero">tarea en el tablero</a> }
+          </p>
+          @if (i.descripcion) {
+            <p class="descripcion">{{ i.descripcion }}</p>
+          }
+        </div>
+        <div class="acciones">
+          @if (i.estado === 'ABIERTA') {
+            <button type="button" class="btn btn-secondary btn-sm" (click)="cambiar(i, 'EN_CURSO')">Atender</button>
+          }
+          <button type="button" class="btn btn-primary btn-sm" (click)="resolviendo.set(resolviendo() === i.id ? null : i.id)">Resolver</button>
+        </div>
+        @if (resolviendo() === i.id) {
+          <form class="resolver" (ngSubmit)="cambiar(i, 'RESUELTA')">
+            <input class="input" name="solucion" maxlength="500" [(ngModel)]="solucion" placeholder="¿Cómo se resolvió?" />
+            <button type="submit" class="btn btn-primary btn-sm">Marcar resuelta</button>
+          </form>
+        }
+      </article>
+    } @empty {
+      <p class="suave">{{ cargando() ? 'Cargando…' : 'Sin incidencias abiertas.' }}</p>
+    }
+  </section>
+
+  <section class="bloque">
+    <button type="button" class="btn btn-ghost" (click)="verResueltas.set(!verResueltas())" [attr.aria-expanded]="verResueltas()">
+      {{ verResueltas() ? 'Ocultar' : 'Ver' }} resueltas · {{ resueltas().length }}
+    </button>
+    @if (verResueltas()) {
+      @for (i of resueltas(); track i.id) {
+        <article class="incidencia resuelta">
+          <div>
+            <p class="titulo">{{ i.titulo }}</p>
+            <p class="suave">
+              {{ nombreCategoria[i.categoria] }} · resuelta {{ i.resueltaEn | date: 'd MMM, HH:mm' }}
+              @if (todas()) { · {{ gestion.nombreTienda(i.tiendaId) }} }
+            </p>
+            @if (i.solucion) {
+              <p class="descripcion">{{ i.solucion }}</p>
+            }
+          </div>
+        </article>
+      }
+    }
+  </section>
+</main>

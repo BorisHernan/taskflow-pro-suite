@@ -6,19 +6,19 @@
 
 @mixin tema-oscuro {
   color-scheme: dark;
-  --bg: #0e0f13;
-  --surface: #17181e;
-  --surface-alt: #1f2129;
-  --surface-hover: #282a34;
-  --text-primary: #ededf2;
-  --text-secondary: #a6a8b6;
-  --text-muted: #6f7180;
-  --border: #2b2d37;
-  --border-strong: #3b3e4b;
-  --accent: #5b8cff;
-  --accent-hover: #7da3ff;
-  --accent-soft: rgba(91, 140, 255, 0.14);
-  --accent-ink: #0b0f17;
+  --bg: #111111;
+  --surface: #1b1b1a;
+  --surface-alt: #232322;
+  --surface-hover: #2c2c2a;
+  --text-primary: #f2f2f0;
+  --text-secondary: #b4b4ae;
+  --text-muted: #85857f;
+  --border: #2c2c2a;
+  --border-strong: #3d3d3a;
+  --accent: #ff4d74;
+  --accent-hover: #ff7090;
+  --accent-soft: rgba(255, 77, 116, 0.16);
+  --accent-ink: #111111;
   --success: #3ccf91;
   --success-hover: #5ad9a3;
   --success-bg: rgba(60, 207, 145, 0.12);
@@ -30,37 +30,38 @@
   --danger-bg: rgba(255, 122, 102, 0.12);
   --danger-border: rgba(255, 122, 102, 0.4);
   --danger-text: #ff9e8f;
-  --info-bg: rgba(91, 140, 255, 0.1);
-  --info-border: rgba(91, 140, 255, 0.35);
-  --info-text: #a9c2ff;
+  --info-bg: rgba(77, 179, 255, 0.1);
+  --info-border: rgba(77, 179, 255, 0.35);
+  --info-text: #9fd3ff;
   --shadow: rgba(0, 0, 0, 0.45);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 8px 24px -12px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 24px 48px -20px rgba(0, 0, 0, 0.7);
 
-  --c-tablero: #60a5fa;
-  --c-tienda: #a78bfa;
-  --c-estadisticas: #2dd4bf;
-  --c-arena: #fb7185;
-  --c-inicio: #fbbf24;
+  --c-tablero: #4db3ff;
+  --c-gestion: #4db3ff;
+  --c-tienda: #ff8126;
+  --c-estadisticas: #c5f53d;
+  --c-arena: #ff4d74;
+  --c-inicio: #ff8126;
 }
 
 :root {
   color-scheme: light;
 
   /* Color */
-  --bg: #f7f7f9;
+  --bg: #f1f1ef;
   --surface: #ffffff;
-  --surface-alt: #eef0f4;
-  --surface-hover: #e6e9ef;
-  --text-primary: #111827;
-  --text-secondary: #4b5565;
-  --text-muted: #8b95a5;
-  --border: #e3e6eb;
-  --border-strong: #cfd4dc;
-  --accent: #1d5bd8;
-  --accent-hover: #1749b0;
-  --accent-soft: rgba(29, 91, 216, 0.09);
+  --surface-alt: #e8e8e5;
+  --surface-hover: #dfdfdb;
+  --text-primary: #111111;
+  --text-secondary: #474745;
+  --text-muted: #77776f;
+  --border: #e0e0dc;
+  --border-strong: #c9c9c3;
+  --accent: #de194b;
+  --accent-hover: #b8103b;
+  --accent-soft: rgba(222, 25, 75, 0.09);
   --accent-ink: #ffffff;
   --success: #12a46b;
   --success-hover: #0e8a59;
@@ -73,9 +74,9 @@
   --danger-bg: #fdecea;
   --danger-border: #f3b4ab;
   --danger-text: #b42818;
-  --info-bg: #eef3fd;
-  --info-border: #c6d6f6;
-  --info-text: #1d4296;
+  --info-bg: #e6f3fd;
+  --info-border: #b5dbf7;
+  --info-text: #0a5a99;
   --shadow: rgba(17, 24, 39, 0.12);
   --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06);
   --shadow-md: 0 8px 24px -12px rgba(17, 24, 39, 0.18);
@@ -83,19 +84,28 @@
 
   /* Identidad de cada sección: su color aparece en el encabezado, iconos,
      botón principal y pestaña activa, para que cada pantalla se sienta propia. */
-  --c-tablero: #2563eb;
-  --c-tienda: #7c3aed;
-  --c-estadisticas: #0d9488;
-  --c-arena: #e11d48;
-  --c-inicio: #d97706;
+  /* En claro, versiones hondas de los campos de color (cielo, naranja, lima, carmín) para que se lean sobre blanco. */
+  --c-tablero: #0b6fc2;
+  --c-gestion: #0b6fc2;
+  --c-tienda: #b84c07;
+  --c-estadisticas: #4a7a0c;
+  --c-arena: #c8103f;
+  --c-inicio: #b84c07;
   --seccion: var(--accent);
 
   /* Compatibilidad: el fondo ya no es un degradado, es plano. */
   --bg-gradient: var(--bg);
   --dot-color: transparent;
 
+  /* Campos de color de la portada: iguales en claro y oscuro. */
+  --campo-naranja: #ff8126;
+  --campo-cielo: #4db3ff;
+  --campo-lima: #c5f53d;
+  --campo-noche: #161615;
+  --campo-carmin: #de194b;
+
   /* Tipografía: 7 tamaños bien separados. */
-  --font-sans: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --font-sans: 'Hanken Grotesk', 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
   --fs-xs: 12px;
   --fs-sm: 14px;
@@ -106,10 +116,10 @@
   --fs-display: clamp(44px, 7vw, 84px);
 
   /* Forma */
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 16px;
-  --radius-pill: 999px;
+  --radius-sm: 2px;
+  --radius: 3px;
+  --radius-lg: 4px;
+  --radius-pill: 3px;
   --ring: 0 0 0 3px var(--accent-soft);
   --ease: cubic-bezier(0.2, 0, 0, 1);
   --gutter: 24px;
@@ -127,7 +137,9 @@
 
 /* La app marca la sección actual en <html> (data-seccion) según la ruta. */
 :root[data-seccion='inicio'] { --seccion: var(--c-inicio); }
-:root[data-seccion='tablero'] { --seccion: var(--c-tablero); }
+:root[data-seccion='tablero'],
+:root[data-seccion='gestion'],
+:root[data-seccion='ingresar'] { --seccion: var(--c-tablero); }
 :root[data-seccion='tienda'] { --seccion: var(--c-tienda); }
 :root[data-seccion='estadisticas'] { --seccion: var(--c-estadisticas); }
 :root[data-seccion='arena'] { --seccion: var(--c-arena); }
@@ -190,7 +202,8 @@ h1,
 h2,
 h3 {
   text-wrap: balance;
-  letter-spacing: -0.02em;
+  font-weight: 500;
+  letter-spacing: -0.03em;
 }
 
 /* Scrollbar delgada con los colores del tema. */
@@ -258,17 +271,17 @@ h3 {
   flex-shrink: 0;
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 0;
   background: var(--seccion);
   color: var(--seccion-tinta);
-  box-shadow: 0 8px 20px -8px var(--seccion);
 }
 
 .page-title {
   margin: 0;
-  font-size: var(--fs-2xl);
-  font-weight: 800;
-  line-height: 1.15;
+  font-size: clamp(30px, 3.6vw, 44px);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
 }
 
 .page-subtitle {
@@ -291,9 +304,9 @@ h3 {
   min-height: 40px;
   padding: 0 16px;
   border: 1px solid transparent;
-  border-radius: var(--radius);
+  border-radius: 0;
   font-size: var(--fs-sm);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
   white-space: nowrap;
   text-decoration: none;
@@ -321,7 +334,6 @@ h3 {
   min-height: 32px;
   padding: 0 10px;
   font-size: 13px;
-  border-radius: var(--radius-sm);
 }
 
 .btn-primary {
@@ -367,7 +379,7 @@ h3 {
   width: 36px;
   min-height: 36px;
   padding: 0;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   background: transparent;
   color: var(--text-secondary);
 
@@ -440,9 +452,7 @@ select.input {
 
 .card {
   background: var(--surface);
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
 }
 
 .chip {
@@ -453,8 +463,8 @@ select.input {
   border-radius: var(--radius-pill);
   background: var(--surface-alt);
   color: var(--text-secondary);
-  font-size: var(--fs-xs);
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -484,7 +494,6 @@ select.input {
 
   &.en-vivo {
     background: var(--success);
-    box-shadow: 0 0 0 3px var(--success-bg);
   }
 }
 
@@ -644,9 +653,7 @@ select.input {
 
 .tf-card {
   background: var(--surface);
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
 }
 
 .tf-dotted-bg {
@@ -713,4 +720,207 @@ select.input {
 .entrar {
   animation: tf-entrar 0.45s var(--ease) backwards;
   animation-delay: calc(min(var(--i, 0), 12) * 45ms);
+}
+
+/* Va aquí y no en app.scss: el selector sube hasta <html>, fuera del componente. */
+/* En la portada la barra se funde con el campo naranja del primer pantallazo. */
+:root[data-seccion='inicio'] .app-header {
+  background: var(--campo-naranja);
+  color: #111111;
+
+  .app-marca,
+  .app-nav-links a,
+  .theme-toggle {
+    color: #111111;
+  }
+
+  .app-nav-links a[data-seccion] app-icono {
+    color: inherit;
+  }
+
+  .theme-toggle {
+    background: rgb(17 17 17 / 0.08);
+  }
+
+  .app-nav {
+    max-width: none;
+    padding: 0 clamp(16px, 2.2vw, 32px);
+  }
+}
+
+/* ── Gestión de tiendas: piezas compartidas por sus pantallas ─────────────── */
+
+.gestion-pagina {
+  padding: 28px var(--gutter) 72px 8px;
+}
+
+@media (max-width: 900px) {
+  .gestion-pagina {
+    padding: 20px var(--gutter) 56px;
+  }
+}
+
+.gestion-cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-bottom: 24px;
+
+  p {
+    margin: 6px 0 0;
+    color: var(--text-secondary);
+  }
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.kpi {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  background: var(--surface);
+  color: inherit;
+  text-decoration: none;
+
+  strong {
+    font-size: 30px;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  span {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  &.kpi-alerta strong {
+    color: var(--danger);
+  }
+}
+
+a.kpi:hover {
+  background: var(--surface-hover);
+}
+
+.bloque {
+  padding: 20px;
+  background: var(--surface);
+  margin-bottom: 16px;
+
+  > h2 {
+    margin: 0 0 14px;
+    font-size: 18px;
+  }
+}
+
+.tabla-envoltura {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th {
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 10px;
+    border-top: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  tbody tr:hover {
+    background: var(--surface-alt);
+  }
+}
+
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--surface-alt);
+  color: var(--text-secondary);
+
+  &.rojo {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+  }
+
+  &.ambar {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+  }
+
+  &.verde {
+    background: var(--success-bg);
+    color: var(--success-text);
+  }
+
+  &.azul {
+    background: var(--info-bg);
+    color: var(--info-text);
+  }
+}
+
+.formulario-linea {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  align-items: end;
+
+  label {
+    display: grid;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .ancho {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .formulario-linea .ancho {
+    grid-column: auto;
+  }
+}
+
+.aviso-ok {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background: var(--success-bg);
+  color: var(--success-text);
+  font-size: 14px;
+}
+
+:root[data-seccion='gestion'] .app-nav {
+  max-width: 1440px;
 }

@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 import { effect, signal } from '@angular/core';
 import { CarritoService } from './carrito.service';
+import { CatalogoService } from './catalogo.service';
 import { Product } from '../../models/product.model';
 
 const producto = (id: number, stock: number, price = 10): Product => ({
@@ -15,7 +16,9 @@ describe('CarritoService', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), { provide: CatalogoService, useValue: { sede: signal(2) } }],
+    });
     carrito = TestBed.inject(CarritoService);
     http = TestBed.inject(HttpTestingController);
   });
@@ -68,7 +71,9 @@ describe('CarritoService', () => {
     carrito.aplicarCupon('BIENVENIDO10');
 
     const pago = carrito.pagar();
-    http.expectOne((r) => r.url.endsWith('/1/purchase')).flush(producto(1, 3, 100));
+    const compra = http.expectOne((r) => r.url.endsWith('/1/purchase'));
+    expect(compra.request.body).toEqual({ quantity: 2, tiendaId: 2 });
+    compra.flush(producto(1, 3, 100));
     const r = await pago;
 
     expect(r.ok).toBe(true);

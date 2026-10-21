@@ -1,9 +1,14 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEsPe from '@angular/common/locales/es-PE';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ActivatedRouteSnapshot, provideRouter, withInMemoryScrolling, withViewTransitions } from '@angular/router';
 
 import { routes } from './app.routes';
 import { registroHttpInterceptor } from './shared/registro-http.interceptor';
+import { authInterceptor } from './auth/auth.interceptor';
+
+registerLocaleData(localeEsPe);
 
 /** Ruta más profunda activa: la que de verdad cambia entre pantallas. */
 function hoja(snapshot: ActivatedRouteSnapshot): ActivatedRouteSnapshot {
@@ -28,6 +33,7 @@ export const appConfig: ApplicationConfig = {
       }),
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
     ),
-    provideHttpClient(withInterceptors([registroHttpInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, registroHttpInterceptor])),
+    { provide: LOCALE_ID, useValue: 'es-PE' },
   ],
 };

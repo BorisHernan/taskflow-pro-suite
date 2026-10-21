@@ -1,0 +1,132 @@
+<main class="gestion-pagina">
+  <header class="gestion-cabecera">
+    <div>
+      <h1 class="page-title">Compras</h1>
+      <p>
+        Pedidos de reposición al almacén central. {{ sesion.esAdmin() ? 'Tú apruebas o rechazas; la tienda confirma cuando llega.' : 'El administrador los aprueba; tú confirmas cuando llega la mercadería.' }}
+      </p>
+    </div>
+    <p class="gasto">Comprometido en pedidos abiertos: <strong>{{ gastoEnCurso() | soles }}</strong></p>
+  </header>
+
+  @if (aviso()) {
+    <p class="aviso-ok" role="status">{{ aviso() }}</p>
+  }
+  @if (error()) {
+    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
+  }
+
+  @if (puedePedir()) {
+    <section class="bloque">
+      <h2>Nuevo pedido</h2>
+      <form class="formulario-linea" (ngSubmit)="pedir()">
+        <label class="ancho">
+          Producto
+          <select class="input" name="producto" [ngModel]="productoId" (ngModelChange)="alElegirProducto($event)" required>
+            <option [ngValue]="null" disabled>Elige un producto…</option>
+            @for (f of productos(); track f.id) {
+              <option [ngValue]="f.productoId">
+                {{ f.producto }} · stock {{ f.stock }}{{ f.estado !== 'OK' ? ' (bajo el mínimo)' : '' }}
+              </option>
+            }
+          </select>
+        </label>
+        <label>
+          Unidades
+          <input class="input" type="number" name="cantidad" min="1" max="500" [(ngModel)]="cantidad" />
+        </label>
+        <label>
+          Nota (opcional)
+          <input class="input" name="nota" maxlength="300" [(ngModel)]="nota" placeholder="Ej.: urgente para el fin de semana" />
+        </label>
+        <button type="submit" class="btn btn-primary" [disabled]="!productoId || cantidad < 1">Enviar pedido</button>
+      </form>
+    </section>
+  } @else {
+    <p class="nota-admin">Elige una tienda en el menú para crear un pedido a su nombre.</p>
+  }
+
+  <section class="bloque">
+    <h2>Por aprobar · {{ porAprobar().length }}</h2>
+    @for (p of porAprobar(); track p.id) {
+      <article class="pedido">
+        <div class="pedido-datos">
+          <p class="pedido-titulo">{{ p.cantidad }} × {{ p.productoNombre }}</p>
+          <p class="suave">
+            #{{ p.id }} · {{ gestion.nombreTienda(p.tiendaId) }} · pidió {{ p.solicitadoPor }} el {{ p.creadoEn | date: 'd MMM, HH:mm' }}
+            @if (p.nota) { · “{{ p.nota }}” }
+          </p>
+        </div>
+        <span class="costo">{{ p.costo | soles }}</span>
+        @if (sesion.esAdmin()) {
+          <div class="pedido-acciones">
+            <button type="button" class="btn btn-primary btn-sm" [disabled]="trabajando() === p.id" (click)="accion(p, 'aprobar')">Aprobar</button>
+            <button type="button" class="btn btn-ghost btn-sm" (click)="rechazando.set(rechazando() === p.id ? null : p.id)">Rechazar</button>
+          </div>
+        } @else {
+          <span class="estado ambar">Esperando aprobación</span>
+        }
+        @if (rechazando() === p.id) {
+          <form class="rechazo" (ngSubmit)="accion(p, 'rechazar')">
+            <input class="input" name="motivo" maxlength="300" [(ngModel)]="motivoRechazo" placeholder="Motivo (opcional): sin stock en el almacén…" />
+            <button type="submit" class="btn btn-secondary btn-sm">Confirmar rechazo</button>
+          </form>
+        }
+      </article>
+    } @empty {
+      <p class="suave">{{ cargando() ? 'Cargando…' : 'No hay pedidos esperando aprobación.' }}</p>
+    }
+  </section>
+
+  <section class="bloque">
+    <h2>En camino · {{ enCamino().length }}</h2>
+    @for (p of enCamino(); track p.id) {
+      <article class="pedido">
+        <div class="pedido-datos">
+          <p class="pedido-titulo">{{ p.cantidad }} × {{ p.productoNombre }}</p>
+          <p class="suave">#{{ p.id }} · {{ gestion.nombreTienda(p.tiendaId) }} · aprobó {{ p.revisadoPor }} el {{ p.actualizadoEn | date: 'd MMM, HH:mm' }}</p>
+        </div>
+        <span class="costo">{{ p.costo | soles }}</span>
+        <div class="pedido-acciones">
+          <button type="button" class="btn btn-primary btn-sm" [disabled]="trabajando() === p.id" (click)="accion(p, 'recibir')">Marcar como recibido</button>
+        </div>
+      </article>
+    } @empty {
+      <p class="suave">{{ cargando() ? 'Cargando…' : 'Nada en camino.' }}</p>
+    }
+  </section>
+
+  <section class="bloque">
+    <h2>Historial</h2>
+    <div class="tabla-envoltura">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            @if (todas()) {
+              <th>Tienda</th>
+            }
+            <th class="num">Costo</th>
+            <th>Estado</th>
+            <th>Actualizado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of historial(); track p.id) {
+            <tr>
+              <td>#{{ p.id }} · {{ p.cantidad }} × {{ p.productoNombre }}@if (p.nota) { <span class="suave"> · {{ p.nota }}</span> }</td>
+              @if (todas()) {
+                <td class="suave">{{ gestion.nombreTienda(p.tiendaId) }}</td>
+              }
+              <td class="num">{{ p.costo | soles }}</td>
+              <td><span class="estado" [class]="claseEstado(p.estado)">{{ nombreEstado[p.estado] }}</span></td>
+              <td class="suave">{{ p.actualizadoEn | date: 'd MMM, HH:mm' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="suave">Sin pedidos cerrados todavía.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

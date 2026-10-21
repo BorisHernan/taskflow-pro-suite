@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { SesionService } from '../auth/sesion.service';
+import { sseConToken } from '../shared/sse';
 import { environment } from '../../environments/environment';
 import { STATUS_LABELS, Task, TaskEvent, TaskPositionUpdate } from '../models/task.model';
 import { RegistroEventosService } from '../shared/registro-eventos.service';
@@ -10,11 +12,14 @@ const API_URL = environment.apiUrl;
 @Injectable({ providedIn: 'root' })
 export class TaskService {
   private readonly registro = inject(RegistroEventosService);
+  private readonly sesion = inject(SesionService);
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Task[]> {
-    return this.http.get<Task[]>(API_URL);
+  /** tienda: solo la usa el admin para filtrar; una tienda siempre recibe las suyas. */
+  getAll(tienda?: number | null): Observable<Task[]> {
+    const params = tienda == null ? new HttpParams() : new HttpParams().set('tienda', tienda);
+    return this.http.get<Task[]>(API_URL, { params });
   }
 
   create(task: Partial<Task>): Observable<Task> {
@@ -40,23 +45,10 @@ export class TaskService {
    * correspondiente en tiempo real.
    */
   streamUpdates(): Observable<TaskEvent> {
-    return new Observable<TaskEvent>((subscriber) => {
-      const eventSource = new EventSource(`${API_URL}/stream`);
-
-      eventSource.onmessage = (event) => {
-        const taskEvent: TaskEvent = JSON.parse(event.data);
-        this.registro.registrar({ demo: 'tablero', canal: 'SSE', direccion: 'entrada', detalle: describirEvento(taskEvent) });
-        subscriber.next(taskEvent);
-      };
-
-      eventSource.onerror = (err) => {
-        // El navegador reintenta solo la conexión SSE; no es necesario
-        // cerrar el observable aquí, solo lo dejamos registrado.
-        console.warn('SSE: conexión interrumpida, reintentando...', err);
-      };
-
-      return () => eventSource.close();
-    });
+    // Con token: el servidor filtra y cada tienda recibe solo los cambios de sus tareas.
+    return sseConToken<TaskEvent>(`${API_URL}/stream`, this.sesion.token()).pipe(
+      tap((e) => this.registro.registrar({ demo: 'tablero', canal: 'SSE', direccion: 'entrada', detalle: describirEvento(e) })),
+    );
   }
 }
 

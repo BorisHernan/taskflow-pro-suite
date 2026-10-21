@@ -54,7 +54,7 @@ import { CarritoService } from '../servicios/carrito.service';
       background: var(--seccion);
       color: #fff;
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 600;
       line-height: 18px;
       text-align: center;
     }

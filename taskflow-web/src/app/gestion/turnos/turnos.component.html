@@ -1,0 +1,133 @@
+<main class="gestion-pagina">
+  <header class="gestion-cabecera">
+    <div>
+      <h1 class="page-title">Turnos</h1>
+      <p>Al abrir un turno se crea su checklist en el tablero. Lo que pase mientras está abierto queda a su nombre.</p>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
+  }
+
+  @if (cierre(); as r) {
+    <section class="bloque cierre" aria-labelledby="cierre-titulo">
+      <h2 id="cierre-titulo">Turno de {{ nombreTurno[r.turno.tipo].toLowerCase() }} cerrado · {{ r.turno.responsable }}</h2>
+      <ng-container *ngTemplateOutlet="cifras; context: { $implicit: r }" />
+      @if (r.pendientes.length) {
+        <p class="pendientes">Quedaron pendientes: {{ r.pendientes.join(', ') }}.</p>
+      } @else {
+        <p class="pendientes ok">Se completó todo el checklist.</p>
+      }
+    </section>
+  }
+
+  @if (todas()) {
+    <p class="nota-admin">Elige una tienda en el menú para ver su turno actual.</p>
+  } @else if (actual(); as t) {
+    <section class="bloque turno-abierto">
+      <div class="turno-cabecera">
+        <div>
+          <p class="etiqueta"><span class="punto en-vivo"></span> Turno de {{ nombreTurno[t.tipo].toLowerCase() }} en curso</p>
+          <h2>{{ t.responsable }}</h2>
+          <p class="suave">Desde las {{ t.inicio | date: 'HH:mm' }} · {{ duracion(t) }} · abrió {{ t.abiertoPor }}</p>
+          @if (t.notaApertura) {
+            <p class="nota">“{{ t.notaApertura }}”</p>
+          }
+        </div>
+        <a class="btn btn-secondary" routerLink="../tablero">Ver checklist en el tablero</a>
+      </div>
+
+      @if (resumenActual(); as r) {
+        <ng-container *ngTemplateOutlet="cifras; context: { $implicit: r }" />
+      }
+
+      <form class="formulario-linea cerrar" (ngSubmit)="cerrar(t)">
+        <label class="ancho">
+          Nota de cierre
+          <input class="input" name="notaCierre" maxlength="500" [(ngModel)]="notaCierre" placeholder="Ej.: caja cuadrada, faltó reponer bebidas" />
+        </label>
+        <button type="submit" class="btn btn-primary">Cerrar turno</button>
+      </form>
+    </section>
+  } @else if (!cargando()) {
+    <section class="bloque">
+      <h2>Abrir turno</h2>
+      <form class="formulario-linea" (ngSubmit)="abrir()">
+        <label>
+          Turno
+          <select class="input" name="tipo" [(ngModel)]="tipo">
+            @for (x of tipos; track x) {
+              <option [value]="x">{{ nombreTurno[x] }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Responsable
+          <input class="input" name="responsable" maxlength="80" [(ngModel)]="responsable" required />
+        </label>
+        <label class="ancho">
+          Nota de apertura
+          <input class="input" name="notaApertura" maxlength="500" [(ngModel)]="notaApertura" placeholder="Ej.: caja inicial S/ 200" />
+        </label>
+        <button type="submit" class="btn btn-primary" [disabled]="!responsable.trim()">Abrir turno</button>
+      </form>
+    </section>
+  }
+
+  <section class="bloque">
+    <h2>Turnos anteriores</h2>
+    <div class="tabla-envoltura">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Turno</th>
+            @if (todas()) {
+              <th>Tienda</th>
+            }
+            <th>Responsable</th>
+            <th>Horario</th>
+            <th>Cierre</th>
+            <th><span class="sr-only">Detalle</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (t of historial(); track t.id) {
+            <tr>
+              <td>{{ nombreTurno[t.tipo] }} · {{ t.inicio | date: 'd MMM' }}</td>
+              @if (todas()) {
+                <td class="suave">{{ gestion.nombreTienda(t.tiendaId) }}</td>
+              }
+              <td>{{ t.responsable }}</td>
+              <td class="suave">{{ t.inicio | date: 'HH:mm' }}–{{ t.fin | date: 'HH:mm' }}</td>
+              <td class="suave">{{ t.notaCierre || '—' }}</td>
+              <td class="num">
+                <button type="button" class="btn btn-ghost btn-sm" (click)="verDetalle(t)">
+                  {{ detalle()?.turno?.id === t.id ? 'Ocultar' : 'Resumen' }}
+                </button>
+              </td>
+            </tr>
+            @if (detalle()?.turno?.id === t.id) {
+              <tr class="detalle">
+                <td [attr.colspan]="todas() ? 6 : 5">
+                  <ng-container *ngTemplateOutlet="cifras; context: { $implicit: detalle() }" />
+                </td>
+              </tr>
+            }
+          } @empty {
+            <tr><td colspan="6" class="suave">{{ cargando() ? 'Cargando…' : 'Sin turnos cerrados todavía.' }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<ng-template #cifras let-r>
+  <dl class="cifras">
+    <div><dt>Ventas</dt><dd>{{ r.ingresos | soles }}</dd><span>{{ r.ventas }} compras · {{ r.unidades }} unidades</span></div>
+    <div><dt>Mermas</dt><dd>{{ r.costoMermas | soles }}</dd><span>{{ r.mermas }} registros</span></div>
+    <div><dt>Incidencias</dt><dd>{{ r.incidencias }}</dd><span>reportadas en el turno</span></div>
+    <div><dt>Checklist</dt><dd>{{ r.tareasHechas }} / {{ r.tareas }}</dd><span>tareas hechas</span></div>
+  </dl>
+</ng-template>

@@ -90,42 +90,29 @@ describe('TaskService', () => {
     req.flush(null);
   });
 
-  it('streamUpdates emite los eventos que llegan por el EventSource del stream SSE', () => {
-    const instances: FakeEventSource[] = [];
-
-    class FakeEventSource {
-      onmessage: ((event: MessageEvent) => void) | null = null;
-      onerror: ((event: Event) => void) | null = null;
-      closed = false;
-
-      constructor(public url: string) {
-        instances.push(this);
-      }
-
-      close() {
-        this.closed = true;
-      }
-    }
-
-    const originalEventSource = (globalThis as any).EventSource;
-    (globalThis as any).EventSource = FakeEventSource;
+  it('streamUpdates lee el stream SSE con fetch, enviando el token, y emite cada evento', async () => {
+    const taskEvent: TaskEvent = { type: 'CREATED', task: { id: 1, title: 'x', status: 'TODO', position: 0 } };
+    const cuerpo = new ReadableStream<Uint8Array>({
+      start(c) {
+        c.enqueue(new TextEncoder().encode(`data:${JSON.stringify(taskEvent)}\n\n`));
+      },
+    });
+    const fetchFalso = vi.fn(async () => new Response(cuerpo, { status: 200 }));
+    const original = globalThis.fetch;
+    globalThis.fetch = fetchFalso as unknown as typeof fetch;
 
     try {
-      const received: TaskEvent[] = [];
-      const subscription = service.streamUpdates().subscribe((event) => received.push(event));
+      const recibido = await new Promise<TaskEvent>((resolve) => {
+        const sub = service.streamUpdates().subscribe((e) => {
+          resolve(e);
+          sub.unsubscribe();
+        });
+      });
 
-      expect(instances).toHaveLength(1);
-      expect(instances[0].url).toBe(`${API_URL}/stream`);
-
-      const taskEvent: TaskEvent = { type: 'CREATED', task: { id: 1, title: 'x', status: 'TODO', position: 0 } };
-      instances[0].onmessage?.({ data: JSON.stringify(taskEvent) } as MessageEvent);
-
-      expect(received).toEqual([taskEvent]);
-
-      subscription.unsubscribe();
-      expect(instances[0].closed).toBe(true);
+      expect(recibido).toEqual(taskEvent);
+      expect(fetchFalso).toHaveBeenCalledWith(`${API_URL}/stream`, expect.objectContaining({ headers: expect.any(Object) }));
     } finally {
-      (globalThis as any).EventSource = originalEventSource;
+      globalThis.fetch = original;
     }
   });
 });

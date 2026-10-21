@@ -1,5 +1,8 @@
 export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
 
+export type TipoTarea = 'MANUAL' | 'REPOSICION' | 'INCIDENCIA' | 'TURNO';
+export type Prioridad = 'BAJA' | 'MEDIA' | 'ALTA' | 'CRITICA';
+
 export interface Task {
   id?: number;
   title: string;
@@ -8,7 +11,28 @@ export interface Task {
   position: number;
   createdAt?: string;
   updatedAt?: string;
+  // Gestión de tiendas: null = tarea general (solo la ve el admin).
+  tiendaId?: number | null;
+  tipo?: TipoTarea;
+  prioridad?: Prioridad;
+  productoId?: number | null;
+  referenciaId?: number | null;
+  turnoId?: number | null;
+  creadoPor?: string;
+  asignadoA?: string | null;
+  cerradaEn?: string | null;
 }
+
+export const NOMBRE_TIPO: Record<TipoTarea, string> = {
+  MANUAL: 'Tarea',
+  REPOSICION: 'Reposición',
+  INCIDENCIA: 'Incidencia',
+  TURNO: 'Checklist',
+};
+
+export const NOMBRE_PRIORIDAD: Record<Prioridad, string> = { BAJA: 'Baja', MEDIA: 'Media', ALTA: 'Alta', CRITICA: 'Crítica' };
+
+export const ORDEN_PRIORIDAD: Record<Prioridad, number> = { CRITICA: 0, ALTA: 1, MEDIA: 2, BAJA: 3 };
 
 export const STATUS_LABELS: Record<TaskStatus, string> = {
   TODO: 'Por hacer',

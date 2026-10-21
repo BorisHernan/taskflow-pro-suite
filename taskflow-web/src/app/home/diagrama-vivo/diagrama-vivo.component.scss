@@ -19,24 +19,24 @@
   gap: 4px 10px;
   width: 100%;
   box-sizing: border-box;
-  padding: 12px 16px;
-  border-radius: 10px;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
+  padding: 14px 18px;
+  background: rgb(255 255 255 / 0.07);
 
   strong {
-    font-size: 15px;
-    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 500;
+    color: inherit;
   }
 
   span {
-    font-size: 13px;
-    color: var(--text-secondary);
+    font-size: 14px;
+    opacity: 0.7;
   }
 }
 
 .nodo-api {
-  border-color: var(--seccion);
+  background: var(--campo-naranja);
+  color: #111111;
 }
 
 /* Tramo vertical de alto fijo: el pulso lo cruza entero con transform (cqh). */
@@ -53,7 +53,7 @@
   bottom: 0;
   left: 28px;
   width: 2px;
-  background: var(--border);
+  background: rgb(255 255 255 / 0.25);
 }
 
 .tramo-nombre {
@@ -61,8 +61,8 @@
   top: 50%;
   left: 48px;
   transform: translateY(-50%);
-  font-size: 13px;
-  color: var(--text-secondary);
+  font-size: 14px;
+  opacity: 0.7;
 }
 
 /* Sube: de la base de datos hacia el navegador. */
@@ -73,7 +73,7 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--seccion);
+  background: var(--campo-lima);
   animation: subir 0.9s ease-in-out forwards;
 }
 

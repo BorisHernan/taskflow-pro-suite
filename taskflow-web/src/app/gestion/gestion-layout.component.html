@@ -1,0 +1,42 @@
+<div class="gestion">
+  <aside class="lateral" aria-label="Gestión de tiendas">
+    @if (sesion.usuario(); as u) {
+      <div class="perfil">
+        <span class="perfil-nombre">{{ u.nombre }}</span>
+        <span class="perfil-rol">{{ u.rol === 'ADMIN' ? 'Administradora' : 'Encargado de tienda' }}</span>
+      </div>
+
+      @if (sesion.esAdmin()) {
+        <label class="selector">
+          <span>Mirando</span>
+          <select class="input" [value]="gestion.tiendaActiva() ?? ''" (change)="elegir($any($event.target).value)">
+            <option value="">Todas las tiendas</option>
+            @for (t of tiendas(); track t.id) {
+              <option [value]="t.id" [selected]="t.id === gestion.tiendaActiva()">{{ t.nombre }}</option>
+            }
+          </select>
+        </label>
+      } @else {
+        <p class="sede"><app-icono nombre="sede" [tamano]="16" />{{ u.tiendaNombre }}</p>
+      }
+    }
+
+    <nav class="menu">
+      @for (s of menu(); track s.ruta) {
+        <a [routerLink]="s.ruta" routerLinkActive="activo">
+          <app-icono [nombre]="s.icono" [tamano]="18" />
+          {{ s.nombre }}
+        </a>
+      }
+    </nav>
+
+    <button type="button" class="btn btn-ghost salir" (click)="sesion.salir()">
+      <app-icono nombre="salir" [tamano]="16" />
+      Cerrar sesión
+    </button>
+  </aside>
+
+  <div class="contenido">
+    <router-outlet />
+  </div>
+</div>

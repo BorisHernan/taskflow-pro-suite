@@ -25,11 +25,11 @@ export function urlArchivo(archivo: string): string {
 
 export const RECORRIDO: PasoRecorrido[] = [
   {
-    ruta: '/tablero',
+    ruta: '/gestion/tablero',
     demo: 'tablero',
-    titulo: 'Tablero Kanban en tiempo real',
-    queEs: 'Un tablero compartido por todos los visitantes.',
-    pruebaEsto: 'Abre esta página en otra pestaña o en tu celular y mueve una tarjeta: se mueve en las dos al instante.',
+    titulo: 'Tareas de cada tienda en tiempo real',
+    queEs: 'La bandeja de trabajo de cada sede: tareas manuales y las que crea el sistema.',
+    pruebaEsto: 'Compra en la tienda online hasta dejar un producto en su mínimo: aquí aparece sola la tarea de reposición.',
     tecnica: 'Server-Sent Events sobre Spring WebFlux',
     comoFunciona:
       'Cada navegador abre una conexión SSE que el servidor mantiene abierta. Cuando alguien crea o mueve una tarea, el cambio se guarda y se emite a todas las conexiones. Un latido cada 15 segundos evita que el proxy de Render corte el stream.',
@@ -71,7 +71,7 @@ public Flux<ServerSentEvent<TaskEvent>> stream(ServerWebExchange exchange) {
     },
   },
   {
-    ruta: '/estadisticas',
+    ruta: '/gestion/estadisticas',
     demo: 'estadisticas',
     titulo: 'Métricas del sistema',
     queEs: 'Contadores en vivo de lo que pasa en la demo.',

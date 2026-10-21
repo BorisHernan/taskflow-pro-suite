@@ -1,0 +1,136 @@
+.ingresar {
+  max-width: 1080px;
+}
+
+.ingresar-cabecera {
+  margin: 24px 0 32px;
+}
+
+.ingresar-lead {
+  max-width: 56ch;
+  margin: 12px 0 0;
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+.cuentas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+}
+
+.cuenta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  border: 0;
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-hover);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+
+  &.admin {
+    background: var(--text-primary);
+    color: var(--bg);
+
+    .cuenta-detalle,
+    .cuenta-rol {
+      color: color-mix(in srgb, var(--bg) 70%, transparent);
+    }
+
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--text-primary) 88%, var(--bg));
+    }
+  }
+}
+
+.cuenta-rol {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.cuenta-nombre {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.cuenta-detalle {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.cuenta-accion {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.formulario {
+  padding: 20px;
+
+  h2 {
+    margin: 0 0 14px;
+    font-size: 18px;
+  }
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+  gap: 12px;
+
+  label {
+    display: grid;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+}
+
+.nota {
+  margin: 14px 0 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 860px) {
+  .cuentas {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .campos {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .cuentas {
+    grid-template-columns: 1fr;
+  }
+}

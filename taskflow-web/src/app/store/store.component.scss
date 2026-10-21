@@ -14,13 +14,8 @@
   padding: 22px 26px;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  color: #fff;
-  background:
-    radial-gradient(circle at 85% 20%, rgb(255 255 255 / 0.18), transparent 40%),
-    linear-gradient(120deg, #6d28d9, #7c3aed 45%, #db2777);
-  background-size: 200% 200%;
-  animation: promo-brillo 12s ease-in-out infinite alternate;
-  box-shadow: 0 10px 30px -12px rgb(124 58 237 / 0.6);
+  color: #111111;
+  background: var(--campo-naranja);
 }
 
 @keyframes promo-brillo {
@@ -38,15 +33,15 @@
   gap: 6px;
   padding: 3px 10px;
   border-radius: var(--radius-pill);
-  background: rgb(255 255 255 / 0.18);
-  font-size: var(--fs-xs);
-  font-weight: 700;
+  background: rgb(17 17 17 / 0.1);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .promo-titulo {
   margin: 10px 0 4px;
   font-size: var(--fs-xl);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.01em;
 }
 
@@ -231,7 +226,7 @@
   background: var(--surface);
   color: var(--text-secondary);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s var(--ease);
 
@@ -311,5 +306,22 @@
   .esq-img,
   .esq-linea {
     animation: none;
+  }
+}
+
+.cabecera-acciones {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.sede {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+
+  .input {
+    min-width: 190px;
   }
 }

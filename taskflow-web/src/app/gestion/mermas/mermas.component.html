@@ -1,0 +1,111 @@
+<main class="gestion-pagina">
+  <header class="gestion-cabecera">
+    <div>
+      <h1 class="page-title">Mermas</h1>
+      <p>Producto que se pierde y ya no se puede vender. Descuenta stock y se valoriza al costo (60 % del precio).</p>
+    </div>
+    <p class="total">Últimas registradas: <strong>{{ total() | soles }}</strong></p>
+  </header>
+
+  @if (aviso()) {
+    <p class="aviso-ok" role="status">{{ aviso() }}</p>
+  }
+  @if (error()) {
+    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
+  }
+
+  @if (!todas()) {
+    <section class="bloque">
+      <h2>Registrar merma</h2>
+      <form class="formulario-linea" (ngSubmit)="registrar()">
+        <label class="ancho">
+          Producto
+          <select class="input" name="producto" [ngModel]="productoId" (ngModelChange)="elegirProducto($event)" required>
+            <option [ngValue]="null" disabled>Elige un producto…</option>
+            @for (f of productos(); track f.id) {
+              <option [ngValue]="f.productoId">{{ f.producto }} · stock {{ f.stock }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Unidades
+          <input class="input" type="number" name="cantidad" min="1" [max]="stockElegido() ?? 500" [(ngModel)]="cantidad" />
+        </label>
+        <label>
+          Motivo
+          <select class="input" name="motivo" [(ngModel)]="motivo">
+            @for (m of motivos; track m) {
+              <option [value]="m">{{ nombreMotivo[m] }}</option>
+            }
+          </select>
+        </label>
+        <label class="ancho">
+          Nota
+          <input class="input" name="nota" maxlength="300" [(ngModel)]="nota" placeholder="Ej.: caja aplastada en la recepción" />
+        </label>
+        <button type="submit" class="btn btn-primary" [disabled]="!productoId || cantidad < 1">Registrar</button>
+      </form>
+      @if (motivo === 'ROBO') {
+        <p class="aviso-robo">Un robo también abre una incidencia de seguridad con su tarea en el tablero.</p>
+      }
+    </section>
+  } @else {
+    <p class="nota-admin">Elige una tienda en el menú para registrar una merma a su nombre.</p>
+  }
+
+  <div class="columnas">
+    <section class="bloque">
+      <h2>Registro</h2>
+      <div class="tabla-envoltura">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              @if (todas()) {
+                <th>Tienda</th>
+              }
+              <th>Motivo</th>
+              <th class="num">Costo</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of mermas(); track m.id) {
+              <tr>
+                <td>
+                  {{ m.cantidad }} × {{ m.productoNombre }}
+                  @if (m.nota) {
+                    <span class="suave">{{ m.nota }}</span>
+                  }
+                </td>
+                @if (todas()) {
+                  <td class="suave">{{ gestion.nombreTienda(m.tiendaId) }}</td>
+                }
+                <td><span class="estado" [class.rojo]="m.motivo === 'ROBO'">{{ nombreMotivo[m.motivo] }}</span></td>
+                <td class="num">{{ m.costo | soles }}</td>
+                <td class="suave">{{ m.creadaEn | date: 'd MMM, HH:mm' }} · {{ m.registradoPor }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="5" class="suave">{{ cargando() ? 'Cargando…' : 'Sin mermas registradas.' }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="bloque">
+      <h2>Por motivo</h2>
+      @for (m of porMotivo(); track m.motivo) {
+        <div class="motivo">
+          <div class="motivo-fila">
+            <span>{{ nombreMotivo[m.motivo] }}</span>
+            <span class="num">{{ m.costo | soles }}</span>
+          </div>
+          <span class="barra"><span [style.width.%]="m.ancho"></span></span>
+        </div>
+      } @empty {
+        <p class="suave">Sin datos.</p>
+      }
+    </section>
+  </div>
+</main>

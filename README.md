@@ -8,15 +8,27 @@
 
 ### Qué es esto
 
-TaskFlow App es un **proyecto de portafolio**: un tablero kanban con actualizaciones en tiempo real (Angular +
-Spring WebFlux reactivo), al que le fui sumando funcionalidades — tienda simulada con stock compartido en vivo,
-dashboard de estadísticas, un mini juego multijugador (Arena Lite) y modo oscuro — para mostrar un rango más
-amplio de lo que sé construir: desde CRUD reactivo hasta WebSockets, pasando por control de abuso en un demo
-público sin login, testing y despliegue gratuito end-to-end.
+TaskFlow es un **sistema de gestión para una cadena de tres tiendas en Lima**, con tiempo real de punta a punta
+(Angular + Spring WebFlux reactivo + PostgreSQL). La tienda online vende contra el stock real de cada sede, y lo
+que pasa en la operación genera trabajo concreto en el tablero de cada tienda:
 
-No es un tutorial ni un boilerplate: cada decisión (por qué SSE aquí y WebSocket allá, por qué rate-limit por IP,
-por qué `replay().limit(1)` en el sink del juego) está tomada y documentada en el código porque tuvo que resolver
-un problema real durante el desarrollo.
+- **Una venta o una merma deja un producto en su mínimo** → se crea sola una tarea de reposición (nunca
+  duplicada, con prioridad crítica si se agota) y aparece al instante en el tablero de esa sede.
+- **La tienda pide reposición** → el administrador aprueba o rechaza → la tienda marca el pedido como recibido,
+  el stock sube y la alerta se cierra sola.
+- **Una incidencia grave** (alta o crítica) abre su tarea; resolverla la cierra, y cerrar la tarea la resuelve.
+- **Abrir un turno** genera su checklist; ventas, mermas e incidencias quedan asociadas al turno y al cerrarlo se
+  ve el resumen.
+
+Hay **dos roles con interfaces distintas** (login con JWT):
+
+| Cuenta | Rol | Qué ve |
+|---|---|---|
+| `admin` | Administradora | Las tres tiendas o una a elección, aprobación de pedidos, estadísticas y reportes CSV |
+| `miraflores`, `sanisidro`, `surco` | Encargado de tienda | Solo su sede: tareas, inventario, compras, mermas, incidencias y turnos |
+
+Todas las cuentas de la demo usan la clave `demo1234` (la pantalla de login entra con un clic). La Arena, un
+juego multijugador por WebSocket, queda como módulo aparte.
 
 ### Demo en vivo
 
@@ -45,14 +57,13 @@ Presenta al autor y propone un recorrido guiado de 4 pasos. Cada demo muestra ar
 de 4" con qué probar ahí y un botón al siguiente paso. Al abrirla, ya despierta el backend gratuito de
 Render, así que la primera demo carga más rápido.
 
-#### 📋 Tablero Kanban (`/tablero`) — el punto de partida
+#### 📋 Gestión (`/gestion`) — tareas, inventario, compras, mermas, incidencias y turnos
 
-Tres columnas (Por hacer / En progreso / Hecho) con **drag & drop** para mover tareas entre ellas o reordenarlas
-dentro de una misma columna. Cualquiera puede crear, editar, mover o borrar tareas — es un demo público sin
-login. Cada cambio se transmite **en tiempo real por Server-Sent Events** a todas las pestañas/navegadores
-conectados: abrí la demo en dos pestañas y movés una tarjeta en una, aparece movida en la otra al instante, sin
-refrescar. El botón **Sorpréndeme** crea al instante una tarea realista al azar. Como es de escritura libre,
-tiene sus propios controles de abuso (ver más abajo).
+Tras el login, cada rol entra a un panel con su menú: **Resumen** (lo importante de hoy y la comparación entre
+tiendas para el admin), **Tareas** (kanban con drag & drop, prioridades y filtros por tipo, actualizado en vivo por
+Server-Sent Events con el JWT en la cabecera; cada tienda recibe solo los cambios de las suyas), **Inventario**,
+**Compras**, **Mermas**, **Incidencias** y **Turnos**. El admin suma **Estadísticas** y **Reportes** CSV por
+tienda y rango de fechas. Toda la lógica de permisos vive en el backend: pedir otra tienda por URL no sirve.
 
 <p>
   <img src="docs/screenshots/kanban-light.png" width="49%" alt="Tablero Kanban, modo claro">

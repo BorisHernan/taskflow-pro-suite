@@ -3,7 +3,9 @@ import { NEVER, of } from 'rxjs';
 import { KanbanBoardComponent } from './kanban-board.component';
 import { TaskService } from '../services/task.service';
 import { Task } from '../models/task.model';
-import { TAREAS_EJEMPLO } from './tareas-ejemplo';
+import { signal } from '@angular/core';
+import { GestionService } from '../gestion/gestion.service';
+import { SesionService } from '../auth/sesion.service';
 
 describe('KanbanBoardComponent', () => {
   let servicio: {
@@ -16,9 +18,9 @@ describe('KanbanBoardComponent', () => {
   let componente: KanbanBoardComponent;
 
   const tareas: Task[] = [
-    { id: 1, title: 'Diseñar el modelo de datos', status: 'TODO', position: 1 },
-    { id: 2, title: 'Agregar autenticación', description: 'Con JWT', status: 'TODO', position: 2 },
-    { id: 3, title: 'Crear board-service', status: 'IN_PROGRESS', position: 1 },
+    { id: 1, title: 'Diseñar el modelo de datos', status: 'TODO', position: 1, tiendaId: 1, prioridad: 'MEDIA', tipo: 'MANUAL' },
+    { id: 2, title: 'Agregar autenticación', description: 'Con JWT', status: 'TODO', position: 2, tiendaId: 1, prioridad: 'CRITICA', tipo: 'REPOSICION' },
+    { id: 3, title: 'Crear board-service', status: 'IN_PROGRESS', position: 1, tiendaId: 1, prioridad: 'BAJA', tipo: 'MANUAL' },
   ];
 
   beforeEach(() => {
@@ -30,7 +32,13 @@ describe('KanbanBoardComponent', () => {
       delete: vi.fn(() => of(undefined)),
       create: vi.fn(),
     };
-    TestBed.configureTestingModule({ providers: [{ provide: TaskService, useValue: servicio }] });
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: TaskService, useValue: servicio },
+        { provide: GestionService, useValue: { tiendaActiva: signal(1), nombreTienda: () => 'Tienda Miraflores' } },
+        { provide: SesionService, useValue: { esAdmin: signal(false) } },
+      ],
+    });
     componente = TestBed.runInInjectionContext(() => new KanbanBoardComponent(TestBed.inject(TaskService)));
     componente.ngOnInit();
   });
@@ -55,16 +63,28 @@ describe('KanbanBoardComponent', () => {
     expect(componente.tasksByStatus('IN_PROGRESS').map((t) => t.id)).toEqual([3, 1]);
   });
 
-  it('"Sorpréndeme" crea una tarea de ejemplo que no esté ya en el tablero', () => {
+  it('una tarea nueva va a la tienda activa con la prioridad elegida', () => {
     servicio.create.mockImplementation((t: Task) => of({ ...t, id: 99 }));
+    componente.newTaskTitle = 'Revisar la vitrina';
+    componente.newTaskPrioridad = 'ALTA';
 
-    componente.sorprender();
+    componente.addTask();
 
     const creada = servicio.create.mock.calls[0][0] as Task;
-    expect(TAREAS_EJEMPLO.some((e) => e.title === creada.title && e.description === creada.description)).toBe(true);
-    expect(tareas.some((t) => t.title === creada.title)).toBe(false);
-    expect(creada.status).toBe('TODO');
+    expect(creada).toMatchObject({ title: 'Revisar la vitrina', status: 'TODO', prioridad: 'ALTA', tiendaId: 1 });
     expect(componente.newTaskTitle).toBe('');
+    expect(componente.newTaskPrioridad).toBe('MEDIA');
+  });
+
+  it('el filtro "Urgentes" deja solo prioridad alta o crítica', () => {
+    componente.filtroTipo.set('urgentes');
+    expect(componente.tasksByStatus('TODO').map((t) => t.id)).toEqual([2]);
+    expect(componente.tasksByStatus('IN_PROGRESS')).toEqual([]);
+  });
+
+  it('una tienda no puede borrar las tareas automáticas', () => {
+    expect(componente.puedeBorrar(tareas[0])).toBe(true);
+    expect(componente.puedeBorrar(tareas[1])).toBe(false);
   });
 
   it('no hay columna vecina a la izquierda de "Por hacer"', () => {

@@ -1,0 +1,63 @@
+.nota-admin {
+  padding: 14px 16px;
+  margin: 0 0 16px;
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+.incidencia {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 16px;
+  padding: 14px 0;
+
+  & + & {
+    border-top: 1px solid var(--border);
+  }
+
+  &.resuelta .titulo {
+    color: var(--text-secondary);
+  }
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.suave {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+
+  a {
+    color: inherit;
+  }
+}
+
+.descripcion {
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+.acciones {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.resolver {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .incidencia {
+    grid-template-columns: 1fr;
+  }
+}
