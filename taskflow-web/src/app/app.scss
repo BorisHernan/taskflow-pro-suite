@@ -2,7 +2,8 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: var(--bg);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
 }
 
 .app-nav {
@@ -19,9 +20,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 19px;
-  font-weight: 500;
-  letter-spacing: -0.03em;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--text-primary);
   text-decoration: none;
 
@@ -54,25 +55,17 @@
 
     &.active {
       color: var(--text-primary);
-      text-decoration: underline;
-      text-decoration-thickness: 2px;
-      text-underline-offset: 6px;
-      text-decoration-color: var(--seccion);
+      box-shadow: inset 0 -2px 0 var(--seccion);
     }
   }
 }
 
-/* Cada pestaña lleva su icono en el color de su sección, aunque no esté activa. */
-.app-nav-links a {
-  @each $s in gestion, tienda, arena {
-    &[data-seccion='#{$s}'] app-icono {
-      color: var(--c-#{$s});
-    }
-  }
+.app-nav-links app-icono {
+  color: var(--text-muted);
 }
 
 .theme-toggle {
-  background: var(--surface-alt);
+  border: 1px solid var(--border);
 }
 
 /* Celular: marca y tema arriba; las 4 secciones en su propia fila, con icono encima. */

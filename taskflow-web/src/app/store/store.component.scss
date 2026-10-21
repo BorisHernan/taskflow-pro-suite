@@ -14,8 +14,8 @@
   padding: 22px 26px;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  color: #111111;
-  background: var(--campo-naranja);
+  color: #ffffff;
+  background: var(--seccion);
 }
 
 @keyframes promo-brillo {
@@ -33,7 +33,7 @@
   gap: 6px;
   padding: 3px 10px;
   border-radius: var(--radius-pill);
-  background: rgb(17 17 17 / 0.1);
+  background: rgb(255 255 255 / 0.16);
   font-size: 13px;
   font-weight: 600;
 }

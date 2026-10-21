@@ -6,18 +6,18 @@
 
 @mixin tema-oscuro {
   color-scheme: dark;
-  --bg: #111111;
-  --surface: #1b1b1a;
-  --surface-alt: #232322;
-  --surface-hover: #2c2c2a;
-  --text-primary: #f2f2f0;
-  --text-secondary: #b4b4ae;
-  --text-muted: #85857f;
-  --border: #2c2c2a;
-  --border-strong: #3d3d3a;
-  --accent: #ff4d74;
-  --accent-hover: #ff7090;
-  --accent-soft: rgba(255, 77, 116, 0.16);
+  --bg: #0f1419;
+  --surface: #171d24;
+  --surface-alt: #1f262e;
+  --surface-hover: #27303a;
+  --text-primary: #e8ecf1;
+  --text-secondary: #a9b3bf;
+  --text-muted: #7d8794;
+  --border: #29323c;
+  --border-strong: #3a4552;
+  --accent: #8fb4e3;
+  --accent-hover: #a9c6ea;
+  --accent-soft: rgba(143, 180, 227, 0.16);
   --accent-ink: #111111;
   --success: #3ccf91;
   --success-hover: #5ad9a3;
@@ -38,30 +38,30 @@
   --shadow-md: 0 8px 24px -12px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 24px 48px -20px rgba(0, 0, 0, 0.7);
 
-  --c-tablero: #4db3ff;
-  --c-gestion: #4db3ff;
-  --c-tienda: #ff8126;
-  --c-estadisticas: #c5f53d;
-  --c-arena: #ff4d74;
-  --c-inicio: #ff8126;
+  --c-tablero: #8fb4e3;
+  --c-gestion: #8fb4e3;
+  --c-tienda: #8fb4e3;
+  --c-estadisticas: #8fb4e3;
+  --c-arena: #8fb4e3;
+  --c-inicio: #8fb4e3;
 }
 
 :root {
   color-scheme: light;
 
   /* Color */
-  --bg: #f1f1ef;
+  --bg: #f5f6f8;
   --surface: #ffffff;
-  --surface-alt: #e8e8e5;
-  --surface-hover: #dfdfdb;
-  --text-primary: #111111;
-  --text-secondary: #474745;
-  --text-muted: #77776f;
-  --border: #e0e0dc;
-  --border-strong: #c9c9c3;
-  --accent: #de194b;
-  --accent-hover: #b8103b;
-  --accent-soft: rgba(222, 25, 75, 0.09);
+  --surface-alt: #eef0f3;
+  --surface-hover: #e5e8ec;
+  --text-primary: #16202c;
+  --text-secondary: #4a5563;
+  --text-muted: #7b8594;
+  --border: #e1e4e9;
+  --border-strong: #c9ced6;
+  --accent: #1d4e89;
+  --accent-hover: #163d6c;
+  --accent-soft: rgba(29, 78, 137, 0.09);
   --accent-ink: #ffffff;
   --success: #12a46b;
   --success-hover: #0e8a59;
@@ -85,12 +85,12 @@
   /* Identidad de cada sección: su color aparece en el encabezado, iconos,
      botón principal y pestaña activa, para que cada pantalla se sienta propia. */
   /* En claro, versiones hondas de los campos de color (cielo, naranja, lima, carmín) para que se lean sobre blanco. */
-  --c-tablero: #0b6fc2;
-  --c-gestion: #0b6fc2;
-  --c-tienda: #b84c07;
-  --c-estadisticas: #4a7a0c;
-  --c-arena: #c8103f;
-  --c-inicio: #b84c07;
+  --c-tablero: #1d4e89;
+  --c-gestion: #1d4e89;
+  --c-tienda: #1d4e89;
+  --c-estadisticas: #1d4e89;
+  --c-arena: #1d4e89;
+  --c-inicio: #1d4e89;
   --seccion: var(--accent);
 
   /* Compatibilidad: el fondo ya no es un degradado, es plano. */
@@ -98,14 +98,14 @@
   --dot-color: transparent;
 
   /* Campos de color de la portada: iguales en claro y oscuro. */
-  --campo-naranja: #ff8126;
-  --campo-cielo: #4db3ff;
-  --campo-lima: #c5f53d;
-  --campo-noche: #161615;
-  --campo-carmin: #de194b;
+  --campo-naranja: #1d4e89;
+  --campo-cielo: #1d4e89;
+  --campo-lima: #1d4e89;
+  --campo-noche: #16202c;
+  --campo-carmin: #1d4e89;
 
   /* Tipografía: 7 tamaños bien separados. */
-  --font-sans: 'Hanken Grotesk', 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
   --fs-xs: 12px;
   --fs-sm: 14px;
@@ -116,10 +116,10 @@
   --fs-display: clamp(44px, 7vw, 84px);
 
   /* Forma */
-  --radius-sm: 2px;
-  --radius: 3px;
-  --radius-lg: 4px;
-  --radius-pill: 3px;
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 8px;
+  --radius-pill: 999px;
   --ring: 0 0 0 3px var(--accent-soft);
   --ease: cubic-bezier(0.2, 0, 0, 1);
   --gutter: 24px;
@@ -202,8 +202,8 @@ h1,
 h2,
 h3 {
   text-wrap: balance;
-  font-weight: 500;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  letter-spacing: -0.015em;
 }
 
 /* Scrollbar delgada con los colores del tema. */
@@ -271,17 +271,17 @@ h3 {
   flex-shrink: 0;
   width: 48px;
   height: 48px;
-  border-radius: 0;
+  border-radius: var(--radius);
   background: var(--seccion);
   color: var(--seccion-tinta);
 }
 
 .page-title {
   margin: 0;
-  font-size: clamp(30px, 3.6vw, 44px);
-  font-weight: 500;
-  line-height: 1.05;
-  letter-spacing: -0.04em;
+  font-size: clamp(26px, 2.6vw, 32px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .page-subtitle {
@@ -304,7 +304,7 @@ h3 {
   min-height: 40px;
   padding: 0 16px;
   border: 1px solid transparent;
-  border-radius: 0;
+  border-radius: var(--radius);
   font-size: var(--fs-sm);
   font-weight: 500;
   line-height: 1;
@@ -452,6 +452,7 @@ select.input {
 
 .card {
   background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
 }
 
@@ -722,32 +723,6 @@ select.input {
   animation-delay: calc(min(var(--i, 0), 12) * 45ms);
 }
 
-/* Va aquí y no en app.scss: el selector sube hasta <html>, fuera del componente. */
-/* En la portada la barra se funde con el campo naranja del primer pantallazo. */
-:root[data-seccion='inicio'] .app-header {
-  background: var(--campo-naranja);
-  color: #111111;
-
-  .app-marca,
-  .app-nav-links a,
-  .theme-toggle {
-    color: #111111;
-  }
-
-  .app-nav-links a[data-seccion] app-icono {
-    color: inherit;
-  }
-
-  .theme-toggle {
-    background: rgb(17 17 17 / 0.08);
-  }
-
-  .app-nav {
-    max-width: none;
-    padding: 0 clamp(16px, 2.2vw, 32px);
-  }
-}
-
 /* ── Gestión de tiendas: piezas compartidas por sus pantallas ─────────────── */
 
 .gestion-pagina {
@@ -785,14 +760,16 @@ select.input {
   display: grid;
   gap: 4px;
   padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   background: var(--surface);
   color: inherit;
   text-decoration: none;
 
   strong {
-    font-size: 30px;
-    font-weight: 500;
-    letter-spacing: -0.03em;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
   }
 
@@ -812,12 +789,14 @@ a.kpi:hover {
 
 .bloque {
   padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   background: var(--surface);
   margin-bottom: 16px;
 
   > h2 {
     margin: 0 0 14px;
-    font-size: 18px;
+    font-size: 16px;
   }
 }
 
@@ -858,7 +837,8 @@ a.kpi:hover {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 8px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
