@@ -31,5 +31,9 @@ public class Purchase {
 
     private BigDecimal total;
 
+    private Long tiendaId;
+
+    private Long turnoId;
+
     private LocalDateTime createdAt;
 }

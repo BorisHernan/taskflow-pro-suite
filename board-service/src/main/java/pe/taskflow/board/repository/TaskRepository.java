@@ -11,6 +11,8 @@ public interface TaskRepository extends ReactiveCrudRepository<Task, Long> {
 
     Flux<Task> findAllByOrderByStatusAscPositionAsc();
 
+    Flux<Task> findByTiendaIdOrderByStatusAscPositionAsc(Long tiendaId);
+
     Mono<Long> countByCreatedByIp(String createdByIp);
 
 }

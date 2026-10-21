@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
@@ -38,4 +39,8 @@ public class Product {
     // Stock al que vuelve el producto en el reset diario; no se expone en la API.
     @JsonIgnore
     private Integer initialStock;
+
+    // Sede a la que corresponde `stock` (el stock vive por tienda, en la tabla inventario).
+    @Transient
+    private Long tiendaId;
 }

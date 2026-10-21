@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +20,9 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import pe.taskflow.board.demo.ContentModerationService;
 import pe.taskflow.board.demo.DemoStatsService;
+import pe.taskflow.board.gestion.Inventario;
+import pe.taskflow.board.gestion.InventarioService;
+import pe.taskflow.board.gestion.TurnoService;
 import pe.taskflow.board.util.ClientIpResolver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,6 +30,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * Tienda simulada del portafolio: carrito, cupones y boleta viven en el frontend,
@@ -44,13 +49,18 @@ public class ProductController {
     private final ProductReviewRepository reviewRepository;
     private final ContentModerationService moderationService;
     private final PurchaseRepository purchaseRepository;
+    private final InventarioService inventario;
+    private final TurnoService turnos;
 
     static final int MAX_RESENAS_POR_IP_AL_DIA = 5;
+    /** Sede que usa la tienda online si el cliente no elige otra. */
+    public static final long TIENDA_PRINCIPAL = 1;
 
-    @Operation(summary = "Lista el catálogo con el stock actual")
+    @Operation(summary = "Lista el catálogo con el stock de la tienda elegida")
     @GetMapping
-    public Flux<Product> findAll() {
-        return productRepository.findAllByOrderByIdAsc();
+    public Flux<Product> findAll(@RequestParam(required = false) Long tienda) {
+        long sede = sede(tienda);
+        return productRepository.conStockDe(sede).doOnNext(p -> p.setTiendaId(sede));
     }
 
     /**
@@ -60,17 +70,21 @@ public class ProductController {
      */
     @Operation(summary = "Stream en vivo (SSE) de cambios de stock")
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<Product>> stream(ServerWebExchange exchange) {
+    public Flux<ServerSentEvent<Product>> stream(ServerWebExchange exchange, @RequestParam(required = false) Long tienda) {
+        long sede = sede(tienda);
         exchange.getResponse().getHeaders().add("X-Accel-Buffering", "no");
         exchange.getResponse().getHeaders().add("Cache-Control", "no-cache, no-transform");
 
         statsService.recordVisitor();
         statsService.recordVisitorPersisted(ClientIpResolver.resolve(exchange.getRequest())).subscribe();
 
-        Flux<ServerSentEvent<Product>> initialSnapshot = productRepository.findAllByOrderByIdAsc()
+        Flux<ServerSentEvent<Product>> initialSnapshot = productRepository.conStockDe(sede)
+                .doOnNext(p -> p.setTiendaId(sede))
                 .map(product -> ServerSentEvent.builder(product).build());
 
+        // Solo los cambios de stock de esta sede.
         Flux<ServerSentEvent<Product>> events = eventPublisher.stream()
+                .filter(product -> product.getTiendaId() != null && product.getTiendaId() == sede)
                 .map(product -> ServerSentEvent.builder(product).build());
 
         Flux<ServerSentEvent<Product>> heartbeat = Flux.interval(Duration.ofSeconds(15))
@@ -79,33 +93,29 @@ public class ProductController {
         return Flux.merge(initialSnapshot, events, heartbeat);
     }
 
-    @Operation(summary = "Compra unidades de un producto: descuenta el stock real y lo transmite a todos")
+    @Operation(summary = "Compra en una sede: descuenta su stock de forma atómica y lo transmite a todos")
     @PostMapping("/{id}/purchase")
     public Mono<Product> purchase(@PathVariable Long id, @Valid @RequestBody PurchaseRequest request) {
+        long sede = sede(request.tiendaId());
         return productRepository.findById(id)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado")))
-                .flatMap(product -> {
-                    if (product.getStock() < request.quantity()) {
-                        return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT,
-                                "Solo quedan " + product.getStock() + " unidades de \"" + product.getName() + "\""));
-                    }
-                    product.setStock(product.getStock() - request.quantity());
-                    return productRepository.save(product);
-                })
-                .flatMap(saved -> purchaseRepository.save(Purchase.builder()
-                                .productId(saved.getId())
-                                .productName(saved.getName())
-                                .category(saved.getCategory())
-                                .quantity(request.quantity())
-                                .total(saved.getPrice().multiply(BigDecimal.valueOf(request.quantity())))
-                                .createdAt(LocalDateTime.now())
-                                .build())
-                        .thenReturn(saved))
-                .doOnSuccess(saved -> {
-                    eventPublisher.publish(saved);
-                    BigDecimal lineTotal = saved.getPrice().multiply(BigDecimal.valueOf(request.quantity()));
-                    statsService.recordPurchase(request.quantity(), lineTotal);
-                });
+                .flatMap(product -> inventario.descontar(sede, id, request.quantity())
+                        .switchIfEmpty(Mono.defer(() -> inventario.stockActual(sede, id).flatMap(stock -> Mono.<Inventario>error(
+                                new ResponseStatusException(HttpStatus.CONFLICT,
+                                        "Solo quedan " + stock + " unidades de \"" + product.getName() + "\"")))))
+                        .flatMap(inv -> turnos.idAbierto(sede).map(Optional::of).defaultIfEmpty(Optional.empty())
+                                .flatMap(turno -> purchaseRepository.save(Purchase.builder()
+                                        .productId(product.getId())
+                                        .productName(product.getName())
+                                        .category(product.getCategory())
+                                        .quantity(request.quantity())
+                                        .total(product.getPrice().multiply(BigDecimal.valueOf(request.quantity())))
+                                        .tiendaId(sede)
+                                        .turnoId(turno.orElse(null))
+                                        .createdAt(LocalDateTime.now())
+                                        .build()))
+                                .doOnNext(compra -> statsService.recordPurchase(compra.getQuantity(), compra.getTotal()))
+                                .thenReturn(InventarioService.conStockDe(product, inv))));
     }
 
     @Operation(summary = "Promedio y cantidad de reseñas de cada producto")
@@ -116,8 +126,10 @@ public class ProductController {
 
     @Operation(summary = "Detalle de un producto")
     @GetMapping("/{id}")
-    public Mono<Product> findOne(@PathVariable Long id) {
-        return productRepository.findById(id)
+    public Mono<Product> findOne(@PathVariable Long id, @RequestParam(required = false) Long tienda) {
+        long sede = sede(tienda);
+        return productRepository.unoConStockDe(id, sede)
+                .doOnNext(p -> p.setTiendaId(sede))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado")));
     }
 
@@ -162,5 +174,9 @@ public class ProductController {
                             .seed(false)
                             .build());
                 });
+    }
+
+    private static long sede(Long tienda) {
+        return tienda == null ? TIENDA_PRINCIPAL : tienda;
     }
 }

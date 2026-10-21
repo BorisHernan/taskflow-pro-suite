@@ -9,10 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
+import pe.taskflow.board.auth.UsuarioActual;
 import pe.taskflow.board.config.TaskEventPublisher;
+import pe.taskflow.board.gestion.IncidenciaService;
 import pe.taskflow.board.demo.ContentModerationService;
 import pe.taskflow.board.demo.DemoStatsService;
 import pe.taskflow.board.model.Task;
@@ -39,14 +43,17 @@ public class TaskController {
     private final TaskEventPublisher eventPublisher;
     private final ContentModerationService moderationService;
     private final DemoStatsService statsService;
+    private final IncidenciaService incidenciaService;
 
     @Value("${app.demo.max-tasks-per-ip}")
     private int maxTasksPerIp;
 
-    @Operation(summary = "Lista todas las tareas ordenadas por columna y posición")
+    @Operation(summary = "Tareas de la tienda del usuario; el admin ve todas o filtra con ?tienda=")
     @GetMapping
-    public Flux<Task> findAll() {
-        return taskRepository.findAllByOrderByStatusAscPositionAsc();
+    public Flux<Task> findAll(@AuthenticationPrincipal Jwt jwt, @RequestParam(required = false) Long tienda) {
+        Long sede = UsuarioActual.de(jwt).tiendaVisible(tienda);
+        return sede == null ? taskRepository.findAllByOrderByStatusAscPositionAsc()
+                : taskRepository.findByTiendaIdOrderByStatusAscPositionAsc(sede);
     }
 
     /**
@@ -57,7 +64,8 @@ public class TaskController {
      */
     @Operation(summary = "Stream de eventos en vivo (SSE): creación, edición, borrado, reset y presencia de visitantes")
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<TaskEvent>> stream(ServerWebExchange exchange) {
+    public Flux<ServerSentEvent<TaskEvent>> stream(ServerWebExchange exchange, @AuthenticationPrincipal Jwt jwt) {
+        UsuarioActual usuario = UsuarioActual.de(jwt);
         exchange.getResponse().getHeaders().add("X-Accel-Buffering", "no");
         exchange.getResponse().getHeaders().add("Cache-Control", "no-cache, no-transform");
 
@@ -68,7 +76,9 @@ public class TaskController {
         Flux<ServerSentEvent<TaskEvent>> initialPresence = Flux.just(
                 ServerSentEvent.builder(new TaskEvent(TaskEventType.PRESENCE, null, currentViewers)).build());
 
+        // Cada usuario recibe solo los cambios de las tareas que puede ver.
         Flux<ServerSentEvent<TaskEvent>> events = eventPublisher.stream()
+                .filter(event -> event.task() == null || usuario.puedeVer(event.task().getTiendaId()))
                 .map(event -> ServerSentEvent.builder(event).build());
 
         Flux<ServerSentEvent<TaskEvent>> heartbeat = Flux.interval(Duration.ofSeconds(15))
@@ -80,7 +90,8 @@ public class TaskController {
 
     @Operation(summary = "Crea una tarea (moderada: bloquea lenguaje ofensivo y limita tareas por IP)")
     @PostMapping
-    public Mono<Task> create(@Valid @RequestBody Task task, ServerHttpRequest request) {
+    public Mono<Task> create(@Valid @RequestBody Task task, ServerHttpRequest request, @AuthenticationPrincipal Jwt jwt) {
+        UsuarioActual usuario = UsuarioActual.de(jwt);
         String clientIp = ClientIpResolver.resolve(request);
 
         if (moderationService.isBlocked(clientIp)) {
@@ -100,6 +111,14 @@ public class TaskController {
 
                             task.setId(null);
                             task.setCreatedByIp(clientIp);
+                            // El admin puede crear tareas generales (sin tienda); la tienda, solo en la suya.
+                            task.setTiendaId(usuario.esAdmin() ? task.getTiendaId() : usuario.tiendaId());
+                            task.setTipo("MANUAL");
+                            task.setPrioridad(task.getPrioridad() == null ? "MEDIA" : task.getPrioridad());
+                            task.setCreadoPor(usuario.usuario());
+                            task.setProductoId(null);
+                            task.setReferenciaId(null);
+                            task.setTurnoId(null);
                             task.setCreatedAt(LocalDateTime.now());
                             task.setUpdatedAt(LocalDateTime.now());
                             if (task.getStatus() == null) {
@@ -115,7 +134,9 @@ public class TaskController {
 
     @Operation(summary = "Actualiza una tarea existente (título, descripción, columna, posición)")
     @PutMapping("/{id}")
-    public Mono<Task> update(@PathVariable Long id, @Valid @RequestBody Task incoming, ServerHttpRequest request) {
+    public Mono<Task> update(@PathVariable Long id, @Valid @RequestBody Task incoming, ServerHttpRequest request,
+                             @AuthenticationPrincipal Jwt jwt) {
+        UsuarioActual usuario = UsuarioActual.de(jwt);
         String clientIp = ClientIpResolver.resolve(request);
 
         if (moderationService.isBlocked(clientIp)) {
@@ -130,15 +151,19 @@ public class TaskController {
 
         return taskRepository.findById(id)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada: " + id)))
+                .doOnNext(existing -> usuario.exigirAcceso(existing.getTiendaId()))
                 .flatMap(existing -> {
                     existing.setTitle(incoming.getTitle());
                     existing.setDescription(incoming.getDescription());
-                    existing.setStatus(incoming.getStatus());
                     existing.setPosition(incoming.getPosition());
-                    existing.setUpdatedAt(LocalDateTime.now());
+                    if (incoming.getPrioridad() != null) {
+                        existing.setPrioridad(incoming.getPrioridad());
+                    }
+                    existing.setAsignadoA(incoming.getAsignadoA());
+                    cambiarEstado(existing, incoming.getStatus());
                     return taskRepository.save(existing);
                 })
-                .doOnSuccess(saved -> eventPublisher.publish(TaskEventType.UPDATED, saved));
+                .flatMap(this::despuesDeGuardar);
     }
 
     /**
@@ -147,30 +172,52 @@ public class TaskController {
      */
     @Operation(summary = "Reordena/mueve varias tareas en una sola llamada (usado por el drag & drop)")
     @PutMapping("/reorder")
-    public Flux<Task> reorder(@RequestBody List<TaskPositionUpdate> updates) {
+    public Flux<Task> reorder(@RequestBody List<TaskPositionUpdate> updates, @AuthenticationPrincipal Jwt jwt) {
+        UsuarioActual usuario = UsuarioActual.de(jwt);
         return Flux.fromIterable(updates)
                 .concatMap(update -> taskRepository.findById(update.id())
                         .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada: " + update.id())))
+                        .doOnNext(existing -> usuario.exigirAcceso(existing.getTiendaId()))
                         .flatMap(existing -> {
-                            existing.setStatus(update.status());
+                            cambiarEstado(existing, update.status());
                             existing.setPosition(update.position());
-                            existing.setUpdatedAt(LocalDateTime.now());
                             return taskRepository.save(existing);
-                        }))
-                .doOnNext(saved -> eventPublisher.publish(TaskEventType.UPDATED, saved));
+                        })
+                        .flatMap(this::despuesDeGuardar));
+    }
+
+    /** Al llegar a Hecho se guarda cuándo; si vuelve atrás, se limpia. */
+    private static void cambiarEstado(Task tarea, String nuevo) {
+        if ("DONE".equals(nuevo) && !"DONE".equals(tarea.getStatus())) {
+            tarea.setCerradaEn(LocalDateTime.now());
+        } else if (!"DONE".equals(nuevo)) {
+            tarea.setCerradaEn(null);
+        }
+        tarea.setStatus(nuevo);
+        tarea.setUpdatedAt(LocalDateTime.now());
+    }
+
+    private Mono<Task> despuesDeGuardar(Task saved) {
+        eventPublisher.publish(TaskEventType.UPDATED, saved);
+        return incidenciaService.alCerrarTarea(saved).thenReturn(saved);
     }
 
     @Operation(summary = "Elimina una tarea por id")
     @DeleteMapping("/{id}")
-    public Mono<Void> delete(@PathVariable Long id) {
-        return taskRepository.existsById(id)
-                .flatMap(exists -> {
-                    if (!exists) {
-                        return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada: " + id));
+    public Mono<Void> delete(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        UsuarioActual usuario = UsuarioActual.de(jwt);
+        return taskRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada: " + id)))
+                .doOnNext(tarea -> {
+                    usuario.exigirAcceso(tarea.getTiendaId());
+                    // Las automáticas (alertas, incidencias, checklist) se cierran, no se borran.
+                    if (!usuario.esAdmin() && tarea.getTipo() != null && !"MANUAL".equals(tarea.getTipo())) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Las tareas automáticas no se borran: muévelas a Hecho.");
                     }
-                    return taskRepository.deleteById(id)
-                            .doOnSuccess(v -> eventPublisher.publish(TaskEventType.DELETED, Task.builder().id(id).build()));
-                });
+                })
+                .flatMap(tarea -> taskRepository.deleteById(id)
+                        .doOnSuccess(v -> eventPublisher.publish(TaskEventType.DELETED,
+                                Task.builder().id(id).tiendaId(tarea.getTiendaId()).build())));
     }
 
     private String violationMessage(String clientIp) {

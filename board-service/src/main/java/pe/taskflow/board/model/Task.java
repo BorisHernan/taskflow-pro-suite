@@ -38,4 +38,26 @@ public class Task {
     // IP del visitante que creó la tarea, usada para limitar abuso en el demo público.
     // Se ignora cualquier valor que venga del cliente; el servidor siempre la sobreescribe.
     private String createdByIp;
+
+    // Gestión de tiendas. null = tarea general (solo la ve el administrador).
+    private Long tiendaId;
+
+    @Pattern(regexp = "MANUAL|REPOSICION|INCIDENCIA|TURNO", message = "tipo inválido")
+    private String tipo;
+
+    @Pattern(regexp = "BAJA|MEDIA|ALTA|CRITICA", message = "prioridad debe ser BAJA, MEDIA, ALTA o CRITICA")
+    private String prioridad;
+
+    private Long productoId;
+
+    // Id de la incidencia que originó la tarea (tipo INCIDENCIA).
+    private Long referenciaId;
+
+    private Long turnoId;
+
+    private String creadoPor;
+
+    private String asignadoA;
+
+    private LocalDateTime cerradaEn;
 }

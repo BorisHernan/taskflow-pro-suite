@@ -11,6 +11,8 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.web.server.ResponseStatusException;
 import pe.taskflow.board.demo.ContentModerationService;
 import pe.taskflow.board.demo.DemoStatsService;
+import pe.taskflow.board.gestion.InventarioService;
+import pe.taskflow.board.gestion.TurnoService;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -34,6 +36,8 @@ class ProductReviewsTest {
     @Mock private ProductReviewRepository reviewRepository;
     @Mock private ContentModerationService moderation;
     @Mock private PurchaseRepository purchaseRepository;
+    @Mock private InventarioService inventario;
+    @Mock private TurnoService turnos;
 
     private ProductController controller;
     private final MockServerHttpRequest request = MockServerHttpRequest.post("/api/products/1/reviews")
@@ -41,7 +45,7 @@ class ProductReviewsTest {
 
     @BeforeEach
     void setUp() {
-        controller = new ProductController(productRepository, eventPublisher, statsService, reviewRepository, moderation, purchaseRepository);
+        controller = new ProductController(productRepository, eventPublisher, statsService, reviewRepository, moderation, purchaseRepository, inventario, turnos);
     }
 
     private static Mono<Product> producto() {

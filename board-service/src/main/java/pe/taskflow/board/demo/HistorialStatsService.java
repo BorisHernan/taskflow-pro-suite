@@ -85,8 +85,8 @@ public class HistorialStatsService {
 
     private Mono<List<StockCategoria>> stockPorCategoria() {
         return db.sql("""
-                        SELECT category AS categoria, SUM(stock) AS stock, SUM(COALESCE(initial_stock, stock)) AS inicial
-                        FROM products GROUP BY category ORDER BY category""")
+                        SELECT p.category AS categoria, SUM(i.stock) AS stock, SUM(i.stock_objetivo) AS inicial
+                        FROM inventario i JOIN products p ON p.id = i.producto_id GROUP BY p.category ORDER BY p.category""")
                 .map((row, meta) -> new StockCategoria(row.get("categoria", String.class),
                         largo(row.get("stock", Long.class)), largo(row.get("inicial", Long.class))))
                 .all().collectList();
