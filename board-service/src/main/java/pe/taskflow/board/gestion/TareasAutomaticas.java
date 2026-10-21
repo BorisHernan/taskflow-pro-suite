@@ -42,7 +42,8 @@ public class TareasAutomaticas {
     /** Crea la alerta de reposición, o actualiza la que ya está abierta (nunca hay dos). */
     public Mono<Task> alertaDeStock(Inventario inv, String producto) {
         String prioridad = inv.getStock() == 0 ? "CRITICA" : "ALTA";
-        String estado = inv.getStock() == 0 ? "Agotado" : "Quedan " + inv.getStock() + " unidades";
+        String estado = inv.getStock() == 0 ? "Agotado"
+                : inv.getStock() == 1 ? "Queda 1 unidad" : "Quedan " + inv.getStock() + " unidades";
         String detalle = estado + " (mínimo " + inv.getStockMinimo() + "). Sugerido: pedir "
                 + Math.max(1, inv.getStockObjetivo() - inv.getStock()) + ".";
         return db.sql("""

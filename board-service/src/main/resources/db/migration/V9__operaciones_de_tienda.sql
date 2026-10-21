@@ -144,7 +144,8 @@ CREATE INDEX idx_pedidos_tienda ON pedidos (tienda_id, estado);
 -- Alertas iniciales: lo que ya está bajo el mínimo tiene su tarea de reposición.
 INSERT INTO tasks (title, description, status, position, tienda_id, tipo, prioridad, producto_id, creado_por, created_at, updated_at)
 SELECT 'Reponer ' || p.name,
-       'Quedan ' || i.stock || ' unidades (mínimo ' || i.stock_minimo || '). Sugerido: pedir ' || (i.stock_objetivo - i.stock) || '.',
+       CASE i.stock WHEN 0 THEN 'Agotado' WHEN 1 THEN 'Queda 1 unidad' ELSE 'Quedan ' || i.stock || ' unidades' END
+           || ' (mínimo ' || i.stock_minimo || '). Sugerido: pedir ' || (i.stock_objetivo - i.stock) || '.',
        'TODO',
        ROW_NUMBER() OVER (PARTITION BY i.tienda_id ORDER BY i.stock, p.id),
        i.tienda_id,
