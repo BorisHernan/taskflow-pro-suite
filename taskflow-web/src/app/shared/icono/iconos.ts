@@ -14,7 +14,7 @@ import {
   GitBranch,
   House,
   Info,
-  Kanban,
+  ClipboardList,
   BriefcaseBusiness,
   Mail,
   Minus,
@@ -61,7 +61,7 @@ import {
 // Solo los iconos que usa la app: el resto de lucide no entra al bundle.
 export const ICONOS = {
   inicio: House,
-  tablero: Kanban,
+  tablero: ClipboardList,
   tienda: ShoppingBag,
   estadisticas: ChartColumn,
   arena: Gamepad2,
