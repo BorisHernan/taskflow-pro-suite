@@ -1,6 +1,9 @@
-import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
+import { GestionService } from '../gestion/gestion.service';
+import { ResumenTienda } from '../models/gestion.model';
 import { HistorialStats, StatsSnapshot } from '../models/stats.model';
 import { StatsService } from '../services/stats.service';
 import { SolesPipe } from '../shared/soles.pipe';
@@ -29,7 +32,6 @@ const EMPTY_STATS: StatsSnapshot = {
 };
 
 const CADA_MS = 15000;
-const DIAS = 30;
 const FORMATO_NUMERO = new Intl.NumberFormat('es-PE');
 const FORMATO_SOLES = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN', maximumFractionDigits: 0 });
 const FORMATO_RELATIVO = new Intl.RelativeTimeFormat('es', { numeric: 'auto' });
@@ -62,7 +64,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     { clave: 'unitsSold', etiqueta: 'Unidades vendidas', icono: 'paquete', persistido: true },
     { clave: 'revenue', etiqueta: 'Ingresos simulados', icono: 'billete', moneda: true, persistido: true },
     { clave: 'tasksCreated', etiqueta: 'Tareas creadas', icono: 'tablero' },
-    { clave: 'totalVisitors', etiqueta: 'Conexiones en vivo', icono: 'ojo' },
+    { clave: 'totalVisitors', etiqueta: 'Conexiones al servidor', icono: 'ojo' },
   ];
 
   readonly unidades = unidades;
@@ -73,6 +75,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   historial = signal<HistorialStats | null>(null);
   loading = signal(false);
   errorMessage = signal<string | null>(null);
+
+  /** Periodo de las series diarias (el servidor entrega 30 días; aquí solo se recorta). */
+  readonly periodos = [7, 14, 30] as const;
+  readonly periodo = signal<7 | 14 | 30>(30);
+  /** Indicadores de hoy por sede, para comparar. */
+  readonly sedes = toSignal(inject(GestionService).resumen().pipe(catchError(() => of([] as ResumenTienda[]))), {
+    initialValue: [] as ResumenTienda[],
+  });
 
   /** Qué mide el gráfico de ventas por día. */
   medidaVentas = signal<'ingresos' | 'unidades'>('ingresos');
@@ -92,12 +102,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // ── Series por día (los días sin datos cuentan como 0) ─────────────
 
-  /** Últimos 30 días en UTC (así agrupa Postgres), del más antiguo a hoy. */
+  /** Últimos días del periodo, en UTC (así agrupa Postgres), del más antiguo a hoy. */
   private readonly dias = computed(() => {
     this.ultimaActualizacion();
+    const n = this.periodo();
     const hoy = new Date();
-    return Array.from({ length: DIAS }, (_, i) => {
-      const d = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate() - (DIAS - 1 - i)));
+    return Array.from({ length: n }, (_, i) => {
+      const d = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate() - (n - 1 - i)));
       return d.toISOString().slice(0, 10);
     });
   });
@@ -176,7 +187,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly lecturaVentas = computed(() => {
     const serie = this.serieVentas();
     const total = serie.reduce((s, p) => s + p.valor, 0);
-    if (total === 0) return 'Aún no hay ventas en los últimos 30 días. Compra algo en la tienda y vuelve aquí.';
+    if (total === 0) return `Aún no hay ventas en los últimos ${this.periodo()} días.`;
     const mejor = serie.reduce((a, b) => (b.valor > a.valor ? b : a));
     return `Total del periodo: ${this.formatoVentas()(total)}. El mejor día fue el ${mejor.detalle} (${this.formatoVentas()(mejor.valor)}).`;
   });

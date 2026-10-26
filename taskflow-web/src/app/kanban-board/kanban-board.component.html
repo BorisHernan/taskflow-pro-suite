@@ -1,49 +1,28 @@
 <main class="gestion-pagina">
-  <header class="page-header">
+  <header class="gestion-cabecera">
     <div>
-      <h1 class="page-title">Tareas</h1>
-      <p class="page-subtitle">
-        <span class="chip" [class.chip-success]="connectionLive()">
-          <span class="punto" [class.en-vivo]="connectionLive()"></span>
-          {{ connectionLive() ? 'En vivo' : 'Conectando…' }}
-        </span>
-        <span>
-          {{ todasLasTiendas() ? 'Todas las tiendas' : gestion.nombreTienda(gestion.tiendaActiva()) }}.
-          Las alertas de stock, incidencias graves y checklists de turno llegan solas.
-        </span>
+      <h1 class="page-title">Órdenes de trabajo</h1>
+      <p>
+        {{ todasLasTiendas() ? 'Todas las sedes' : gestion.nombreTienda(gestion.tiendaActiva()) }}: quién hace qué ahora mismo.
+        Asigna cada orden a alguien disponible y su avance corre con el tiempo estimado.
       </p>
     </div>
-
-    <div class="input-icono buscador">
-      <app-icono nombre="buscar" [tamano]="16" />
-      <label class="sr-only" for="buscar-tarea">Buscar tareas</label>
-      <input
-        id="buscar-tarea"
-        class="input"
-        type="search"
-        placeholder="Buscar tareas…"
-        autocomplete="off"
-        [ngModel]="filtro()"
-        (ngModelChange)="filtro.set($event)"
-      />
-    </div>
+    <a class="equipo" routerLink="../personal" aria-label="Ver el personal de la sede">
+      <span><strong>{{ resumenPersonal().trabajando }}</strong> trabajando</span>
+      <span><strong>{{ resumenPersonal().disponibles }}</strong> disponibles</span>
+      <span [class.alerta-texto]="resumenPersonal().ausentes > 0"><strong>{{ resumenPersonal().ausentes }}</strong> ausentes</span>
+      <app-icono nombre="derecha" [tamano]="14" />
+    </a>
   </header>
 
-  @if (errorMessage()) {
-    <div class="alerta alerta-error" role="alert">
-      <app-icono nombre="alerta" />
-      <span>{{ errorMessage() }}</span>
-    </div>
-  }
-
-  <form class="nueva card" (ngSubmit)="addTask()">
+  <form class="nueva" (ngSubmit)="addTask()">
     <div class="nueva-fila">
       <label class="sr-only" for="nueva-tarea">Título de la nueva tarea</label>
       <input
         id="nueva-tarea"
         class="input"
         type="text"
-        [placeholder]="todasLasTiendas() ? 'Tarea general de la cadena…' : '¿Qué hay que hacer? Ej.: cambiar los precios de la vitrina…'"
+        [placeholder]="todasLasTiendas() ? 'Nueva tarea general de la cadena…' : 'Nueva tarea, por ejemplo: cambiar los precios de la vitrina'"
         autocomplete="off"
         maxlength="120"
         [(ngModel)]="newTaskTitle"
@@ -56,37 +35,56 @@
         }
       </select>
       <button type="button" class="btn btn-ghost" (click)="mostrarDescripcion.set(!mostrarDescripcion())" [attr.aria-expanded]="mostrarDescripcion()">
-        {{ mostrarDescripcion() ? 'Sin detalle' : 'Agregar detalle' }}
+        {{ mostrarDescripcion() ? 'Quitar detalle' : 'Agregar detalle' }}
       </button>
       <button type="submit" class="btn btn-primary" [disabled]="!newTaskTitle.trim()">
         <app-icono nombre="mas" [tamano]="16" />
-        Agregar tarea
+        Crear tarea
       </button>
     </div>
     @if (mostrarDescripcion()) {
       <label class="sr-only" for="nueva-descripcion">Detalle</label>
-      <textarea
-        id="nueva-descripcion"
-        class="input"
-        placeholder="Detalles opcionales…"
-        maxlength="300"
-        [(ngModel)]="newTaskDescription"
-        name="newTaskDescription"
-      ></textarea>
+      <textarea id="nueva-descripcion" class="input" placeholder="Detalle opcional…" maxlength="300" [(ngModel)]="newTaskDescription" name="newTaskDescription"></textarea>
     }
   </form>
 
-  <div class="filtros-tipo" role="group" aria-label="Filtrar por tipo">
-    @for (f of filtrosTipo; track f.clave) {
-      <button type="button" [class.activo]="filtroTipo() === f.clave" (click)="filtroTipo.set(f.clave)">{{ f.nombre }}</button>
-    }
+  <div class="herramientas">
+    <div class="segmentado" role="group" aria-label="Filtrar por origen">
+      @for (f of filtrosTipo; track f.clave) {
+        <button type="button" [attr.aria-pressed]="filtroTipo() === f.clave" (click)="filtroTipo.set(f.clave)">{{ f.nombre }}</button>
+      }
+    </div>
+    <div class="filtros-derecha">
+      <label class="sr-only" for="filtro-prioridad">Prioridad</label>
+      <select id="filtro-prioridad" class="input compacto" [ngModel]="filtroPrioridad()" (ngModelChange)="filtroPrioridad.set($event)">
+        <option value="todas">Cualquier prioridad</option>
+        <option value="urgentes">Alta y crítica</option>
+        @for (p of prioridades; track p) {
+          <option [value]="p">Solo {{ nombrePrioridad[p].toLowerCase() }}</option>
+        }
+      </select>
+      <label class="sr-only" for="orden">Orden</label>
+      <select id="orden" class="input compacto" [ngModel]="orden()" (ngModelChange)="orden.set($event)">
+        <option value="manual">Orden manual</option>
+        <option value="prioridad">Por prioridad</option>
+        <option value="recientes">Más recientes</option>
+      </select>
+      <div class="input-icono buscador">
+        <app-icono nombre="buscar" [tamano]="16" />
+        <label class="sr-only" for="buscar-tarea">Buscar tareas</label>
+        <input id="buscar-tarea" class="input" type="search" placeholder="Buscar por título o #número" autocomplete="off"
+          [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" />
+      </div>
+    </div>
   </div>
 
-  @if (filtrando()) {
+  @if (arrastreBloqueado()) {
     <p class="aviso-filtro">
       <app-icono nombre="info" [tamano]="16" />
-      Mostrando solo lo que coincide con el filtro. Mientras filtras, arrastrar está pausado.
-      <button type="button" class="btn btn-sm btn-ghost" (click)="filtro.set(''); filtroTipo.set('todas')">Quitar filtros</button>
+      Con filtros u otro orden, arrastrar está pausado para no alterar el orden manual.
+      <button type="button" class="btn btn-sm btn-ghost" (click)="filtro.set(''); filtroTipo.set('todas'); filtroPrioridad.set('todas'); orden.set('manual')">
+        Restablecer vista
+      </button>
     </p>
   }
 
@@ -94,9 +92,8 @@
     @for (status of statuses; track status) {
       <section class="columna" [attr.data-status]="status" [attr.aria-labelledby]="'col-' + status">
         <header class="columna-cabecera">
-          <span class="columna-marca"></span>
           <h2 [id]="'col-' + status">{{ statusLabels[status] }}</h2>
-          <span class="chip">{{ totalDe(status) }}</span>
+          <span class="contador" [attr.aria-label]="totalDe(status) + ' tareas'">{{ totalDe(status) }}</span>
         </header>
 
         <div
@@ -105,50 +102,95 @@
           [id]="'list-' + status"
           [cdkDropListData]="tasksByStatus(status)"
           [cdkDropListConnectedTo]="connectedLists()"
-          [cdkDropListDisabled]="filtrando()"
+          [cdkDropListDisabled]="arrastreBloqueado()"
           (cdkDropListDropped)="onDrop($event, status)"
         >
-          @for (task of tasksByStatus(status); track task.id; let i = $index) {
-            <article class="tarjeta entrar" [style.--i]="i" [attr.data-prioridad]="task.prioridad" cdkDrag>
+          @for (task of tasksByStatus(status); track task.id) {
+            <article class="tarjeta" [attr.data-tarea]="task.id" [attr.data-prioridad]="task.prioridad" [attr.data-tour]="task.id === primeraAutomatica() ? 'tarea-automatica' : null" cdkDrag [cdkDragDisabled]="arrastreBloqueado()">
               <div class="tarjeta-arrastre" *cdkDragPreview>{{ task.title }}</div>
               <div class="tarjeta-placeholder" *cdkDragPlaceholder></div>
 
-              <p class="tarjeta-etiquetas">
-                @if (task.tipo && task.tipo !== 'MANUAL') {
-                  <span class="etiqueta" [attr.data-tipo]="task.tipo">{{ nombreTipo[task.tipo] }}</span>
+              <div class="tarjeta-meta">
+                <span class="codigo">#{{ task.id }}</span>
+                @if (esAutomatica(task)) {
+                  <span class="origen"><app-icono nombre="automatica" [tamano]="13" />{{ nombreTipo[task.tipo!] }}</span>
                 }
-                @if (task.prioridad && task.prioridad !== 'MEDIA') {
-                  <span class="etiqueta prioridad" [attr.data-prioridad]="task.prioridad">{{ nombrePrioridad[task.prioridad] }}</span>
+                @if (task.prioridad === 'CRITICA' || task.prioridad === 'ALTA') {
+                  <span class="estado" [class.rojo]="task.prioridad === 'CRITICA'" [class.ambar]="task.prioridad === 'ALTA'">
+                    <app-icono nombre="alerta" [tamano]="13" />{{ nombrePrioridad[task.prioridad] }}
+                  </span>
+                } @else if (task.prioridad === 'BAJA') {
+                  <span class="estado">Baja</span>
+                }
+              </div>
+
+              <h3 class="tarjeta-titulo">
+                <button type="button" (click)="abrirDetalle(task)">{{ task.title }}</button>
+              </h3>
+
+              <p class="tarjeta-pie">
+                @if (motivoCierre(task)) {
+                  <span class="cierre-auto"><app-icono nombre="hecho" [tamano]="13" />Cerrada automáticamente</span>
+                } @else {
+                  <span>{{ haceCuanto(task.createdAt) }}</span>
                 }
                 @if (todasLasTiendas()) {
-                  <span class="etiqueta tienda">{{ task.tiendaId ? gestion.nombreTienda(task.tiendaId) : 'General' }}</span>
+                  <span>· {{ task.tiendaId ? gestion.nombreTienda(task.tiendaId) : 'General' }}</span>
                 }
               </p>
 
-              <h3 class="tarjeta-titulo">{{ task.title }}</h3>
-              @if (task.description) {
-                <p class="tarjeta-descripcion">{{ task.description }}</p>
+              @if (task.status === 'IN_PROGRESS' && task.empleadoId) {
+                <div class="asignacion">
+                  <span class="avatar" aria-hidden="true">{{ iniciales(task.asignadoA) }}</span>
+                  <div class="asignacion-texto">
+                    <span><strong>{{ task.asignadoA }}</strong> · {{ restante(task) }}</span>
+                    <span class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="avance(task)"
+                      [attr.aria-label]="'Avance de #' + task.id"><span [style.width.%]="avance(task)"></span></span>
+                  </div>
+                  <span class="porcentaje">{{ avance(task) }}%</span>
+                </div>
+              } @else if (task.status === 'DONE' && task.asignadoA) {
+                <p class="hecho-por"><app-icono nombre="persona" [tamano]="13" />Hecha por {{ task.asignadoA }}</p>
               }
-              @if (task.asignadoA || task.creadoPor) {
-                <p class="tarjeta-autor">{{ task.asignadoA ? 'Responsable: ' + task.asignadoA : 'Creó ' + task.creadoPor }}</p>
+              @if (task.tipo === 'REPOSICION' && task.productoId && task.status !== 'DONE' && almacenDe(task) != null) {
+                <p class="almacen" [class.sin]="almacenDe(task) === 0 && task.status === 'TODO'">
+                  <app-icono nombre="paquete" [tamano]="13" />
+                  @if (task.status === 'IN_PROGRESS' && !task.empleadoId) {
+                    Esperando al distribuidor
+                  } @else if (almacenDe(task) === 0) {
+                    Sin unidades en el almacén: hay que pedirlas
+                  } @else {
+                    {{ almacenDe(task) }} u. en el almacén
+                  }
+                </p>
               }
 
               <div class="tarjeta-acciones">
-                @if (task.tipo === 'REPOSICION' && task.productoId && task.status === 'TODO') {
-                  <a class="btn btn-sm btn-secondary pedir" routerLink="../compras" [queryParams]="{ producto: task.productoId }">Pedir reposición</a>
+                @if (puedeAsignar(task)) {
+                  <label class="sr-only" [for]="'asignar-' + task.id">Asignar la orden #{{ task.id }}</label>
+                  <select class="input asignar" [id]="'asignar-' + task.id" [disabled]="asignando() === task.id || !disponiblesPara(task).length"
+                    (change)="asignar(task, $any($event.target).value); $any($event.target).value = ''">
+                    <option value="">{{ disponiblesPara(task).length ? 'Asignar a…' : 'Nadie disponible' }}</option>
+                    @for (e of disponiblesPara(task); track e.id) {
+                      <option [value]="e.id">{{ e.nombre }} · {{ nombrePuesto[e.puesto] }}</option>
+                    }
+                  </select>
+                }
+                @if (task.tipo === 'REPOSICION' && task.productoId && task.status === 'TODO' && almacenDe(task) === 0) {
+                  <a class="btn btn-sm btn-secondary pedir" routerLink="../compras" [queryParams]="{ producto: task.productoId }">Pedir al distribuidor</a>
                 }
                 @if (columnaVecina(status, -1); as anterior) {
-                  <button type="button" class="btn btn-icon btn-sm" (click)="moverA(task, -1)" [attr.aria-label]="'Mover a ' + statusLabels[anterior]">
+                  <button type="button" class="btn btn-icon btn-sm" (click)="moverA(task, -1)" [attr.aria-label]="'Mover #' + task.id + ' a ' + statusLabels[anterior]">
                     <app-icono nombre="izquierda" [tamano]="16" />
                   </button>
                 }
                 @if (columnaVecina(status, 1); as siguiente) {
-                  <button type="button" class="btn btn-icon btn-sm" (click)="moverA(task, 1)" [attr.aria-label]="'Mover a ' + statusLabels[siguiente]">
+                  <button type="button" class="btn btn-icon btn-sm" (click)="moverA(task, 1)" [attr.aria-label]="'Mover #' + task.id + ' a ' + statusLabels[siguiente]">
                     <app-icono nombre="derecha" [tamano]="16" />
                   </button>
                 }
                 @if (puedeBorrar(task)) {
-                  <button type="button" class="btn btn-icon btn-sm btn-danger-hover eliminar" (click)="deleteTask(task)" [attr.aria-label]="'Eliminar ' + task.title">
+                  <button type="button" class="btn btn-icon btn-sm btn-danger-hover" (click)="deleteTask(task)" [attr.aria-label]="'Eliminar #' + task.id">
                     <app-icono nombre="basura" [tamano]="16" />
                   </button>
                 }
@@ -159,9 +201,9 @@
               @if (cargando()) {
                 Cargando tareas…
               } @else if (filtrando()) {
-                Nada coincide en esta columna.
+                Nada coincide con los filtros en esta columna.
               } @else {
-                Sin tareas. Arrastra una aquí.
+                Sin tareas en esta columna.
               }
             </div>
           }
@@ -170,6 +212,58 @@
     }
   </div>
 </main>
+
+<dialog #panel class="panel-detalle" aria-labelledby="detalle-titulo" (close)="detalle.set(null)" (cancel)="detalle.set(null)">
+  @if (detalle(); as t) {
+    <header class="panel-cabecera">
+      <div>
+        <p class="codigo">Tarea #{{ t.id }}</p>
+        <h2 id="detalle-titulo">{{ t.title }}</h2>
+      </div>
+      <button type="button" class="btn btn-icon" (click)="detalle.set(null)" aria-label="Cerrar detalle">
+        <app-icono nombre="cerrar" [tamano]="18" />
+      </button>
+    </header>
+
+    <dl class="panel-datos">
+      <div><dt>Estado</dt><dd>{{ statusLabels[t.status] }}</dd></div>
+      <div><dt>Prioridad</dt><dd>{{ nombrePrioridad[t.prioridad ?? 'MEDIA'] }}</dd></div>
+      <div><dt>Origen</dt><dd>{{ esAutomatica(t) ? 'Automática · ' + nombreTipo[t.tipo!] : 'Creada a mano' }}</dd></div>
+      <div><dt>Sede</dt><dd>{{ t.tiendaId ? gestion.nombreTienda(t.tiendaId) : 'General' }}</dd></div>
+      <div><dt>Creada</dt><dd>{{ t.createdAt | date: 'd MMM y, HH:mm' }} · {{ t.creadoPor || 'sistema' }}</dd></div>
+      @if (t.asignadoA) {
+        <div><dt>Responsable</dt><dd>{{ t.asignadoA }}</dd></div>
+      }
+      @if (t.cerradaEn) {
+        <div><dt>Cerrada</dt><dd>{{ t.cerradaEn | date: 'd MMM y, HH:mm' }}</dd></div>
+      }
+    </dl>
+
+    @if (motivoCierre(t); as motivo) {
+      <p class="alerta"><app-icono nombre="historial" [tamano]="16" /><span><strong>Cierre automático:</strong> {{ motivo }}</span></p>
+    }
+
+    @if (t.description) {
+      <h3>Detalle e historial</h3>
+      <p class="panel-texto">{{ t.description }}</p>
+    }
+
+    <div class="panel-acciones">
+      @if (t.tipo === 'REPOSICION' && t.productoId) {
+        <a class="btn btn-secondary" routerLink="../compras" [queryParams]="{ producto: t.productoId }" (click)="detalle.set(null)">Ver compras del producto</a>
+      }
+      @if (t.tipo === 'INCIDENCIA') {
+        <a class="btn btn-secondary" routerLink="../incidencias" (click)="detalle.set(null)">Ver incidencias</a>
+      }
+      @if (t.tipo === 'TURNO') {
+        <a class="btn btn-secondary" routerLink="../turnos" (click)="detalle.set(null)">Ver turno</a>
+      }
+      @if (t.tipo === 'PEDIDO') {
+        <a class="btn btn-secondary" routerLink="../pedidos-online" (click)="detalle.set(null)">Despachar pedido</a>
+      }
+    </div>
+  }
+</dialog>
 
 @if (pendienteBorrar(); as borrada) {
   <div class="toast" role="status">

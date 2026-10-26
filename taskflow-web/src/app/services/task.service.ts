@@ -1,8 +1,9 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, filter, merge, share, tap, timer } from 'rxjs';
+import { DemoBackend } from '../shared/demo/demo-backend.service';
 import { SesionService } from '../auth/sesion.service';
-import { sseConToken } from '../shared/sse';
+import { EstadoConexion, sseConToken } from '../shared/sse';
 import { environment } from '../../environments/environment';
 import { STATUS_LABELS, Task, TaskEvent, TaskPositionUpdate } from '../models/task.model';
 import { RegistroEventosService } from '../shared/registro-eventos.service';
@@ -13,6 +14,7 @@ const API_URL = environment.apiUrl;
 export class TaskService {
   private readonly registro = inject(RegistroEventosService);
   private readonly sesion = inject(SesionService);
+  private readonly demo = inject(DemoBackend);
 
   constructor(private http: HttpClient) {}
 
@@ -44,11 +46,24 @@ export class TaskService {
    * cualquier pestaña o cliente), este observable emite el evento tipado
    * correspondiente en tiempo real.
    */
+  /** Estado de la conexión en tiempo real, para el indicador de la barra superior. */
+  readonly conexion = signal<EstadoConexion>('conectando');
+
+  // Una sola conexión compartida por todas las pantallas que la usen; se cierra 5 s después de que nadie la escuche.
+  private compartido: Observable<TaskEvent> | null = null;
+  private tokenCompartido: string | null = null;
+
   streamUpdates(): Observable<TaskEvent> {
-    // Con token: el servidor filtra y cada tienda recibe solo los cambios de sus tareas.
-    return sseConToken<TaskEvent>(`${API_URL}/stream`, this.sesion.token()).pipe(
-      tap((e) => this.registro.registrar({ demo: 'tablero', canal: 'SSE', direccion: 'entrada', detalle: describirEvento(e) })),
-    );
+    const token = this.sesion.token();
+    if (!this.compartido || this.tokenCompartido !== token) {
+      this.tokenCompartido = token;
+      // Con token: el servidor filtra y cada tienda recibe solo los cambios de sus tareas.
+      this.compartido = sseConToken<TaskEvent>(`${API_URL}/stream`, token, (e) => this.conexion.set(e)).pipe(
+        tap((e) => this.registro.registrar({ demo: 'tablero', canal: 'SSE', direccion: 'entrada', detalle: describirEvento(e) })),
+        share({ resetOnRefCountZero: () => timer(5000) }),
+      );
+    }
+    return merge(this.compartido.pipe(filter(() => !this.demo.activo())), this.demo.eventos$);
   }
 }
 

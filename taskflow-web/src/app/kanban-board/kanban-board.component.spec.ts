@@ -23,6 +23,10 @@ describe('KanbanBoardComponent', () => {
     { id: 3, title: 'Crear board-service', status: 'IN_PROGRESS', position: 1, tiendaId: 1, prioridad: 'BAJA', tipo: 'MANUAL' },
   ];
 
+  const persona = (id: number, puesto: string, estado: string) =>
+    ({ id, tiendaId: 1, nombre: 'P' + id, puesto, turno: 'MANANA', horario: '07:00–15:00', estado, disponibilidad: 'ACTIVO', avanceTurno: 50 }) as never;
+  const personal = [persona(1, 'REPONEDOR', 'DISPONIBLE'), persona(2, 'CAJERO', 'DISPONIBLE'), persona(3, 'REPONEDOR', 'AUSENTE')];
+
   beforeEach(() => {
     vi.useFakeTimers();
     servicio = {
@@ -35,7 +39,16 @@ describe('KanbanBoardComponent', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: TaskService, useValue: servicio },
-        { provide: GestionService, useValue: { tiendaActiva: signal(1), nombreTienda: () => 'Tienda Miraflores' } },
+        {
+          provide: GestionService,
+          useValue: {
+            tiendaActiva: signal(1),
+            cambios: signal(0),
+            nombreTienda: () => 'Tienda Miraflores',
+            personal: () => of(personal),
+            inventario: () => of([{ tiendaId: 1, productoId: 7, almacen: 0 }, { tiendaId: 1, productoId: 8, almacen: 30 }]),
+          },
+        },
         { provide: SesionService, useValue: { esAdmin: signal(false) } },
       ],
     });
@@ -76,8 +89,8 @@ describe('KanbanBoardComponent', () => {
     expect(componente.newTaskPrioridad).toBe('MEDIA');
   });
 
-  it('el filtro "Urgentes" deja solo prioridad alta o crítica', () => {
-    componente.filtroTipo.set('urgentes');
+  it('el filtro de prioridad "alta y crítica" deja solo las urgentes', () => {
+    componente.filtroPrioridad.set('urgentes');
     expect(componente.tasksByStatus('TODO').map((t) => t.id)).toEqual([2]);
     expect(componente.tasksByStatus('IN_PROGRESS')).toEqual([]);
   });
@@ -116,5 +129,25 @@ describe('KanbanBoardComponent', () => {
     componente.deleteTask(tareas[0]);
     componente.ngOnDestroy();
     expect(servicio.delete).toHaveBeenCalledWith(1);
+  });
+
+  it('la reposición solo se asigna a reponedores disponibles y si hay unidades en el almacén', () => {
+    const conAlmacen: Task = { id: 10, title: 'Reponer A', status: 'TODO', position: 1, tiendaId: 1, tipo: 'REPOSICION', productoId: 8 };
+    const sinAlmacen: Task = { ...conAlmacen, id: 11, productoId: 7 };
+
+    expect(componente.disponiblesPara(conAlmacen).map((e) => e.id)).toEqual([1]);
+    expect(componente.puedeAsignar(conAlmacen)).toBe(true);
+    expect(componente.puedeAsignar(sinAlmacen)).toBe(false);
+    expect(componente.disponiblesPara(tareas[0]).map((e) => e.id)).toEqual([1, 2]);
+  });
+
+  it('el avance de una orden asignada corre con el tiempo estimado', () => {
+    const inicio = new Date('2026-10-25T10:00:00').getTime();
+    vi.setSystemTime(inicio);
+    componente.ahora.set(inicio + 150_000);
+    const t: Task = { id: 20, title: 'X', status: 'IN_PROGRESS', position: 1, tiendaId: 1, empleadoId: 1, asignadaEn: '2026-10-25T10:00:00', minutosEstimados: 5 };
+
+    expect(componente.avance(t)).toBe(50);
+    expect(componente.restante(t)).toBe('quedan 3 min');
   });
 });

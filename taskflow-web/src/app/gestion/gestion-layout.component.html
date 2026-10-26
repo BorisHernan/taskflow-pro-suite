@@ -1,42 +1,88 @@
-<div class="gestion">
-  <aside class="lateral" aria-label="Gestión de tiendas">
-    @if (sesion.usuario(); as u) {
-      <div class="perfil">
-        <span class="perfil-nombre">{{ u.nombre }}</span>
-        <span class="perfil-rol">{{ u.rol === 'ADMIN' ? 'Administradora' : 'Encargado de tienda' }}</span>
-      </div>
+<div class="shell" [class.menu-abierto]="menuAbierto()">
+  <aside class="lateral" id="menu-gestion" aria-label="Navegación de la gestión">
+    <a class="marca" routerLink="/" aria-label="TaskFlow, ir a la portada">
+      <img src="favicon.svg?v=4" alt="" width="28" height="28" />
+      <span>
+        <strong>TaskFlow</strong>
+        <small>Operaciones</small>
+      </span>
+    </a>
+
+    <nav class="menu">
+      @for (g of menu(); track g.nombre) {
+        <p class="grupo" [id]="'grupo-' + g.nombre">{{ g.nombre }}</p>
+        <ul [attr.aria-labelledby]="'grupo-' + g.nombre">
+          @for (e of g.enlaces; track e.ruta) {
+            <li>
+              <a [routerLink]="e.ruta" routerLinkActive="activo" ariaCurrentWhenActive="page" [attr.data-tour]="e.ruta === 'tablero' ? 'menu-tareas' : null"
+                [class.en-recorrido]="tour.activo() && tour.paso()?.ruta === '/gestion/' + e.ruta">
+                <app-icono [nombre]="e.icono" [tamano]="18" />
+                {{ e.nombre }}
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </nav>
+
+    <div class="externos">
+      <a routerLink="/tienda"><app-icono nombre="tienda" [tamano]="18" />Tienda online</a>
+    </div>
+  </aside>
+
+  <button type="button" class="velo" aria-label="Cerrar menú" tabindex="-1" (click)="menuAbierto.set(false)"></button>
+
+  <div class="principal">
+    <header class="superior">
+      <button type="button" class="btn btn-icon abrir-menu" (click)="menuAbierto.set(!menuAbierto())"
+        [attr.aria-expanded]="menuAbierto()" aria-controls="menu-gestion" aria-label="Abrir menú">
+        <app-icono nombre="menu" [tamano]="20" />
+      </button>
 
       @if (sesion.esAdmin()) {
-        <label class="selector">
-          <span>Mirando</span>
+        <label class="sede">
+          <app-icono nombre="sede" [tamano]="16" />
+          <span class="sr-only">Sede que estás viendo</span>
           <select class="input" [value]="gestion.tiendaActiva() ?? ''" (change)="elegir($any($event.target).value)">
-            <option value="">Todas las tiendas</option>
-            @for (t of tiendas(); track t.id) {
+            <option value="">Todas las sedes</option>
+            @for (t of gestion.tiendas(); track t.id) {
               <option [value]="t.id" [selected]="t.id === gestion.tiendaActiva()">{{ t.nombre }}</option>
             }
           </select>
         </label>
       } @else {
-        <p class="sede"><app-icono nombre="sede" [tamano]="16" />{{ u.tiendaNombre }}</p>
+        <p class="sede-fija"><app-icono nombre="sede" [tamano]="16" />{{ sesion.usuario()?.tiendaNombre }}</p>
       }
-    }
 
-    <nav class="menu">
-      @for (s of menu(); track s.ruta) {
-        <a [routerLink]="s.ruta" routerLinkActive="activo">
-          <app-icono [nombre]="s.icono" [tamano]="18" />
-          {{ s.nombre }}
-        </a>
-      }
-    </nav>
+      <p class="conexion" role="status" data-tour="conexion" [title]="'Actualizaciones en tiempo real: ' + conexion().texto">
+        <span class="punto" [class.en-vivo]="conexion().clase === 'en-vivo'" [class.problema]="conexion().clase === 'problema'"></span>
+        {{ conexion().texto }}
+      </p>
 
-    <button type="button" class="btn btn-ghost salir" (click)="sesion.salir()">
-      <app-icono nombre="salir" [tamano]="16" />
-      Cerrar sesión
-    </button>
-  </aside>
+      <div class="derecha">
+        <button type="button" class="btn btn-ghost btn-sm recorrido" (click)="tour.iniciar()">
+          <app-icono nombre="chispas" [tamano]="16" />
+          <span class="recorrido-texto">Recorrido</span>
+        </button>
+        <app-selector-tema />
+        @if (sesion.usuario(); as u) {
+          <div class="usuario">
+            <span class="iniciales" aria-hidden="true">{{ u.nombre.charAt(0) }}</span>
+            <span class="usuario-texto">
+              <strong>{{ u.nombre }}</strong>
+              <small>{{ u.rol === 'ADMIN' ? 'Administración' : 'Encargado de tienda' }}</small>
+            </span>
+          </div>
+        }
+        <button type="button" class="btn btn-ghost btn-sm" (click)="sesion.salir()">
+          <app-icono nombre="salir" [tamano]="16" />
+          <span class="salir-texto">Salir</span>
+        </button>
+      </div>
+    </header>
 
-  <div class="contenido">
-    <router-outlet />
+    <div class="contenido">
+      <router-outlet />
+    </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
 export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
 
-export type TipoTarea = 'MANUAL' | 'REPOSICION' | 'INCIDENCIA' | 'TURNO';
+export type TipoTarea = 'MANUAL' | 'REPOSICION' | 'INCIDENCIA' | 'TURNO' | 'PEDIDO';
 export type Prioridad = 'BAJA' | 'MEDIA' | 'ALTA' | 'CRITICA';
 
 export interface Task {
@@ -20,6 +20,9 @@ export interface Task {
   turnoId?: number | null;
   creadoPor?: string;
   asignadoA?: string | null;
+  empleadoId?: number | null;
+  asignadaEn?: string | null;
+  minutosEstimados?: number | null;
   cerradaEn?: string | null;
 }
 
@@ -28,6 +31,7 @@ export const NOMBRE_TIPO: Record<TipoTarea, string> = {
   REPOSICION: 'Reposición',
   INCIDENCIA: 'Incidencia',
   TURNO: 'Checklist',
+  PEDIDO: 'Pedido online',
 };
 
 export const NOMBRE_PRIORIDAD: Record<Prioridad, string> = { BAJA: 'Baja', MEDIA: 'Media', ALTA: 'Alta', CRITICA: 'Crítica' };

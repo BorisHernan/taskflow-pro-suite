@@ -1,23 +1,23 @@
 :host {
   display: block;
-  /* Paleta categórica de los gráficos: tonos separados y legibles en ambos temas. */
-  --g1: #0d9488;
-  --g2: #7c3aed;
-  --g3: #2563eb;
-  --g4: #f59e0b;
-  --g5: #e11d48;
-  --g6: #65a30d;
-  --g7: #64748b;
+  /* Series de los gráficos: salen de los tokens --tf-serie-*, iguales en significado en ambos temas. */
+  --g1: var(--tf-serie-1);
+  --g2: var(--tf-serie-2);
+  --g3: var(--tf-serie-3);
+  --g4: var(--tf-serie-4);
+  --g5: var(--tf-serie-5);
+  --g6: var(--tf-serie-6);
+  --g7: var(--tf-text-secondary);
 }
 
-:host-context([data-theme='dark']) {
-  --g1: #2dd4bf;
-  --g2: #a78bfa;
-  --g3: #60a5fa;
-  --g4: #fbbf24;
-  --g5: #fb7185;
-  --g6: #a3e635;
-  --g7: #94a3b8;
+.comparacion {
+  margin-bottom: 16px;
+}
+
+.titulo-tabla {
+  margin: 0;
+  padding: 16px 20px;
+  font-size: 16px;
 }
 
 .controles {

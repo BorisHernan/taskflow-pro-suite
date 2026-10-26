@@ -4,172 +4,229 @@
       <h1 class="page-title">{{ titulo() }}</h1>
       <p>{{ hoy | date: "EEEE d 'de' MMMM" }} · {{ sesion.usuario()?.nombre }}</p>
     </div>
-    @if (!todas()) {
-      @if (turno(); as responsable) {
-        <a class="turno-activo" routerLink="../turnos">
-          <span class="punto en-vivo"></span>
-          Turno abierto · {{ responsable }}
-        </a>
-      } @else {
-        <a class="btn btn-primary" routerLink="../turnos">Abrir el turno</a>
+    <div class="cabecera-acciones">
+      @if (!todas()) {
+        @if (turno(); as responsable) {
+          <a class="estado verde turno-activo" routerLink="../turnos"><app-icono nombre="reloj" [tamano]="14" />Turno abierto · {{ responsable }}</a>
+        } @else {
+          <a class="btn btn-primary" routerLink="../turnos">Abrir turno</a>
+        }
       }
-    }
+      <button type="button" class="btn btn-secondary" (click)="cargar()" [attr.aria-busy]="cargando()">
+        <app-icono nombre="refrescar" [tamano]="16" />Actualizar
+      </button>
+    </div>
   </header>
 
   @if (error()) {
-    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
-  }
-
-  <section class="kpis" aria-label="Indicadores de hoy">
-    <a class="kpi" routerLink="../compras">
-      <strong>{{ total().ventasHoy | soles }}</strong>
-      <span>vendido hoy en {{ total().comprasHoy }} compras</span>
-    </a>
-    <a class="kpi" [class.kpi-alerta]="total().agotados > 0" routerLink="../inventario">
-      <strong>{{ total().alertas }}</strong>
-      <span>productos bajo el mínimo{{ total().agotados ? ', ' + total().agotados + ' agotados' : '' }}</span>
-    </a>
-    <a class="kpi" [class.kpi-alerta]="total().tareasUrgentes > 0" routerLink="../tablero">
-      <strong>{{ total().tareasUrgentes }}</strong>
-      <span>tareas urgentes de {{ total().tareasAbiertas }} abiertas</span>
-    </a>
-    <a class="kpi" routerLink="../incidencias">
-      <strong>{{ total().incidencias }}</strong>
-      <span>incidencias sin resolver</span>
-    </a>
-    <a class="kpi" routerLink="../compras">
-      <strong>{{ total().pedidos }}</strong>
-      <span>pedidos de reposición en curso</span>
-    </a>
-    <a class="kpi" routerLink="../mermas">
-      <strong>{{ total().mermasMes | soles }}</strong>
-      <span>en mermas este mes</span>
-    </a>
-  </section>
-
-  @if (todas() && filas().length > 1) {
-    <section class="bloque">
-      <h2>Comparación entre tiendas</h2>
-      <div class="tabla-envoltura">
-        <table class="tabla">
-          <thead>
-            <tr>
-              <th>Tienda</th>
-              <th class="num">Ventas hoy</th>
-              <th class="num">Bajo mínimo</th>
-              <th class="num">Tareas urgentes</th>
-              <th class="num">Incidencias</th>
-              <th class="num">Pedidos</th>
-              <th>Turno</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (f of filas(); track f.tiendaId) {
-              <tr>
-                <td><button type="button" class="enlace" (click)="verTienda(f.tiendaId)">{{ f.nombre }}</button></td>
-                <td class="num">{{ f.ventasHoy | soles }}</td>
-                <td class="num">
-                  {{ f.alertas }}
-                  @if (f.agotados) {
-                    <span class="estado rojo">{{ f.agotados }} agotados</span>
-                  }
-                </td>
-                <td class="num">{{ f.tareasUrgentes }}</td>
-                <td class="num">{{ f.incidenciasAbiertas }}</td>
-                <td class="num">{{ f.pedidosEnCurso }}</td>
-                <td>
-                  @if (f.turnoResponsable) {
-                    <span class="estado verde">{{ f.turnoResponsable }}</span>
-                  } @else {
-                    <span class="estado">Sin turno</span>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </section>
-  }
-
-  <div class="columnas">
-    <section class="bloque">
-      <h2>Ventas de los últimos 14 días</h2>
-      <app-grafico-serie
-        tipo="barras"
-        color="var(--c-tablero)"
-        [puntos]="serie()"
-        [alto]="200"
-        [formato]="formatoSoles"
-        descripcion="Ingresos por día de los últimos 14 días"
-      />
-    </section>
-
-    <section class="bloque">
-      <h2>Para reponer</h2>
-      @for (a of alertas(); track a.id) {
-        <div class="fila-alerta">
-          <div>
-            <p class="fila-titulo">{{ a.producto }}</p>
-            <p class="fila-detalle">
-              {{ a.stock }} de mínimo {{ a.stockMinimo }}
-              @if (todas()) {
-                · {{ gestion.nombreTienda(a.tiendaId) }}
-              }
-            </p>
-          </div>
-          @if (a.pedidoEnCurso) {
-            <span class="estado azul">Pedido en curso</span>
+    <div class="bloque"><app-estado-vista tipo="error" titulo="No se pudo cargar el resumen" [texto]="error()!" (reintentar)="cargar()" /></div>
+  } @else {
+    <section class="kpis" aria-label="Indicadores de hoy" data-tour="kpis">
+      <a class="kpi" routerLink="../compras">
+        <span class="kpi-nombre">Ventas de hoy</span>
+        <strong>{{ total().ventasHoy | soles }}</strong>
+        <span class="kpi-detalle">{{ total().comprasHoy }} {{ total().comprasHoy === 1 ? 'compra' : 'compras' }} en la tienda online</span>
+      </a>
+      <a class="kpi" [class.kpi-alerta]="total().agotados > 0" routerLink="../inventario">
+        <span class="kpi-nombre">Productos bajo el mínimo</span>
+        <strong>{{ total().alertas }}</strong>
+        <span class="kpi-detalle">
+          @if (total().agotados) {
+            <app-icono nombre="alerta" [tamano]="14" />{{ total().agotados }} agotados
           } @else {
-            <span class="estado" [class.rojo]="a.estado === 'AGOTADO'" [class.ambar]="a.estado === 'BAJO'">
-              {{ a.estado === 'AGOTADO' ? 'Agotado' : 'Bajo' }}
-            </span>
+            Ninguno agotado
           }
-        </div>
-      } @empty {
-        <p class="vacio-texto">{{ cargando() ? 'Cargando…' : 'Todo el stock está sobre el mínimo.' }}</p>
-      }
-      <a class="ver-todo" routerLink="../inventario">Ver inventario</a>
+        </span>
+      </a>
+      <a class="kpi" [class.kpi-alerta]="total().tareasUrgentes > 0" routerLink="../tablero">
+        <span class="kpi-nombre">Tareas urgentes</span>
+        <strong>{{ total().tareasUrgentes }}</strong>
+        <span class="kpi-detalle">de {{ total().tareasAbiertas }} abiertas</span>
+      </a>
+      <a class="kpi" routerLink="../incidencias">
+        <span class="kpi-nombre">Incidencias sin resolver</span>
+        <strong>{{ total().incidencias }}</strong>
+        <span class="kpi-detalle">abiertas o en curso</span>
+      </a>
+      <a class="kpi" routerLink="../compras">
+        <span class="kpi-nombre">Compras en curso</span>
+        <strong>{{ total().pedidos }}</strong>
+        <span class="kpi-detalle">por aprobar o en camino</span>
+      </a>
+      <a class="kpi" routerLink="../mermas">
+        <span class="kpi-nombre">Mermas del mes</span>
+        <strong>{{ total().mermasMes | soles }}</strong>
+        <span class="kpi-detalle">valorizadas al costo</span>
+      </a>
     </section>
-  </div>
 
-  <div class="columnas">
-    <section class="bloque">
-      <h2>Últimas ventas</h2>
-      <div class="tabla-envoltura">
-        <table class="tabla">
-          <tbody>
-            @for (v of ventas(); track v.id) {
-              <tr>
-                <td>{{ v.producto }} <span class="suave">× {{ v.cantidad }}</span></td>
-                @if (todas()) {
-                  <td class="suave">{{ gestion.nombreTienda(v.tiendaId) }}</td>
-                }
-                <td class="num">{{ v.total | soles }}</td>
-                <td class="num suave">{{ v.fecha | date: 'd MMM, HH:mm' }}</td>
-              </tr>
-            } @empty {
-              <tr><td class="suave">{{ cargando() ? 'Cargando…' : 'Todavía no hay ventas.' }}</td></tr>
+    <div class="columnas">
+      <section class="bloque" aria-labelledby="stock-titulo" data-tour="reponer">
+        <div class="bloque-cabecera">
+          <h2 id="stock-titulo">Stock para reponer</h2>
+          <a class="ver-todo" routerLink="../inventario">Ver inventario</a>
+        </div>
+        @for (a of alertas(); track a.id) {
+          <div class="fila" [attr.data-producto]="a.productoId">
+            <div>
+              <p class="fila-titulo">{{ a.producto }}</p>
+              <p class="fila-detalle">
+                Stock {{ a.stock }} · mínimo {{ a.stockMinimo }}
+                @if (todas()) { · {{ gestion.nombreTienda(a.tiendaId) }} }
+              </p>
+            </div>
+            @if (a.pedidoEnCurso) {
+              <span class="estado azul"><app-icono nombre="envio" [tamano]="14" />Pedido en curso</span>
+            } @else if (a.estado === 'AGOTADO') {
+              <span class="estado rojo"><app-icono nombre="error" [tamano]="14" />Agotado</span>
+            } @else {
+              <span class="estado ambar"><app-icono nombre="alerta" [tamano]="14" />Bajo mínimo</span>
             }
-          </tbody>
-        </table>
+          </div>
+        } @empty {
+          <app-estado-vista [tipo]="cargando() ? 'cargando' : 'vacio'" [titulo]="cargando() ? 'Cargando…' : 'Todo el stock está sobre el mínimo'" icono="hecho" />
+        }
+      </section>
+
+      <section class="bloque" aria-labelledby="inc-titulo">
+        <div class="bloque-cabecera">
+          <h2 id="inc-titulo">Incidencias abiertas</h2>
+          <a class="ver-todo" routerLink="../incidencias">Ver incidencias</a>
+        </div>
+        @for (i of incidencias(); track i.id) {
+          <div class="fila">
+            <div>
+              <p class="fila-titulo">{{ i.titulo }}</p>
+              <p class="fila-detalle">
+                {{ i.creadaEn | date: 'd MMM, HH:mm' }}
+                @if (todas()) { · {{ gestion.nombreTienda(i.tiendaId) }} }
+              </p>
+            </div>
+            <span class="estado" [class.rojo]="i.severidad === 'CRITICA' || i.severidad === 'ALTA'" [class.ambar]="i.severidad === 'MEDIA'">
+              @if (i.severidad === 'CRITICA' || i.severidad === 'ALTA') { <app-icono nombre="alerta" [tamano]="14" /> }
+              {{ nombreSeveridad[i.severidad] }}
+            </span>
+          </div>
+        } @empty {
+          <app-estado-vista [tipo]="cargando() ? 'cargando' : 'vacio'" [titulo]="cargando() ? 'Cargando…' : 'Sin incidencias abiertas'" icono="hecho" />
+        }
+      </section>
+    </div>
+
+    <section class="bloque" aria-labelledby="prio-titulo">
+      <div class="bloque-cabecera">
+        <h2 id="prio-titulo">Tareas prioritarias pendientes</h2>
+        <a class="ver-todo" routerLink="../tablero">Ver todas las tareas</a>
       </div>
+      @if (prioritarias().length) {
+        <div class="tabla-envoltura">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Tarea</th>
+                <th>Origen</th>
+                <th>Prioridad</th>
+                <th>Estado</th>
+                @if (todas()) { <th>Sede</th> }
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of prioritarias(); track t.id) {
+                <tr>
+                  <td><span class="codigo">#{{ t.id }}</span> {{ t.title }}</td>
+                  <td class="suave">{{ nombreTipo[t.tipo ?? 'MANUAL'] }}</td>
+                  <td>
+                    <span class="estado" [class.rojo]="t.prioridad === 'CRITICA'" [class.ambar]="t.prioridad === 'ALTA'">
+                      <app-icono nombre="alerta" [tamano]="14" />{{ nombrePrioridad[t.prioridad!] }}
+                    </span>
+                  </td>
+                  <td class="suave">{{ t.status === 'IN_PROGRESS' ? 'En progreso' : 'Por hacer' }}</td>
+                  @if (todas()) { <td class="suave">{{ gestion.nombreTienda(t.tiendaId) || 'General' }}</td> }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <app-estado-vista [tipo]="cargando() ? 'cargando' : 'vacio'" [titulo]="cargando() ? 'Cargando…' : 'No hay tareas urgentes pendientes'" icono="hecho" />
+      }
     </section>
 
-    <section class="bloque">
-      <h2>Incidencias abiertas</h2>
-      @for (i of incidencias(); track i.id) {
-        <div class="fila-alerta">
-          <div>
-            <p class="fila-titulo">{{ i.titulo }}</p>
-            <p class="fila-detalle">{{ i.creadaEn | date: 'd MMM, HH:mm' }}@if (todas()) { · {{ gestion.nombreTienda(i.tiendaId) }} }</p>
-          </div>
-          <span class="estado" [class.rojo]="i.severidad === 'CRITICA' || i.severidad === 'ALTA'">{{ nombreSeveridad[i.severidad] }}</span>
+    <div class="columnas">
+      <section class="bloque" aria-labelledby="ventas-titulo">
+        <div class="bloque-cabecera">
+          <h2 id="ventas-titulo">Ingresos de los últimos 14 días</h2>
+          <span class="suave unidad">Soles por día</span>
         </div>
-      } @empty {
-        <p class="vacio-texto">{{ cargando() ? 'Cargando…' : 'Sin incidencias abiertas.' }}</p>
-      }
-      <a class="ver-todo" routerLink="../incidencias">Ver incidencias</a>
-    </section>
-  </div>
+        <app-grafico-serie
+          tipo="barras"
+          color="var(--tf-serie-1)"
+          [puntos]="serie()"
+          [alto]="200"
+          [formato]="formatoSoles"
+          descripcion="Ingresos por día de los últimos 14 días, en soles"
+        />
+      </section>
+
+      <section class="bloque" aria-labelledby="ult-titulo">
+        <h2 id="ult-titulo">Últimas ventas</h2>
+        @for (v of ventas(); track v.id) {
+          <div class="fila">
+            <div>
+              <p class="fila-titulo">{{ v.producto }} × {{ v.cantidad }}</p>
+              <p class="fila-detalle">
+                {{ v.fecha | date: 'd MMM, HH:mm' }}
+                @if (todas()) { · {{ gestion.nombreTienda(v.tiendaId) }} }
+              </p>
+            </div>
+            <span class="monto">{{ v.total | soles }}</span>
+          </div>
+        } @empty {
+          <app-estado-vista [tipo]="cargando() ? 'cargando' : 'vacio'" [titulo]="cargando() ? 'Cargando…' : 'Todavía no hay ventas'" icono="tienda" />
+        }
+      </section>
+    </div>
+
+    @if (todas() && filas().length > 1) {
+      <section class="bloque sin-relleno" aria-labelledby="comp-titulo">
+        <h2 id="comp-titulo" class="comp-titulo">Comparación entre sedes</h2>
+        <div class="tabla-envoltura">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Sede</th>
+                <th class="num">Ventas hoy</th>
+                <th class="num">Bajo mínimo</th>
+                <th class="num">Agotados</th>
+                <th class="num">Tareas urgentes</th>
+                <th class="num">Incidencias</th>
+                <th class="num">Compras en curso</th>
+                <th>Turno</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (f of filas(); track f.tiendaId) {
+                <tr>
+                  <td><button type="button" class="enlace" (click)="verTienda(f.tiendaId)">{{ f.nombre }}</button></td>
+                  <td class="num">{{ f.ventasHoy | soles }}</td>
+                  <td class="num">{{ f.alertas }}</td>
+                  <td class="num">{{ f.agotados }}</td>
+                  <td class="num">{{ f.tareasUrgentes }}</td>
+                  <td class="num">{{ f.incidenciasAbiertas }}</td>
+                  <td class="num">{{ f.pedidosEnCurso }}</td>
+                  <td>
+                    @if (f.turnoResponsable) {
+                      <span class="estado verde"><app-icono nombre="reloj" [tamano]="14" />{{ f.turnoResponsable }}</span>
+                    } @else {
+                      <span class="estado">Sin turno</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  }
 </main>

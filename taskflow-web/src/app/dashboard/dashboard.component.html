@@ -1,20 +1,21 @@
-<main class="page">
-  <header class="page-header">
+<main class="gestion-pagina">
+  <header class="gestion-cabecera">
     <div>
-      <div class="page-titulo-fila">
-        <span class="page-icono"><app-icono nombre="estadisticas" [tamano]="24" /></span>
-        <h1 class="page-title">Estadísticas</h1>
-      </div>
-      <p class="page-subtitle">
-        Lo que pasa en la demo, resumido por PostgreSQL y dibujado en SVG. Toca
-        <app-icono nombre="info" [tamano]="14" /> en cada gráfico para saber cómo leerlo.
+      <h1 class="page-title">Estadísticas</h1>
+      <p>
+        Datos agregados por PostgreSQL. Usa <app-icono nombre="info" [tamano]="14" /> en cada gráfico para saber cómo leerlo.
         @if (ultimaActualizacion()) {
-          <span class="chip">Actualizado {{ haceCuanto() }}</span>
+          Actualizado {{ haceCuanto() }}.
         }
       </p>
     </div>
 
     <div class="controles">
+      <div class="segmentado" role="group" aria-label="Periodo de las series diarias">
+        @for (p of periodos; track p) {
+          <button type="button" [attr.aria-pressed]="periodo() === p" (click)="periodo.set(p)">{{ p }} días</button>
+        }
+      </div>
       <label class="interruptor">
         <input
           type="checkbox"
@@ -39,7 +40,41 @@
     </div>
   }
 
-  <section class="kpis" aria-label="Indicadores">
+  @if (sedes().length > 1) {
+    <section class="bloque sin-relleno comparacion" aria-labelledby="sedes-titulo">
+      <h2 id="sedes-titulo" class="titulo-tabla">Comparación de sedes · hoy</h2>
+      <div class="tabla-envoltura">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th scope="col">Sede</th>
+              <th scope="col" class="num">Ventas hoy</th>
+              <th scope="col" class="num">Compras</th>
+              <th scope="col" class="num">Bajo mínimo</th>
+              <th scope="col" class="num">Agotados</th>
+              <th scope="col" class="num">Incidencias abiertas</th>
+              <th scope="col" class="num">Mermas del mes</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (f of sedes(); track f.tiendaId) {
+              <tr>
+                <td>{{ f.nombre }}</td>
+                <td class="num">{{ f.ventasHoy | soles }}</td>
+                <td class="num">{{ f.comprasHoy }}</td>
+                <td class="num">{{ f.alertas }}</td>
+                <td class="num">{{ f.agotados }}</td>
+                <td class="num">{{ f.incidenciasAbiertas }}</td>
+                <td class="num">{{ f.mermasMes | soles }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+
+  <section class="kpis" aria-label="Indicadores" data-tour="estadisticas">
     @for (kpi of kpis; track kpi.clave; let i = $index) {
       <article class="kpi card entrar" [style.--i]="i">
         <span class="kpi-icono"><app-icono [nombre]="kpi.icono" [tamano]="20" /></span>
@@ -64,7 +99,7 @@
         class="ancho-completo entrar"
         style="--i: 1"
         titulo="Visitas por día"
-        subtitulo="Personas distintas por día, últimos 30 días"
+        [subtitulo]="'Personas distintas por día, últimos ' + periodo() + ' días'"
         ayuda="Cuántas personas diferentes abrieron la demo cada día. Si alguien entra varias veces el mismo día cuenta una sola vez."
         comoLeer="Mira la forma de la curva: subidas = días con más tráfico (por ejemplo, cuando compartí el link). Pasa el mouse o usa las flechas del teclado para ver cada día."
         fuente="SELECT visit_date, COUNT(*) FROM visit_log GROUP BY visit_date"
@@ -75,7 +110,7 @@
           color="var(--g1)"
           [puntos]="serieVisitas()"
           [formato]="unidades"
-          descripcion="Visitas por día de los últimos 30 días"
+          [descripcion]="'Visitas por día de los últimos ' + periodo() + ' días'"
         />
       </app-tarjeta-grafico>
 
@@ -83,7 +118,7 @@
         class="ancho-completo entrar"
         style="--i: 2"
         titulo="Ventas por día"
-        subtitulo="Últimos 30 días"
+        [subtitulo]="'Últimos ' + periodo() + ' días, todas las sedes'"
         ayuda="Lo que se vendió en la tienda cada día. Cada barra es un día; la altura es el total de ese día."
         comoLeer="Las barras sirven para comparar días entre sí. Cambia entre ingresos (soles) y unidades para ver si se venden muchas cosas baratas o pocas caras."
         fuente="SELECT CAST(created_at AS DATE), SUM(quantity), SUM(total) FROM purchases GROUP BY 1"
@@ -98,7 +133,7 @@
           color="var(--g2)"
           [puntos]="serieVentas()"
           [formato]="formatoVentas()"
-          descripcion="Ventas por día de los últimos 30 días"
+          [descripcion]="'Ventas por día de los últimos ' + periodo() + ' días'"
         />
       </app-tarjeta-grafico>
 

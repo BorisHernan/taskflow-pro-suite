@@ -3,8 +3,14 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, map, shareReplay } from 'rxjs';
 import { API_BASE, SesionService } from '../auth/sesion.service';
+import { DemoBackend } from '../shared/demo/demo-backend.service';
+import { Task } from '../models/task.model';
 import {
+  AvisoPersonal,
+  Empleado,
   FilaInventario,
+  PuestoTienda,
+  TipoAusencia,
   Incidencia,
   Merma,
   Pedido,
@@ -30,6 +36,22 @@ export class GestionService {
   readonly tiendaActiva = computed(() =>
     this.sesion.esAdmin() ? this.elegidaPorAdmin() : (this.sesion.usuario()?.tiendaId ?? null),
   );
+
+  /** Sube cada vez que algo cambia fuera de la pantalla (la demo del recorrido): las pantallas se recargan. */
+  readonly cambios = signal(0);
+
+  constructor() {
+    inject(DemoBackend).cambio$.subscribe(() => this.avisarCambio());
+  }
+
+  /** Durante esa recarga las pantallas no muestran "Cargando…": se actualizan en el lugar. */
+  readonly recargaSilenciosa = signal(false);
+
+  avisarCambio(): void {
+    this.recargaSilenciosa.set(true);
+    this.cambios.update((n) => n + 1);
+    setTimeout(() => this.recargaSilenciosa.set(false), 1500);
+  }
 
   readonly tiendas$ = this.http.get<Tienda[]>(`${this.api}/tiendas`).pipe(shareReplay(1));
   readonly tiendas = toSignal(this.tiendas$, { initialValue: [] as Tienda[] });
@@ -114,12 +136,36 @@ export class GestionService {
     return this.http.get<Pedido[]>(`${this.api}/pedidos`, { params: this.params() });
   }
 
-  pedir(datos: { productoId: number; cantidad: number; nota?: string; tiendaId?: number | null }): Observable<Pedido> {
+  pedir(datos: { productoId: number; cantidad: number; nota?: string; tiendaId?: number | null; empleadoId?: number | null }): Observable<Pedido> {
     return this.http.post<Pedido>(`${this.api}/pedidos`, { tiendaId: this.tiendaActiva(), ...datos });
   }
 
   revisarPedido(id: number, accion: 'aprobar' | 'rechazar' | 'recibir', nota?: string): Observable<Pedido> {
     return this.http.post<Pedido>(`${this.api}/pedidos/${id}/${accion}`, { nota });
+  }
+
+  personal(): Observable<Empleado[]> {
+    return this.http.get<Empleado[]>(`${this.api}/personal`, { params: this.params() });
+  }
+
+  asignar(tareaId: number, empleadoId: number, rapido = false): Observable<Task> {
+    return this.http.post<Task>(`${this.api}/tasks/${tareaId}/asignar`, { empleadoId, rapido });
+  }
+
+  registrarAusencia(id: number, datos: { disponibilidad: TipoAusencia; motivo: string; hasta?: string | null }): Observable<Empleado> {
+    return this.http.put<Empleado>(`${this.api}/personal/${id}/ausencia`, datos);
+  }
+
+  moverAPuesto(id: number, puesto: PuestoTienda | null): Observable<Empleado> {
+    return this.http.put<Empleado>(`${this.api}/personal/${id}/puesto`, { puesto });
+  }
+
+  avisosPersonal(): Observable<AvisoPersonal[]> {
+    return this.http.get<AvisoPersonal[]>(`${this.api}/personal/avisos`, { params: this.params() });
+  }
+
+  reincorporar(id: number): Observable<Empleado> {
+    return this.http.delete<Empleado>(`${this.api}/personal/${id}/ausencia`);
   }
 
   /** Descarga el CSV con la sesión (un enlace normal no llevaría el token). */

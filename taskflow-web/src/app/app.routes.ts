@@ -26,8 +26,23 @@ export const routes: Routes = [
       },
       {
         path: 'tablero',
-        title: 'Tareas · TaskFlow',
+        title: 'Órdenes de trabajo · TaskFlow',
         loadComponent: () => import('./kanban-board/kanban-board.component').then((m) => m.KanbanBoardComponent),
+      },
+      {
+        path: 'operaciones',
+        title: 'Centro de operaciones · TaskFlow',
+        loadComponent: () => import('./gestion/operaciones/operaciones.component').then((m) => m.OperacionesComponent),
+      },
+      {
+        path: 'personal',
+        title: 'Personal · TaskFlow',
+        loadComponent: () => import('./gestion/personal/personal.component').then((m) => m.PersonalComponent),
+      },
+      {
+        path: 'pedidos-online',
+        title: 'Pedidos online · TaskFlow',
+        loadComponent: () => import('./gestion/pedidos-online/pedidos-online.component').then((m) => m.PedidosOnlineComponent),
       },
       {
         path: 'inventario',
@@ -83,6 +98,16 @@ export const routes: Routes = [
     path: 'tienda/boleta',
     title: 'Tu boleta · Tienda · TaskFlow',
     loadComponent: () => import('./store/boleta/boleta.component').then((m) => m.BoletaComponent),
+  },
+  {
+    path: 'tienda/pedido',
+    title: 'Seguir mi pedido · Tienda · TaskFlow',
+    loadComponent: () => import('./store/seguimiento/seguimiento.component').then((m) => m.SeguimientoComponent),
+  },
+  {
+    path: 'tienda/pedido/:codigo',
+    title: 'Seguir mi pedido · Tienda · TaskFlow',
+    loadComponent: () => import('./store/seguimiento/seguimiento.component').then((m) => m.SeguimientoComponent),
   },
   {
     path: 'arena',

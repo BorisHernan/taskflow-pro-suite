@@ -1,126 +1,153 @@
 <main class="gestion-pagina">
   <header class="gestion-cabecera">
     <div>
-      <h1 class="page-title">Inventario</h1>
+      <h1 class="page-title">Stock</h1>
       <p>
         Cuando una venta o una merma deja un producto en su mínimo, se crea sola una tarea de reposición.
-        Lo más urgente aparece primero.
+        Por defecto, lo más urgente aparece primero.
       </p>
     </div>
-    <button type="button" class="btn btn-secondary" (click)="cargar()">Actualizar</button>
+    <div class="cabecera-acciones">
+      <button type="button" class="btn btn-secondary" (click)="cargar()" [attr.aria-busy]="cargando()">
+        <app-icono nombre="refrescar" [tamano]="16" />Actualizar
+      </button>
+    </div>
   </header>
 
-  @if (aviso()) {
-    <p class="aviso-ok" role="status">{{ aviso() }}</p>
-  }
-  @if (error()) {
-    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
-  }
-
   <div class="herramientas">
-    <div class="filtros" role="group" aria-label="Filtrar por estado">
-      <button type="button" [class.activo]="filtro() === 'alerta'" (click)="filtro.set('alerta')">Bajo el mínimo · {{ conteo().alerta }}</button>
-      <button type="button" [class.activo]="filtro() === 'agotados'" (click)="filtro.set('agotados')">Agotados · {{ conteo().agotados }}</button>
-      <button type="button" [class.activo]="filtro() === 'todos'" (click)="filtro.set('todos')">Todos · {{ conteo().todos }}</button>
+    <div class="segmentado" role="group" aria-label="Filtrar por estado del stock">
+      <button type="button" [attr.aria-pressed]="filtro() === 'alerta'" (click)="cambiarFiltro('alerta')">Bajo el mínimo · {{ conteo().alerta }}</button>
+      <button type="button" [attr.aria-pressed]="filtro() === 'agotados'" (click)="cambiarFiltro('agotados')">Agotados · {{ conteo().agotados }}</button>
+      <button type="button" [attr.aria-pressed]="filtro() === 'todos'" (click)="cambiarFiltro('todos')">Todos · {{ conteo().todos }}</button>
     </div>
-    <label class="sr-only" for="buscar-producto">Buscar producto</label>
-    <input id="buscar-producto" class="input buscar" type="search" placeholder="Buscar producto o categoría…" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+    <div class="input-icono buscar">
+      <app-icono nombre="buscar" [tamano]="16" />
+      <label class="sr-only" for="buscar-producto">Buscar producto</label>
+      <input id="buscar-producto" class="input" type="search" placeholder="Producto, categoría o código"
+        [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event); pagina.set(1)" />
+    </div>
   </div>
 
-  <div class="bloque tabla-envoltura">
-    <table class="tabla">
-      <thead>
-        <tr>
-          <th>Producto</th>
-          @if (todas()) {
-            <th>Tienda</th>
-          }
-          <th>Stock</th>
-          <th class="num">Mínimo</th>
-          <th class="num">Objetivo</th>
-          <th>Estado</th>
-          <th><span class="sr-only">Acciones</span></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (f of visibles(); track f.id) {
-          <tr>
-            <td>
-              <span class="producto">{{ f.producto }}</span>
-              <span class="suave">{{ f.categoria }} · {{ f.precio | soles }}</span>
-            </td>
-            @if (todas()) {
-              <td class="suave">{{ gestion.nombreTienda(f.tiendaId) }}</td>
+  <div class="bloque sin-relleno">
+    @if (error()) {
+      <app-estado-vista tipo="error" titulo="No se pudo cargar el inventario" [texto]="error()!" (reintentar)="cargar()" />
+    } @else if (cargando() && !filas().length) {
+      <app-estado-vista tipo="cargando" titulo="Cargando inventario…" />
+    } @else if (!filtradas().length) {
+      <app-estado-vista titulo="Nada coincide con el filtro" texto="Prueba con otro estado o cambia la búsqueda." icono="buscar" />
+    } @else {
+      <div class="tabla-envoltura">
+        <table class="tabla" data-tour="stock">
+          <caption class="sr-only">Stock por producto</caption>
+          <thead>
+            <tr>
+              <th scope="col" [attr.aria-sort]="ordenDe('producto')"><button type="button" (click)="ordenarPor('producto')">Producto <app-icono nombre="ordenarCol" [tamano]="12" /></button></th>
+              <th scope="col">Código</th>
+              @if (todas()) {
+                <th scope="col" [attr.aria-sort]="ordenDe('tienda')"><button type="button" (click)="ordenarPor('tienda')">Sede <app-icono nombre="ordenarCol" [tamano]="12" /></button></th>
+              }
+              <th scope="col" class="num" [attr.aria-sort]="ordenDe('stock')"><button type="button" (click)="ordenarPor('stock')">Stock <app-icono nombre="ordenarCol" [tamano]="12" /></button></th>
+              <th scope="col" class="num">Mínimo</th>
+              <th scope="col" class="num">Objetivo</th>
+              <th scope="col" class="num" title="Unidades en el almacén de la tienda, listas para reponer el piso">Almacén</th>
+              <th scope="col" [attr.aria-sort]="ordenDe('cobertura')"><button type="button" (click)="ordenarPor('cobertura')">Estado <app-icono nombre="ordenarCol" [tamano]="12" /></button></th>
+              <th scope="col"><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (f of visibles(); track f.id) {
+              <tr>
+                <td>
+                  <span class="producto">{{ f.producto }}</span>
+                  <span class="suave detalle">{{ f.categoria }} · {{ f.precio | soles }}</span>
+                </td>
+                <td><span class="codigo">{{ codigo(f) }}</span></td>
+                @if (todas()) {
+                  <td class="suave">{{ gestion.nombreTienda(f.tiendaId) }}</td>
+                }
+                <td class="num"><strong class="stock">{{ f.stock }}</strong></td>
+                <td class="num">{{ f.stockMinimo }}</td>
+                <td class="num">{{ f.stockObjetivo }}</td>
+                <td class="num" [class.sin-almacen]="f.almacen === 0">{{ f.almacen === 0 ? 'Sin stock' : f.almacen }}</td>
+                <td>
+                  @if (f.pedidoEnCurso) {
+                    <a class="estado azul" routerLink="../compras"><app-icono nombre="envio" [tamano]="13" />Pedido en curso</a>
+                  } @else if (f.estado === 'AGOTADO') {
+                    <span class="estado rojo"><app-icono nombre="error" [tamano]="13" />Agotado</span>
+                  } @else if (f.estado === 'BAJO') {
+                    <span class="estado ambar"><app-icono nombre="alerta" [tamano]="13" />Bajo el mínimo</span>
+                  } @else {
+                    <span class="estado verde"><app-icono nombre="hecho" [tamano]="13" />Normal</span>
+                  }
+                </td>
+                <td class="acciones">
+                  @if (!f.pedidoEnCurso) {
+                    <button type="button" class="btn btn-sm btn-secondary" (click)="abrirPedido(f)" [attr.aria-expanded]="pidiendo() === f.id">Pedir</button>
+                  }
+                  @if (sesion.esAdmin()) {
+                    <button type="button" class="btn btn-sm btn-ghost" (click)="abrirNiveles(f)" [attr.aria-expanded]="editando() === f.id">Niveles</button>
+                  }
+                </td>
+              </tr>
+              @if (pidiendo() === f.id) {
+                <tr class="panel">
+                  <td [attr.colspan]="todas() ? 9 : 8">
+                    <form class="formulario-linea" (ngSubmit)="pedir(f)">
+                      <label>
+                        Unidades a pedir
+                        <input class="input" type="number" name="cantidad" min="1" max="500" [(ngModel)]="cantidad" [attr.aria-describedby]="'sug-' + f.id" />
+                      </label>
+                      <p class="campo-ayuda sugerencia" [id]="'sug-' + f.id">
+                        Sugerido: {{ f.stockObjetivo - f.stock }} para llegar al objetivo de {{ f.stockObjetivo }}. La administración debe aprobarlo.
+                      </p>
+                      <div class="botones">
+                        <button type="submit" class="btn btn-primary" [disabled]="cantidad < 1 || enviando()" [attr.aria-busy]="enviando()">
+                          {{ enviando() ? 'Enviando…' : 'Enviar pedido' }}
+                        </button>
+                        <button type="button" class="btn btn-ghost" (click)="pidiendo.set(null)">Cancelar</button>
+                      </div>
+                    </form>
+                  </td>
+                </tr>
+              }
+              @if (editando() === f.id) {
+                <tr class="panel">
+                  <td [attr.colspan]="todas() ? 9 : 8">
+                    <form class="formulario-linea" (ngSubmit)="guardarNiveles(f)">
+                      <label>
+                        Stock mínimo
+                        <input class="input" type="number" name="minimo" min="0" [(ngModel)]="minimo" />
+                      </label>
+                      <label>
+                        Stock objetivo
+                        <input class="input" type="number" name="objetivo" min="1" [(ngModel)]="objetivo" [attr.aria-invalid]="objetivo <= minimo" />
+                      </label>
+                      @if (objetivo <= minimo) {
+                        <p class="campo-error">El objetivo debe ser mayor que el mínimo.</p>
+                      }
+                      <div class="botones">
+                        <button type="submit" class="btn btn-primary" [disabled]="objetivo <= minimo">Guardar niveles</button>
+                        <button type="button" class="btn btn-ghost" (click)="editando.set(null)">Cancelar</button>
+                      </div>
+                    </form>
+                  </td>
+                </tr>
+              }
             }
-            <td>
-              <div class="nivel">
-                <strong>{{ f.stock }}</strong>
-                <span class="barra" [attr.data-estado]="f.estado"><span [style.width.%]="nivel(f)"></span></span>
-              </div>
-            </td>
-            <td class="num">{{ f.stockMinimo }}</td>
-            <td class="num">{{ f.stockObjetivo }}</td>
-            <td>
-              @if (f.pedidoEnCurso) {
-                <a class="estado azul" routerLink="../compras">Pedido en curso</a>
-              } @else {
-                <span class="estado" [class]="claseEstado(f.estado)">
-                  {{ f.estado === 'AGOTADO' ? 'Agotado' : f.estado === 'BAJO' ? 'Bajo el mínimo' : 'Normal' }}
-                </span>
-              }
-            </td>
-            <td class="acciones">
-              @if (!f.pedidoEnCurso) {
-                <button type="button" class="btn btn-sm btn-secondary" (click)="abrirPedido(f)">Pedir</button>
-              }
-              @if (sesion.esAdmin()) {
-                <button type="button" class="btn btn-sm btn-ghost" (click)="abrirNiveles(f)">Niveles</button>
-              }
-            </td>
-          </tr>
-          @if (pidiendo() === f.id) {
-            <tr class="panel">
-              <td [attr.colspan]="todas() ? 7 : 6">
-                <form class="formulario-linea" (ngSubmit)="pedir(f)">
-                  <label>
-                    Unidades a pedir
-                    <input class="input" type="number" name="cantidad" min="1" max="500" [(ngModel)]="cantidad" />
-                  </label>
-                  <p class="sugerencia">Sugerido: {{ f.stockObjetivo - f.stock }} para llegar al objetivo de {{ f.stockObjetivo }}.</p>
-                  <div class="botones">
-                    <button type="submit" class="btn btn-primary" [disabled]="cantidad < 1">Enviar pedido</button>
-                    <button type="button" class="btn btn-ghost" (click)="pidiendo.set(null)">Cancelar</button>
-                  </div>
-                </form>
-              </td>
-            </tr>
-          }
-          @if (editando() === f.id) {
-            <tr class="panel">
-              <td [attr.colspan]="todas() ? 7 : 6">
-                <form class="formulario-linea" (ngSubmit)="guardarNiveles(f)">
-                  <label>
-                    Stock mínimo
-                    <input class="input" type="number" name="minimo" min="0" [(ngModel)]="minimo" />
-                  </label>
-                  <label>
-                    Stock objetivo
-                    <input class="input" type="number" name="objetivo" min="1" [(ngModel)]="objetivo" />
-                  </label>
-                  <div class="botones">
-                    <button type="submit" class="btn btn-primary" [disabled]="objetivo <= minimo">Guardar</button>
-                    <button type="button" class="btn btn-ghost" (click)="editando.set(null)">Cancelar</button>
-                  </div>
-                </form>
-              </td>
-            </tr>
-          }
-        } @empty {
-          <tr>
-            <td colspan="7" class="suave">{{ cargando() ? 'Cargando inventario…' : 'Nada coincide con el filtro.' }}</td>
-          </tr>
-        }
-      </tbody>
-    </table>
+          </tbody>
+        </table>
+      </div>
+      <nav class="paginacion" aria-label="Páginas del inventario">
+        <span>{{ rango() }}</span>
+        <div class="botones">
+          <button type="button" class="btn btn-sm btn-secondary" [disabled]="pagina() <= 1" (click)="pagina.set(pagina() - 1)">
+            <app-icono nombre="anterior" [tamano]="14" />Anterior
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary" [disabled]="pagina() >= paginas()" (click)="pagina.set(pagina() + 1)">
+            Siguiente<app-icono nombre="siguiente" [tamano]="14" />
+          </button>
+        </div>
+      </nav>
+    }
   </div>
 </main>

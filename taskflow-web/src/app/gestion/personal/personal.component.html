@@ -1,0 +1,147 @@
+<main class="gestion-pagina">
+  <header class="gestion-cabecera">
+    <div>
+      <h1 class="page-title">Personal</h1>
+      <p>
+        Quién está trabajando, quién está libre para recibir una orden y quién falta hoy. Los turnos son de 8 horas:
+        mañana 07:00–15:00, tarde 15:00–23:00 y noche 23:00–07:00.
+      </p>
+    </div>
+    <div class="cabecera-acciones">
+      <a class="btn btn-secondary" routerLink="../tablero"><app-icono nombre="tablero" [tamano]="16" />Órdenes de trabajo</a>
+    </div>
+  </header>
+
+  <section class="kpis" aria-label="Personal por estado" data-tour="personal">
+    <button type="button" class="kpi" [attr.aria-pressed]="filtro() === 'TRABAJANDO'" (click)="filtro.set(filtro() === 'TRABAJANDO' ? 'todos' : 'TRABAJANDO')">
+      <span class="kpi-nombre">Trabajando ahora</span><strong>{{ conteo().TRABAJANDO }}</strong>
+      <span class="kpi-detalle">con una orden en curso</span>
+    </button>
+    <button type="button" class="kpi" [attr.aria-pressed]="filtro() === 'DISPONIBLE'" (click)="filtro.set(filtro() === 'DISPONIBLE' ? 'todos' : 'DISPONIBLE')">
+      <span class="kpi-nombre">Disponibles</span><strong>{{ conteo().DISPONIBLE }}</strong>
+      <span class="kpi-detalle">en turno y sin orden</span>
+    </button>
+    <button type="button" class="kpi" [attr.aria-pressed]="filtro() === 'FUERA_DE_TURNO'" (click)="filtro.set(filtro() === 'FUERA_DE_TURNO' ? 'todos' : 'FUERA_DE_TURNO')">
+      <span class="kpi-nombre">Fuera de turno o libres</span><strong>{{ conteo().FUERA_DE_TURNO }}</strong>
+      <span class="kpi-detalle">otro horario o su día libre</span>
+    </button>
+    <button type="button" class="kpi" [class.kpi-alerta]="conteo().AUSENTE > 0" [attr.aria-pressed]="filtro() === 'AUSENTE'"
+      (click)="filtro.set(filtro() === 'AUSENTE' ? 'todos' : 'AUSENTE')">
+      <span class="kpi-nombre">Ausentes</span><strong>{{ conteo().AUSENTE }}</strong>
+      <span class="kpi-detalle">descanso médico, vacaciones o permiso</span>
+    </button>
+  </section>
+
+  <div class="herramientas">
+    <div class="segmentado" role="group" aria-label="Filtrar por puesto">
+      <button type="button" [attr.aria-pressed]="!puesto()" (click)="puesto.set('')">Todos · {{ conteo().todos }}</button>
+      @for (p of puestos; track p) {
+        <button type="button" [attr.aria-pressed]="puesto() === p" (click)="puesto.set(p)">{{ nombrePuesto[p] }}</button>
+      }
+    </div>
+    @if (filtro() !== 'todos') {
+      <button type="button" class="btn btn-ghost btn-sm" (click)="filtro.set('todos')">Ver todos los estados</button>
+    }
+  </div>
+
+  <section class="bloque sin-relleno" aria-label="Lista del personal">
+    @if (error()) {
+      <app-estado-vista tipo="error" titulo="No se pudo cargar el personal" [texto]="error()!" (reintentar)="cargar()" />
+    } @else {
+      <ul class="personas">
+        @for (e of visibles(); track e.id) {
+          <li class="persona" [attr.data-estado]="e.estado" [attr.data-empleado]="e.id">
+            <span class="avatar" aria-hidden="true">{{ iniciales(e.nombre) }}</span>
+            <div class="quien">
+              <p class="nombre">{{ e.nombre }}</p>
+              <p class="puesto">
+                {{ nombrePuesto[e.puesto] }} · turno {{ e.turno === 'MANANA' ? 'mañana' : e.turno.toLowerCase() }} {{ e.horario }}
+                @if (e.diaLibre) { · libre los {{ dias[e.diaLibre] }} }
+                @if (todas()) { · {{ gestion.nombreTienda(e.tiendaId) }} }
+              </p>
+            </div>
+
+            <div class="ahora">
+              <span class="estado" [class.verde]="e.estado === 'DISPONIBLE'" [class.marca]="e.estado === 'TRABAJANDO'"
+                [class.rojo]="e.estado === 'AUSENTE'" [class.azul]="e.estado === 'LIBRE_HOY'">
+                {{ e.estado === 'AUSENTE' && e.disponibilidad !== 'ACTIVO' ? nombreAusencia[e.disponibilidad] : nombreEstado[e.estado] }}
+              </span>
+              @if (e.estado === 'TRABAJANDO') {
+                <p class="detalle">
+                  <a routerLink="../tablero">#{{ e.tareaId }} {{ e.tareaTitulo }}</a>
+                </p>
+                <span class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="avance(e)"
+                  [attr.aria-label]="'Avance de la orden de ' + e.nombre"><span [style.width.%]="avance(e)"></span></span>
+              } @else if (e.estado === 'AUSENTE') {
+                <p class="detalle">
+                  {{ e.motivo }}
+                  @if (e.ausenteDesde) { · desde {{ e.ausenteDesde | date: 'd MMM' }} }
+                  {{ e.ausenteHasta ? '· vuelve el ' + (e.ausenteHasta | date: 'd MMM') : '· sin fecha de retorno' }}
+                </p>
+              } @else if (e.estado === 'LIBRE_HOY') {
+                <p class="detalle">Descansa los {{ dias[e.diaLibre ?? 0] }}: no se le asignan órdenes hoy.</p>
+              } @else if (e.estado === 'DISPONIBLE') {
+                <p class="detalle">Libre para recibir una orden.</p>
+              } @else {
+                <p class="detalle">Su turno es {{ e.horario }}.</p>
+              }
+            </div>
+
+            <div class="turno">
+              @if (e.estado === 'TRABAJANDO' || e.estado === 'DISPONIBLE') {
+                <span class="turno-texto">Turno al {{ e.avanceTurno }}%</span>
+                <span class="barra fina" role="progressbar" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="e.avanceTurno"
+                  [attr.aria-label]="'Avance del turno de ' + e.nombre"><span [style.width.%]="e.avanceTurno"></span></span>
+              }
+            </div>
+
+            <div class="acciones">
+              <button type="button" class="btn btn-ghost btn-sm" (click)="telefono.abrir(e)">Ver su app</button>
+              @if (e.estado === 'AUSENTE') {
+                <button type="button" class="btn btn-secondary btn-sm" [disabled]="trabajando() === e.id" (click)="reincorporar(e)">Reincorporar</button>
+              } @else {
+                <button type="button" class="btn btn-ghost btn-sm" [disabled]="trabajando() === e.id" (click)="abrirAusencia(e)">Registrar ausencia</button>
+              }
+            </div>
+          </li>
+        } @empty {
+          <li>
+            <app-estado-vista [tipo]="cargando() ? 'cargando' : 'vacio'" [titulo]="cargando() ? 'Cargando…' : 'Nadie coincide con el filtro'" icono="usuarios" />
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</main>
+
+<dialog #dialogo class="dialogo" (close)="ausencia.set(null)" aria-labelledby="ausencia-titulo">
+  @if (ausencia(); as e) {
+    <form (ngSubmit)="guardarAusencia()">
+      <h2 id="ausencia-titulo">Ausencia de {{ e.nombre }}</h2>
+      <p class="suave">
+        {{ e.tareaId ? 'Tiene la orden #' + e.tareaId + ' en curso: quedará libre para asignarla a otra persona.' : 'No podrá recibir órdenes hasta que se reincorpore.' }}
+      </p>
+      <label class="campo">
+        <span>Tipo</span>
+        <select class="input" name="tipo" [(ngModel)]="tipo">
+          @for (t of tiposAusencia; track t) {
+            <option [value]="t">{{ nombreAusencia[t] }}</option>
+          }
+        </select>
+      </label>
+      <label class="campo">
+        <span>Motivo</span>
+        <input class="input" name="motivo" maxlength="200" required [(ngModel)]="motivo"
+          [placeholder]="tipo === 'DESCANSO_MEDICO' ? 'Por ejemplo: gripe, con certificado médico' : 'Por ejemplo: vacaciones programadas'" />
+      </label>
+      <label class="campo">
+        <span>Vuelve el (opcional)</span>
+        <input class="input" type="date" name="hasta" [min]="hoy()" [(ngModel)]="hasta" />
+      </label>
+      <div class="dialogo-acciones">
+        <button type="button" class="btn btn-ghost" (click)="ausencia.set(null)">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!motivo.trim() || trabajando() === e.id">Registrar ausencia</button>
+      </div>
+    </form>
+  }
+</dialog>

@@ -1,59 +1,73 @@
-.nota-admin {
-  padding: 14px 16px;
-  margin: 0 0 16px;
-  background: var(--info-bg);
-  color: var(--info-text);
+.ayuda {
+  margin: 10px 0 0;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .input {
+    width: auto;
+  }
 }
 
 .incidencia {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px 16px;
-  padding: 14px 0;
+  padding: 14px 0 14px 0;
 
   & + & {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--tf-border);
   }
 
-  &.resuelta .titulo {
-    color: var(--text-secondary);
+  // Las graves sin resolver llevan una marca lateral, sin teñir toda la fila.
+  &.grave {
+    padding-left: 12px;
+    box-shadow: inset 3px 0 0 var(--tf-danger);
   }
 }
 
 .titulo {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  align-items: baseline;
   gap: 8px;
   margin: 0;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-.suave {
-  margin: 4px 0 0;
+.etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+
+.meta {
+  margin: 8px 0 0;
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--tf-text-secondary);
 
   a {
-    color: inherit;
+    color: var(--tf-primary);
   }
 }
 
-.descripcion {
+.descripcion,
+.solucion {
   margin: 6px 0 0;
   font-size: 14px;
+}
+
+.solucion {
+  color: var(--tf-text-secondary);
 }
 
 .acciones {
   display: flex;
   align-items: flex-start;
   gap: 6px;
-}
-
-.resolver {
-  grid-column: 1 / -1;
-  display: flex;
-  gap: 8px;
 }
 
 @media (max-width: 640px) {

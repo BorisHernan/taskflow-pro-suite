@@ -3,8 +3,8 @@
     <div>
       <h1 class="page-title">Reportes</h1>
       <p>
-        Exporta en CSV {{ gestion.tiendaActiva() == null ? 'las tres tiendas' : gestion.nombreTienda(gestion.tiendaActiva()) }}.
-        Cambia la tienda en el menú de la izquierda.
+        Exportación en CSV de {{ gestion.tiendaActiva() == null ? 'las tres sedes' : gestion.nombreTienda(gestion.tiendaActiva()) }}.
+        Cambia la sede en la barra superior. Los archivos abren en Excel con tildes correctas.
       </p>
     </div>
   </header>
@@ -13,7 +13,7 @@
     <div class="alerta alerta-error" role="alert">{{ error() }}</div>
   }
 
-  <section class="bloque">
+  <section class="bloque" aria-label="Periodo" data-tour="reportes">
     <form class="formulario-linea rango">
       <label>
         Desde
@@ -35,6 +35,7 @@
           <p class="suave">{{ r.usaFechas ? 'Del ' + desde + ' al ' + hasta : 'Estado actual, sin rango de fechas' }}</p>
         </div>
         <button type="button" class="btn btn-secondary" [disabled]="descargando() !== null" (click)="descargar(r)">
+          <app-icono nombre="descargar" [tamano]="16" />
           {{ descargando() === r.tipo ? 'Generando…' : 'Descargar CSV' }}
         </button>
       </li>

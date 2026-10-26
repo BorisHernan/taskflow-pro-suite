@@ -1,0 +1,176 @@
+<main class="operaciones">
+  <header class="cabecera">
+    <div>
+      <h1 class="page-title">Centro de operaciones</h1>
+      <p>
+        Arrastra a cada persona a su puesto o a una orden. Cada movimiento le llega como aviso con lo que debe hacer.
+        @if (elegida(); as e) {
+          <strong class="elegida-texto">Elegiste a {{ e.nombre }}: toca un puesto o una orden.</strong>
+        }
+      </p>
+    </div>
+    <nav class="atajos" aria-label="Módulos relacionados">
+      <a routerLink="../tablero">Órdenes de trabajo</a>
+      <a routerLink="../personal">Personal</a>
+      <a routerLink="../pedidos-online">Pedidos online</a>
+      <a routerLink="../turnos">Turnos</a>
+    </nav>
+  </header>
+
+  @if (sinSede()) {
+    <p class="alerta"><app-icono nombre="info" [tamano]="16" /><span>Elige una sede en la barra superior para ver su centro de operaciones.</span></p>
+  } @else if (error()) {
+    <p class="alerta"><app-icono nombre="error" [tamano]="16" /><span>{{ error() }}</span></p>
+  } @else {
+    @if (alertas().length) {
+      <section class="alertas" aria-label="Lo que la tienda necesita ahora">
+        @for (a of alertas(); track a.texto) {
+          <div class="alerta-op">
+            <app-icono nombre="alerta" [tamano]="16" />
+            <span>{{ a.texto }}</span>
+            @if (a.accion) {
+              <button type="button" class="btn btn-sm btn-primary" (click)="resolver(a)">{{ a.accion }}</button>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    <div class="tablero">
+      <!-- Equipo de hoy -->
+      <section class="panel equipo" aria-labelledby="equipo-titulo" data-tour="equipo">
+        <h2 id="equipo-titulo">Equipo de hoy <span class="contador">{{ presentes().length }}</span></h2>
+        <p class="panel-ayuda">En turno y en la tienda. Sin puesto fijo:</p>
+        <div class="bandeja" cdkDropList id="bandeja" [cdkDropListConnectedTo]="zonas()" [cdkDropListData]="sinPuesto()"
+          (cdkDropListDropped)="soltar($event)" [class.destino]="elegida()" (click)="tocarPuesto(null)">
+          @for (e of sinPuesto(); track e.id) {
+            <div class="ficha" cdkDrag [cdkDragData]="e" [attr.data-empleado]="e.id" [class.trabajando]="e.estado === 'TRABAJANDO'" [class.elegida]="elegida()?.id === e.id"
+              (click)="$event.stopPropagation(); elegir(e)" role="button" tabindex="0" (keydown.enter)="elegir(e)"
+              [attr.aria-pressed]="elegida()?.id === e.id" [attr.aria-label]="e.nombre + ', ' + nombrePuesto[e.puesto]">
+              <span class="avatar">{{ iniciales(e.nombre) }}</span>
+              <span class="ficha-texto">
+                <strong>{{ primerNombre(e.nombre) }}</strong>
+                <small>{{ e.estado === 'TRABAJANDO' ? '#' + e.tareaId + ' en curso' : nombrePuesto[e.puesto] }}</small>
+              </span>
+              <div class="ficha-arrastre" *cdkDragPreview><span class="avatar">{{ iniciales(e.nombre) }}</span>{{ e.nombre }}</div>
+            </div>
+          } @empty {
+            <p class="vacio">Todos tienen puesto. Suelta aquí para dejar a alguien libre.</p>
+          }
+        </div>
+
+        <h3>No disponibles hoy</h3>
+        <ul class="fuera">
+          @for (e of libresHoy(); track e.id) {
+            <li><span class="avatar apagado">{{ iniciales(e.nombre) }}</span><span>{{ e.nombre }}<small>Libre los {{ dias[e.diaLibre ?? 0] }}</small></span></li>
+          }
+          @for (e of ausentes(); track e.id) {
+            <li>
+              <span class="avatar ausente">{{ iniciales(e.nombre) }}</span>
+              <span>{{ e.nombre }}<small>{{ e.disponibilidad !== 'ACTIVO' ? nombreAusencia[e.disponibilidad] : 'Ausente' }} · {{ e.motivo }}</small></span>
+            </li>
+          }
+          @if (!libresHoy().length && !ausentes().length) {
+            <li class="vacio">Nadie falta hoy.</li>
+          }
+        </ul>
+        <p class="panel-ayuda">{{ fueraDeTurno() }} {{ fueraDeTurno() === 1 ? 'persona entra' : 'personas entran' }} en otro turno. <a routerLink="../personal">Ver personal</a></p>
+      </section>
+
+      <!-- Plano de la tienda -->
+      <section class="panel plano" aria-labelledby="plano-titulo" data-tour="plano">
+        <h2 id="plano-titulo">Plano de la tienda</h2>
+        @for (grupo of ['entrada', 'cajas', 'interior']; track grupo) {
+          <div class="fila" [attr.data-grupo]="grupo">
+            @for (st of estaciones; track st.clave) {
+              @if (st.grupo === grupo) {
+                <div class="estacion" cdkDropList [id]="'puesto-' + st.clave" [cdkDropListConnectedTo]="zonas()" [cdkDropListData]="enPuesto(st.clave)"
+                  (cdkDropListDropped)="soltar($event)" [class.vacia]="!enPuesto(st.clave).length" [class.destino]="elegida()"
+                  (click)="tocarPuesto(st.clave)" [attr.aria-label]="st.nombre + ': ' + enPuesto(st.clave).length + ' personas'">
+                  <p class="estacion-nombre">
+                    {{ st.nombre }}
+                    @if (st.grupo === 'cajas') {
+                      <span class="estado" [class.verde]="enPuesto(st.clave).length" >{{ enPuesto(st.clave).length ? 'Abierta' : 'Cerrada' }}</span>
+                    }
+                  </p>
+                  @if (st.ayuda) {
+                    <p class="estacion-ayuda">{{ st.ayuda }}</p>
+                  }
+                  <div class="estacion-personas">
+                    @for (e of enPuesto(st.clave); track e.id) {
+                      <div class="ficha" cdkDrag [cdkDragData]="e" [attr.data-empleado]="e.id" [class.trabajando]="e.estado === 'TRABAJANDO'" [class.elegida]="elegida()?.id === e.id"
+              (click)="$event.stopPropagation(); elegir(e)" role="button" tabindex="0" (keydown.enter)="elegir(e)"
+              [attr.aria-pressed]="elegida()?.id === e.id" [attr.aria-label]="e.nombre + ', ' + nombrePuesto[e.puesto]">
+              <span class="avatar">{{ iniciales(e.nombre) }}</span>
+              <span class="ficha-texto">
+                <strong>{{ primerNombre(e.nombre) }}</strong>
+                <small>{{ e.estado === 'TRABAJANDO' ? '#' + e.tareaId + ' en curso' : nombrePuesto[e.puesto] }}</small>
+              </span>
+              <div class="ficha-arrastre" *cdkDragPreview><span class="avatar">{{ iniciales(e.nombre) }}</span>{{ e.nombre }}</div>
+            </div>
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Órdenes y avisos -->
+      <section class="panel lateral" aria-labelledby="ordenes-titulo" data-tour="ordenes-op">
+        <h2 id="ordenes-titulo">Órdenes</h2>
+        <p class="resumen-ordenes">
+          <span><strong>{{ porHacer().length }}</strong> por hacer</span>
+          <span><strong>{{ enCurso().length }}</strong> en progreso</span>
+          <span><strong>{{ hechasHoy() }}</strong> hechas hoy</span>
+        </p>
+        <div class="ordenes">
+          @for (t of porHacer(); track t.id) {
+            <div class="orden" cdkDropList [id]="'orden-' + t.id" [cdkDropListConnectedTo]="zonas()" [cdkDropListData]="[]"
+              (cdkDropListDropped)="soltar($event)" [class.destino]="elegida()" (click)="tocarOrden(t)">
+              <p class="orden-meta">
+                <span class="codigo">#{{ t.id }}</span> {{ nombreTipo[t.tipo ?? 'MANUAL'] }}
+                @if (t.prioridad === 'CRITICA' || t.prioridad === 'ALTA') {
+                  <span class="estado" [class.rojo]="t.prioridad === 'CRITICA'" [class.ambar]="t.prioridad === 'ALTA'">{{ t.prioridad === 'CRITICA' ? 'Crítica' : 'Alta' }}</span>
+                }
+              </p>
+              <p class="orden-titulo">{{ t.title }}</p>
+              <p class="orden-pie">{{ sinAlmacen(t) ? 'Sin almacén: pedir al distribuidor' : 'Suelta aquí a quien la hará' }}</p>
+            </div>
+          }
+          @for (t of enCurso(); track t.id) {
+            <div class="orden en-curso" [attr.data-tarea]="t.id">
+              <p class="orden-meta"><span class="codigo">#{{ t.id }}</span> {{ nombreTipo[t.tipo ?? 'MANUAL'] }}</p>
+              <p class="orden-titulo">{{ t.title }}</p>
+              @if (t.empleadoId) {
+                <div class="progreso">
+                  <span class="avatar mini">{{ iniciales(t.asignadoA) }}</span>
+                  <span class="barra"><span [style.width.%]="avance(t)"></span></span>
+                  <span class="porcentaje">{{ avance(t) }}%</span>
+                </div>
+              } @else {
+                <p class="orden-pie">{{ t.tipo === 'REPOSICION' ? 'Esperando al distribuidor' : 'En curso, sin persona asignada' }}</p>
+              }
+            </div>
+          }
+          @if (!porHacer().length && !enCurso().length) {
+            <p class="vacio">{{ cargando() ? 'Cargando…' : 'No hay órdenes pendientes.' }}</p>
+          }
+        </div>
+
+        <h2 class="avisos-titulo">Avisos al personal</h2>
+        <ul class="feed" aria-live="polite">
+          @for (a of feed(); track a.id) {
+            <li>
+              <span class="avatar mini">{{ iniciales(a.empleado) }}</span>
+              <span>{{ a.mensaje }}<small>{{ a.creadoEn | date: 'HH:mm' }}</small></span>
+            </li>
+          } @empty {
+            <li class="vacio">Aún no se envió ningún aviso hoy.</li>
+          }
+        </ul>
+      </section>
+    </div>
+  }
+</main>

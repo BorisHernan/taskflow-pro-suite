@@ -1,6 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GestionService, mensajeDeError } from '../gestion.service';
+import { IconoComponent } from '../../shared/icono/icono.component';
+import { AvisosService } from '../../shared/ui/avisos.service';
 
 interface Reporte {
   tipo: string;
@@ -17,12 +19,13 @@ function isoDia(d: Date): string {
 @Component({
   selector: 'app-reportes',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, IconoComponent],
   templateUrl: './reportes.component.html',
   styleUrl: './reportes.component.scss',
 })
 export class ReportesComponent {
   readonly gestion = inject(GestionService);
+  private readonly avisos = inject(AvisosService);
 
   readonly reportes: Reporte[] = [
     { tipo: 'ventas', nombre: 'Ventas', detalle: 'Cada compra de la tienda online con su sede, producto, cantidad y total.', usaFechas: true },
@@ -50,6 +53,7 @@ export class ReportesComponent {
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
         this.descargando.set(null);
+        this.avisos.exito(`Descargado ${nombre}.`);
       },
       error: (err) => {
         this.descargando.set(null);

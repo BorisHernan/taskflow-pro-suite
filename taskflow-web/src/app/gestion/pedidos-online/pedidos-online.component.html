@@ -1,0 +1,80 @@
+<main class="gestion-pagina">
+  <header class="gestion-cabecera">
+    <div>
+      <h1 class="page-title">Pedidos online</h1>
+      <p>Compras de la tienda online. Cada una llega con su tarea en el tablero; al avanzarla aquí, el cliente lo ve en su seguimiento.</p>
+    </div>
+    <div class="cabecera-acciones">
+      <a class="btn btn-secondary" routerLink="/tienda" target="_blank" rel="noopener">
+        <app-icono nombre="tienda" [tamano]="16" />Abrir la tienda
+      </a>
+    </div>
+  </header>
+
+  <section class="kpis" aria-label="Pedidos por estado" data-tour="pedidos-online">
+    <div class="kpi"><span class="kpi-nombre">Por empezar</span><strong>{{ kpis().nuevos }}</strong></div>
+    <div class="kpi"><span class="kpi-nombre">Preparando</span><strong>{{ kpis().preparando }}</strong></div>
+    <div class="kpi"><span class="kpi-nombre">Listos o en camino</span><strong>{{ kpis().salida }}</strong></div>
+    <div class="kpi"><span class="kpi-nombre">Entregados</span><strong>{{ kpis().entregados }}</strong></div>
+  </section>
+
+  <div class="herramientas">
+    <div class="segmentado" role="group" aria-label="Filtrar pedidos">
+      <button type="button" [attr.aria-pressed]="filtro() === 'pendientes'" (click)="filtro.set('pendientes')">Por atender · {{ pendientes().length }}</button>
+      <button type="button" [attr.aria-pressed]="filtro() === 'entregados'" (click)="filtro.set('entregados')">Entregados · {{ entregados().length }}</button>
+    </div>
+  </div>
+
+  <section class="bloque" aria-label="Lista de pedidos">
+    @if (error()) {
+      <app-estado-vista tipo="error" titulo="No se pudieron cargar los pedidos" [texto]="error()!" (reintentar)="cargar()" />
+    } @else {
+      @for (v of visibles(); track v.orden.id) {
+        <article class="pedido" [attr.data-orden]="v.orden.codigo" [class.urgente]="v.orden.modalidad === 'ENVIO' && v.orden.estado === 'RECIBIDA'">
+          <div class="info">
+            <p class="titulo">
+              <span class="codigo">{{ v.orden.codigo }}</span>
+              {{ v.orden.clienteNombre }}
+            </p>
+            <p class="etiquetas">
+              <span class="estado" [class.azul]="v.orden.modalidad === 'ENVIO'">
+                <app-icono [nombre]="v.orden.modalidad === 'ENVIO' ? 'envio' : 'sede'" [tamano]="13" />
+                {{ v.orden.modalidad === 'ENVIO' ? 'Envío en ' + vehiculo(v) + (v.orden.distanciaKm != null ? ' · ' + v.orden.distanciaKm + ' km' : '') : 'Recojo en tienda' }}
+              </span>
+              <span class="estado" [class.ambar]="v.orden.estado === 'RECIBIDA'" [class.marca]="v.orden.estado === 'PREPARANDO'"
+                [class.verde]="v.orden.estado === 'ENTREGADA'">
+                <app-icono [nombre]="v.orden.estado === 'ENTREGADA' ? 'hecho' : 'reloj'" [tamano]="13" />{{ nombreEstado[v.orden.estado] }}
+              </span>
+            </p>
+            <p class="productos">
+              @for (l of v.lineas; track $index) {
+                <span>{{ l.cantidad }} × {{ l.producto }}</span>
+              }
+            </p>
+            <p class="meta">
+              {{ v.orden.creadaEn | date: 'd MMM, HH:mm' }} · {{ unidades(v) }} {{ unidades(v) === 1 ? 'unidad' : 'unidades' }} · {{ v.orden.total | soles }}
+              @if (todas()) { · {{ v.tiendaNombre }} }
+              @if (v.orden.direccion) { · {{ v.orden.direccion }} }
+              @if (v.orden.tareaId) { · <a routerLink="../tablero">Tarea #{{ v.orden.tareaId }}</a> }
+              · <a [routerLink]="['/tienda/pedido', v.orden.codigo]" target="_blank" rel="noopener">Ver como cliente</a>
+            </p>
+          </div>
+          @if (siguiente(v.orden); as s) {
+            <div class="acciones">
+              <button type="button" class="btn btn-primary btn-sm" [disabled]="trabajando() === v.orden.id" (click)="avanzar(v, s.estado)">
+                {{ trabajando() === v.orden.id ? 'Guardando…' : s.accion }}
+              </button>
+            </div>
+          }
+        </article>
+      } @empty {
+        <app-estado-vista
+          [tipo]="cargando() ? 'cargando' : 'vacio'"
+          [titulo]="cargando() ? 'Cargando…' : filtro() === 'pendientes' ? 'No hay pedidos por atender' : 'Aún no se entregó ningún pedido'"
+          [texto]="cargando() ? '' : 'Haz una compra en la tienda online y aparecerá aquí al instante.'"
+          icono="carrito"
+        />
+      }
+    }
+  </section>
+</main>

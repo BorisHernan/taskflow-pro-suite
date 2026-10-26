@@ -1,29 +1,34 @@
 .gasto {
   margin: 0;
-  color: var(--text-secondary);
+  font-size: 14px;
+  color: var(--tf-text-secondary);
 
   strong {
-    color: var(--text-primary);
-    font-weight: 500;
+    margin-left: 6px;
+    color: var(--tf-text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 }
 
-.nota-admin {
-  padding: 14px 16px;
-  margin: 0 0 16px;
-  background: var(--info-bg);
-  color: var(--info-text);
+.contador {
+  margin-left: 6px;
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  background: var(--tf-surface-alt);
+  font-size: 12px;
+  color: var(--tf-text-secondary);
 }
 
 .pedido {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 8px 16px;
-  padding: 12px 0;
+  gap: 8px 20px;
+  padding: 14px 0;
 
   & + & {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--tf-border);
   }
 }
 
@@ -32,14 +37,54 @@
   font-weight: 500;
 }
 
-.suave {
+.pedido-detalle {
   margin: 2px 0 0;
   font-size: 13px;
-  color: var(--text-secondary);
+}
+
+.ciclo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+
+  li {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--tf-text-secondary);
+
+    & + li::before {
+      content: '';
+      position: absolute;
+      left: -14px;
+      width: 10px;
+      height: 1px;
+      background: var(--tf-border-strong);
+    }
+
+    &[data-estado='hecho'] {
+      color: var(--tf-success);
+    }
+
+    &[data-estado='actual'] {
+      color: var(--tf-text);
+      font-weight: 600;
+    }
+
+    &[data-estado='rechazado'] {
+      color: var(--tf-danger);
+    }
+  }
 }
 
 .costo {
   font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
 .pedido-acciones {
@@ -47,10 +92,15 @@
   gap: 6px;
 }
 
-.rechazo {
-  grid-column: 1 / -1;
-  display: flex;
-  gap: 8px;
+.titulo-tabla {
+  margin: 0;
+  padding: 16px 20px;
+  font-size: 16px;
+}
+
+.nota {
+  display: block;
+  font-size: 12px;
 }
 
 @media (max-width: 640px) {
@@ -58,8 +108,7 @@
     grid-template-columns: 1fr auto;
   }
 
-  .pedido-acciones,
-  .pedido > .estado {
+  .pedido-acciones {
     grid-column: 1 / -1;
   }
 }

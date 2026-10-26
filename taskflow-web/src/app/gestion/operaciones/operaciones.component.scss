@@ -1,0 +1,479 @@
+.operaciones {
+  display: grid;
+  gap: 14px;
+  padding: 20px 24px 28px;
+
+  @media (max-width: 760px) {
+    padding: 16px;
+  }
+}
+
+.cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+
+  p {
+    margin: 4px 0 0;
+    color: var(--tf-text-secondary);
+  }
+}
+
+.elegida-texto {
+  display: block;
+  color: var(--tf-primary);
+}
+
+.atajos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  a {
+    padding: 6px 10px;
+    border: 1px solid var(--tf-border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--tf-text-secondary);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--tf-text);
+      border-color: var(--tf-border-strong);
+    }
+  }
+}
+
+.alertas {
+  display: grid;
+  gap: 6px;
+}
+
+.alerta-op {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--tf-warning) 45%, transparent);
+  border-radius: var(--radius);
+  background: var(--tf-warning-bg);
+  color: var(--tf-text);
+  font-size: 14px;
+
+  app-icono {
+    color: var(--tf-warning);
+  }
+
+  span {
+    flex: 1;
+  }
+}
+
+.tablero {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) 330px;
+  gap: 14px;
+  align-items: start;
+
+  @media (max-width: 1180px) {
+    grid-template-columns: 240px minmax(0, 1fr);
+
+    .lateral {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--tf-border);
+  border-radius: var(--radius-lg);
+  background: var(--tf-surface);
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 15px;
+  }
+
+  h3 {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--tf-text-secondary);
+  }
+}
+
+.contador {
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--tf-surface-alt);
+  font-size: 12px;
+}
+
+.panel-ayuda {
+  margin: 0;
+  font-size: 12px;
+  color: var(--tf-text-secondary);
+}
+
+.vacio {
+  margin: 0;
+  font-size: 12px;
+  color: var(--tf-text-secondary);
+}
+
+// Zonas donde se suelta: se resaltan al arrastrar o con alguien elegido.
+.bandeja,
+.estacion,
+.orden {
+  transition: border-color 0.15s, background-color 0.15s;
+
+  &.cdk-drop-list-receiving,
+  &.cdk-drop-list-dragging {
+    border-color: var(--tf-primary);
+    background: var(--tf-primary-subtle);
+  }
+
+  &.destino {
+    cursor: pointer;
+    border-style: dashed;
+    border-color: var(--tf-primary);
+  }
+}
+
+.bandeja {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 56px;
+  padding: 8px;
+  border: 1px dashed var(--tf-border-strong);
+  border-radius: var(--radius);
+}
+
+.fuera {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  small {
+    display: block;
+    font-size: 11px;
+    color: var(--tf-text-secondary);
+  }
+}
+
+.plano {
+  align-content: start;
+}
+
+.fila {
+  display: grid;
+  gap: 8px;
+
+  &[data-grupo='entrada'] {
+    grid-template-columns: 1fr;
+  }
+
+  &[data-grupo='cajas'] {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  &[data-grupo='interior'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (max-width: 760px) {
+    &[data-grupo='cajas'],
+    &[data-grupo='interior'] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}
+
+.estacion {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 104px;
+  padding: 10px;
+  border: 1px solid var(--tf-border);
+  border-radius: var(--radius);
+  background: var(--tf-surface-alt);
+
+  &.vacia {
+    background: transparent;
+  }
+}
+
+[data-grupo='entrada'] .estacion {
+  min-height: 76px;
+}
+
+[data-grupo='interior'] .estacion {
+  min-height: 150px;
+}
+
+.estacion-nombre {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  white-space: nowrap;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.estacion-ayuda {
+  margin: -2px 0 0;
+  font-size: 11px;
+  color: var(--tf-text-secondary);
+}
+
+.estacion-personas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+// Ficha de una persona: se arrastra o se toca.
+.ficha {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 4px 8px 4px 4px;
+  border: 1px solid var(--tf-border-strong);
+  border-radius: 999px;
+  background: var(--tf-surface);
+  cursor: grab;
+  user-select: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--tf-focus);
+    outline-offset: 2px;
+  }
+
+  &.elegida {
+    border-color: var(--tf-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--tf-primary) 35%, transparent);
+  }
+
+  &.trabajando .avatar {
+    background: var(--tf-primary);
+    color: var(--tf-primary-on);
+  }
+
+  &.cdk-drag-placeholder {
+    opacity: 0.35;
+  }
+}
+
+.ficha-texto {
+  display: grid;
+  min-width: 0;
+  line-height: 1.15;
+
+  strong {
+    font-size: 12px;
+  }
+
+  small {
+    overflow: hidden;
+    font-size: 10px;
+    color: var(--tf-text-secondary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.ficha-arrastre {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  border-radius: 999px;
+  background: var(--tf-surface);
+  border: 1px solid var(--tf-primary);
+  box-shadow: var(--tf-shadow-pop);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--tf-primary-subtle);
+  color: var(--tf-primary);
+  font-size: 10px;
+  font-weight: 700;
+
+  &.mini {
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
+  }
+
+  &.apagado {
+    background: var(--tf-surface-alt);
+    color: var(--tf-text-secondary);
+  }
+
+  &.ausente {
+    background: var(--tf-danger-bg);
+    color: var(--tf-danger);
+  }
+}
+
+.resumen-ordenes {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--tf-text-secondary);
+
+  strong {
+    color: var(--tf-text);
+  }
+}
+
+.ordenes {
+  display: grid;
+  gap: 6px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.orden {
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  border: 1px solid var(--tf-border);
+  border-radius: var(--radius);
+  background: var(--tf-surface-alt);
+
+  &.en-curso {
+    background: transparent;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.orden-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--tf-text-secondary);
+}
+
+.orden-titulo {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.orden-pie {
+  font-size: 11px;
+  color: var(--tf-text-secondary);
+}
+
+.progreso {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.barra {
+  display: block;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--tf-surface-alt);
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    background: var(--tf-primary);
+    transition: width 0.9s linear;
+  }
+}
+
+.porcentaje {
+  font-size: 11px;
+  color: var(--tf-text-secondary);
+}
+
+.avisos-titulo {
+  margin-top: 6px !important;
+}
+
+.feed {
+  display: grid;
+  gap: 8px;
+  max-height: 220px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  small {
+    display: block;
+    color: var(--tf-text-secondary);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barra span {
+    transition: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .estacion,
+  [data-grupo='interior'] .estacion {
+    min-height: 72px;
+  }
+}
+
+// En cajas angostas, el estado va debajo del nombre.
+[data-grupo='cajas'] .estacion-nombre {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}

@@ -1,37 +1,5 @@
-.herramientas {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.filtros {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-
-  button {
-    padding: 8px 12px;
-    border: 0;
-    background: var(--surface);
-    color: var(--text-secondary);
-    font-size: 14px;
-    cursor: pointer;
-
-    &:hover {
-      color: var(--text-primary);
-    }
-
-    &.activo {
-      background: var(--text-primary);
-      color: var(--bg);
-    }
-  }
-}
-
 .buscar {
-  max-width: 320px;
+  width: min(300px, 100%);
 }
 
 .producto {
@@ -39,42 +7,13 @@
   font-weight: 500;
 }
 
-.suave {
-  font-size: 13px;
-  color: var(--text-secondary);
+.detalle {
+  display: block;
+  font-size: 12px;
 }
 
-.nivel {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 140px;
-
-  strong {
-    min-width: 2ch;
-    font-weight: 500;
-    font-variant-numeric: tabular-nums;
-  }
-}
-
-.barra {
-  flex: 1;
-  height: 6px;
-  background: var(--surface-alt);
-
-  span {
-    display: block;
-    height: 100%;
-    background: var(--success);
-  }
-
-  &[data-estado='BAJO'] span {
-    background: var(--warning);
-  }
-
-  &[data-estado='AGOTADO'] span {
-    background: var(--danger);
-  }
+.stock {
+  font-weight: 600;
 }
 
 .acciones {
@@ -87,17 +26,20 @@ a.estado {
 }
 
 .panel td {
-  background: var(--surface-alt);
+  background: var(--tf-surface-alt);
 }
 
 .sugerencia {
   margin: 0;
-  font-size: 13px;
-  color: var(--text-secondary);
   align-self: center;
 }
 
 .botones {
   display: flex;
   gap: 8px;
+}
+
+.sin-almacen {
+  color: var(--tf-warning);
+  font-size: 13px;
 }

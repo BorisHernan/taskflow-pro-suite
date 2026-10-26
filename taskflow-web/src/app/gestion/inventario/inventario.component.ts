@@ -4,9 +4,14 @@ import { RouterLink } from '@angular/router';
 import { SesionService } from '../../auth/sesion.service';
 import { EstadoStock, FilaInventario } from '../../models/gestion.model';
 import { SolesPipe } from '../../shared/soles.pipe';
+import { IconoComponent } from '../../shared/icono/icono.component';
+import { AvisosService } from '../../shared/ui/avisos.service';
+import { EstadoVistaComponent } from '../../shared/ui/estado-vista.component';
 import { GestionService, mensajeDeError } from '../gestion.service';
 
 type Filtro = 'todos' | 'alerta' | 'agotados';
+type Columna = 'producto' | 'stock' | 'cobertura' | 'tienda';
+const POR_PAGINA = 20;
 
 function normalizar(t: string): string {
   return t.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
@@ -16,13 +21,17 @@ function normalizar(t: string): string {
 @Component({
   selector: 'app-inventario',
   standalone: true,
-  imports: [FormsModule, RouterLink, SolesPipe],
+  imports: [FormsModule, RouterLink, SolesPipe, IconoComponent, EstadoVistaComponent],
   templateUrl: './inventario.component.html',
   styleUrl: './inventario.component.scss',
 })
 export class InventarioComponent {
   readonly gestion = inject(GestionService);
   readonly sesion = inject(SesionService);
+  private readonly avisos = inject(AvisosService);
+  readonly orden = signal<{ columna: Columna; asc: boolean }>({ columna: 'cobertura', asc: true });
+  readonly pagina = signal(1);
+  readonly enviando = signal(false);
 
   readonly filas = signal<FilaInventario[]>([]);
   readonly cargando = signal(true);
@@ -45,11 +54,36 @@ export class InventarioComponent {
     agotados: this.filas().filter((f) => f.estado === 'AGOTADO').length,
   }));
 
-  readonly visibles = computed(() => {
+  readonly filtradas = computed(() => {
     const texto = normalizar(this.busqueda().trim());
+    const { columna, asc } = this.orden();
+    const valor = (f: FilaInventario): string | number =>
+      columna === 'producto'
+        ? normalizar(f.producto)
+        : columna === 'stock'
+          ? f.stock
+          : columna === 'tienda'
+            ? this.gestion.nombreTienda(f.tiendaId)
+            : f.stock / Math.max(f.stockMinimo, 1);
     return this.filas()
       .filter((f) => this.filtro() === 'todos' || (this.filtro() === 'agotados' ? f.estado === 'AGOTADO' : f.estado !== 'OK'))
-      .filter((f) => !texto || normalizar(`${f.producto} ${f.categoria}`).includes(texto));
+      .filter((f) => !texto || normalizar(`${f.producto} ${f.categoria} ${this.codigo(f)}`).includes(texto))
+      .sort((a, b) => {
+        const x = valor(a);
+        const y = valor(b);
+        const r = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y));
+        return asc ? r : -r;
+      });
+  });
+  readonly paginas = computed(() => Math.max(1, Math.ceil(this.filtradas().length / POR_PAGINA)));
+  readonly visibles = computed(() => {
+    const p = Math.min(this.pagina(), this.paginas());
+    return this.filtradas().slice((p - 1) * POR_PAGINA, p * POR_PAGINA);
+  });
+  readonly rango = computed(() => {
+    const total = this.filtradas().length;
+    const p = Math.min(this.pagina(), this.paginas());
+    return total ? `${(p - 1) * POR_PAGINA + 1}–${Math.min(p * POR_PAGINA, total)} de ${total}` : '0 productos';
   });
 
   readonly todas = computed(() => this.gestion.tiendaActiva() == null);
@@ -62,7 +96,7 @@ export class InventarioComponent {
   }
 
   cargar(): void {
-    this.cargando.set(true);
+    if (!this.gestion.recargaSilenciosa()) this.cargando.set(true);
     this.gestion.inventario().subscribe({
       next: (filas) => {
         this.filas.set(filas);
@@ -75,6 +109,26 @@ export class InventarioComponent {
         this.error.set(mensajeDeError(err, 'No se pudo cargar el inventario.'));
       },
     });
+  }
+
+  /** Código del producto (su id en el catálogo), para buscar y referirse a él sin ambigüedad. */
+  codigo(f: FilaInventario): string {
+    return 'P-' + String(f.productoId).padStart(4, '0');
+  }
+
+  ordenarPor(columna: Columna): void {
+    this.orden.update((o) => ({ columna, asc: o.columna === columna ? !o.asc : true }));
+    this.pagina.set(1);
+  }
+
+  ordenDe(columna: Columna): 'ascending' | 'descending' | 'none' {
+    const o = this.orden();
+    return o.columna !== columna ? 'none' : o.asc ? 'ascending' : 'descending';
+  }
+
+  cambiarFiltro(f: Filtro): void {
+    this.filtro.set(f);
+    this.pagina.set(1);
   }
 
   nivel(f: FilaInventario): number {
@@ -92,13 +146,18 @@ export class InventarioComponent {
   }
 
   pedir(f: FilaInventario): void {
+    this.enviando.set(true);
     this.gestion.pedir({ productoId: f.productoId, cantidad: this.cantidad, tiendaId: f.tiendaId }).subscribe({
       next: (p) => {
+        this.enviando.set(false);
         this.pidiendo.set(null);
-        this.mostrarAviso(`Pedido #${p.id} enviado: ${p.cantidad} × ${p.productoNombre}. Queda esperando la aprobación del administrador.`);
+        this.avisos.exito(`Pedido #${p.id} enviado: ${p.cantidad} × ${p.productoNombre}. Queda pendiente de aprobación.`);
         this.cargar();
       },
-      error: (err) => this.error.set(mensajeDeError(err, 'No se pudo enviar el pedido.')),
+      error: (err) => {
+        this.enviando.set(false);
+        this.avisos.error(mensajeDeError(err, 'No se pudo enviar el pedido.'));
+      },
     });
   }
 
@@ -113,16 +172,11 @@ export class InventarioComponent {
     this.gestion.cambiarNiveles(f.id, this.minimo, this.objetivo).subscribe({
       next: () => {
         this.editando.set(null);
-        this.mostrarAviso(`Niveles de ${f.producto} actualizados. Si quedó bajo el nuevo mínimo, ya tiene su tarea de reposición.`);
+        this.avisos.exito(`Niveles de ${f.producto} guardados. Si quedó bajo el nuevo mínimo, ya tiene su tarea de reposición.`);
         this.cargar();
       },
-      error: (err) => this.error.set(mensajeDeError(err, 'No se pudieron guardar los niveles.')),
+      error: (err) => this.avisos.error(mensajeDeError(err, 'No se pudieron guardar los niveles.')),
     });
   }
 
-  private mostrarAviso(texto: string): void {
-    this.error.set(null);
-    this.aviso.set(texto);
-    setTimeout(() => this.aviso.set(null), 6000);
-  }
 }

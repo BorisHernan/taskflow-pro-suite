@@ -1,122 +1,291 @@
-.gestion {
+.shell {
   display: grid;
-  grid-template-columns: 232px minmax(0, 1fr);
-  max-width: 1440px;
-  margin: 0 auto;
-  min-height: calc(100svh - 60px);
+  grid-template-columns: 244px minmax(0, 1fr);
+  min-height: 100svh;
 }
+
+// ── Barra lateral ──────────────────────────────────────────────────────
 
 .lateral {
   position: sticky;
-  top: 60px;
-  align-self: start;
+  top: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  height: calc(100svh - 60px);
-  padding: 28px 16px 20px var(--gutter);
+  height: 100svh;
+  padding: 16px 12px;
   overflow-y: auto;
+  background: var(--tf-surface);
+  border-right: 1px solid var(--tf-border);
 }
 
-.perfil {
-  display: grid;
-  gap: 2px;
-}
-
-.perfil-nombre {
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
-
-.perfil-rol {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.selector {
-  display: grid;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.sede {
+.marca {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  font-weight: 500;
+  gap: 10px;
+  height: 32px;
+  padding: 0 8px;
+  margin-bottom: 20px;
+  color: var(--tf-text);
+  text-decoration: none;
+
+  span {
+    display: grid;
+    line-height: 1.15;
+  }
+
+  strong {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  small {
+    font-size: 12px;
+    color: var(--tf-text-secondary);
+  }
 }
 
 .menu {
-  display: grid;
-  gap: 2px;
+  flex: 1;
+
+  ul {
+    display: grid;
+    gap: 2px;
+    margin: 0 0 16px;
+    padding: 0;
+    list-style: none;
+  }
 
   a {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 12px;
+    min-height: 36px;
+    padding: 0 10px;
     border-radius: var(--radius);
-    color: var(--text-secondary);
-    font-size: 15px;
+    color: var(--tf-text-secondary);
+    font-size: 14px;
+    font-weight: 500;
     text-decoration: none;
-    transition: background-color 0.15s, color 0.15s;
+    transition: background-color 0.12s var(--ease), color 0.12s var(--ease);
 
     &:hover {
-      background: var(--surface-alt);
-      color: var(--text-primary);
+      background: var(--tf-surface-hover);
+      color: var(--tf-text);
     }
 
     &.activo {
-      background: var(--accent-soft);
-      color: var(--accent);
+      background: var(--tf-primary-subtle);
+      color: var(--tf-primary);
       font-weight: 600;
     }
   }
 }
 
-.salir {
-  margin-top: auto;
-  justify-content: flex-start;
+.grupo {
+  margin: 0 0 6px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tf-text-secondary);
 }
 
-.contenido {
+.externos {
+  padding-top: 12px;
+  border-top: 1px solid var(--tf-border);
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 36px;
+    padding: 0 10px;
+    border-radius: var(--radius);
+    color: var(--tf-text-secondary);
+    font-size: 14px;
+    text-decoration: none;
+
+    &:hover {
+      background: var(--tf-surface-hover);
+      color: var(--tf-text);
+    }
+  }
+}
+
+// ── Barra superior ─────────────────────────────────────────────────────
+
+.principal {
   min-width: 0;
 }
 
-@media (max-width: 900px) {
-  .gestion {
-    grid-template-columns: 1fr;
+.superior {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 64px;
+  padding: 0 var(--gutter);
+  background: var(--tf-surface);
+  border-bottom: 1px solid var(--tf-border);
+}
+
+.abrir-menu {
+  display: none;
+}
+
+.sede {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  app-icono {
+    position: absolute;
+    left: 10px;
+    color: var(--tf-text-secondary);
+    pointer-events: none;
+  }
+
+  .input {
+    min-width: 210px;
+    padding-left: 34px;
+    font-weight: 500;
+  }
+}
+
+.sede-fija {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+
+  app-icono {
+    color: var(--tf-text-secondary);
+  }
+}
+
+.conexion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--tf-text-secondary);
+}
+
+.derecha {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iniciales {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--tf-primary-subtle);
+  color: var(--tf-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.usuario-texto {
+  display: grid;
+  line-height: 1.2;
+
+  strong {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  small {
+    font-size: 12px;
+    color: var(--tf-text-secondary);
+  }
+}
+
+.velo {
+  display: none;
+}
+
+// ── Tablet y móvil: la barra lateral pasa a ser un cajón ───────────────
+
+@media (max-width: 1024px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .lateral {
-    position: static;
-    height: auto;
-    padding: 16px var(--gutter) 0;
-    gap: 12px;
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 60;
+    width: 260px;
+    transform: translateX(-100%);
+    transition: transform 0.2s var(--ease);
   }
 
-  .perfil,
-  .salir {
+  .menu-abierto .lateral {
+    transform: none;
+    box-shadow: var(--tf-shadow-pop);
+  }
+
+  .menu-abierto .velo {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    display: block;
+    border: 0;
+    background: rgb(16 24 22 / 0.45);
+  }
+
+  .abrir-menu {
+    display: inline-flex;
+    margin-left: -8px;
+  }
+
+  .usuario-texto {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .recorrido-texto {
     display: none;
   }
 
-  .menu {
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    padding-bottom: 4px;
+  .superior {
+    gap: 8px;
+  }
 
-    a {
-      flex-shrink: 0;
-      padding: 8px 12px;
-      font-size: 14px;
-    }
+  .sede .input {
+    min-width: 0;
+    max-width: 170px;
+  }
+
+  .conexion {
+    font-size: 0;
+    gap: 0;
+  }
+
+  .salir-texto,
+  .usuario {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lateral {
+    transition: none;
   }
 }

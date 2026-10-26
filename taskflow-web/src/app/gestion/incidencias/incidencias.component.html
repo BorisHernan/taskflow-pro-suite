@@ -2,27 +2,20 @@
   <header class="gestion-cabecera">
     <div>
       <h1 class="page-title">Incidencias</h1>
-      <p>Equipos que fallan, problemas de seguridad, reclamos. Las de severidad alta o crítica crean una tarea en el tablero.</p>
+      <p>Equipos que fallan, problemas de seguridad o reclamos. Las de severidad alta o crítica crean una tarea en el tablero.</p>
     </div>
   </header>
 
-  @if (aviso()) {
-    <p class="aviso-ok" role="status">{{ aviso() }}</p>
-  }
-  @if (error()) {
-    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
-  }
-
   @if (!todas()) {
-    <section class="bloque">
-      <h2>Reportar incidencia</h2>
+    <section class="bloque" aria-labelledby="reportar-titulo" data-tour="incidencias">
+      <h2 id="reportar-titulo">Reportar incidencia</h2>
       <form class="formulario-linea" (ngSubmit)="reportar()">
         <label class="ancho">
           Qué pasó
-          <input class="input" name="titulo" maxlength="160" [(ngModel)]="titulo" placeholder="Ej.: el aire acondicionado no enfría" required />
+          <input class="input" name="titulo" maxlength="160" [(ngModel)]="titulo" placeholder="Por ejemplo: el aire acondicionado no enfría" required />
         </label>
         <label>
-          Categoría
+          Tipo
           <select class="input" name="categoria" [(ngModel)]="categoria">
             @for (c of categorias; track c) {
               <option [value]="c">{{ nombreCategoria[c] }}</option>
@@ -31,7 +24,7 @@
         </label>
         <label>
           Severidad
-          <select class="input" name="severidad" [(ngModel)]="severidad">
+          <select class="input" name="severidad" [(ngModel)]="severidad" aria-describedby="ayuda-severidad">
             @for (s of severidades; track s) {
               <option [value]="s">{{ nombreSeveridad[s] }}</option>
             }
@@ -41,67 +34,90 @@
           Detalle (opcional)
           <input class="input" name="descripcion" maxlength="1000" [(ngModel)]="descripcion" />
         </label>
-        <button type="submit" class="btn btn-primary" [disabled]="!titulo.trim()">Reportar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!titulo.trim() || enviando()" [attr.aria-busy]="enviando()">
+          {{ enviando() ? 'Reportando…' : 'Reportar' }}
+        </button>
       </form>
+      <p class="campo-ayuda ayuda" id="ayuda-severidad">
+        {{ severidad === 'ALTA' || severidad === 'CRITICA' ? 'Con esta severidad se creará una tarea en el tablero.' : 'Las severidades baja y media no crean tarea.' }}
+      </p>
     </section>
   } @else {
-    <p class="nota-admin">Elige una tienda en el menú para reportar una incidencia a su nombre.</p>
+    <p class="alerta"><app-icono nombre="info" [tamano]="16" /><span>Elige una sede en la barra superior para reportar una incidencia a su nombre.</span></p>
   }
 
-  <section class="bloque">
-    <h2>Sin resolver · {{ abiertas().length }}</h2>
-    @for (i of abiertas(); track i.id) {
-      <article class="incidencia">
-        <div>
-          <p class="titulo">
-            <span class="estado" [class]="claseSeveridad(i.severidad)">{{ nombreSeveridad[i.severidad] }}</span>
-            {{ i.titulo }}
-          </p>
-          <p class="suave">
-            {{ nombreCategoria[i.categoria] }} · {{ nombreEstado[i.estado] }} · {{ i.creadaEn | date: 'd MMM, HH:mm' }} · {{ i.reportadaPor }}
-            @if (todas()) { · {{ gestion.nombreTienda(i.tiendaId) }} }
-            @if (i.tareaId) { · <a routerLink="../tablero">tarea en el tablero</a> }
-          </p>
-          @if (i.descripcion) {
-            <p class="descripcion">{{ i.descripcion }}</p>
-          }
-        </div>
-        <div class="acciones">
-          @if (i.estado === 'ABIERTA') {
-            <button type="button" class="btn btn-secondary btn-sm" (click)="cambiar(i, 'EN_CURSO')">Atender</button>
-          }
-          <button type="button" class="btn btn-primary btn-sm" (click)="resolviendo.set(resolviendo() === i.id ? null : i.id)">Resolver</button>
-        </div>
-        @if (resolviendo() === i.id) {
-          <form class="resolver" (ngSubmit)="cambiar(i, 'RESUELTA')">
-            <input class="input" name="solucion" maxlength="500" [(ngModel)]="solucion" placeholder="¿Cómo se resolvió?" />
-            <button type="submit" class="btn btn-primary btn-sm">Marcar resuelta</button>
-          </form>
+  <div class="herramientas">
+    <div class="segmentado" role="group" aria-label="Filtrar por estado">
+      <button type="button" [attr.aria-pressed]="filtroEstado() === 'abiertas'" (click)="filtroEstado.set('abiertas')">Sin resolver · {{ conteo().abiertas }}</button>
+      <button type="button" [attr.aria-pressed]="filtroEstado() === 'resueltas'" (click)="filtroEstado.set('resueltas')">Resueltas · {{ conteo().resueltas }}</button>
+      <button type="button" [attr.aria-pressed]="filtroEstado() === 'todas'" (click)="filtroEstado.set('todas')">Todas · {{ conteo().todas }}</button>
+    </div>
+    <div class="filtros">
+      <label class="sr-only" for="f-sev">Severidad</label>
+      <select id="f-sev" class="input" [ngModel]="filtroSeveridad()" (ngModelChange)="filtroSeveridad.set($event)">
+        <option value="">Cualquier severidad</option>
+        @for (s of severidades; track s) {
+          <option [value]="s">{{ nombreSeveridad[s] }}</option>
         }
-      </article>
-    } @empty {
-      <p class="suave">{{ cargando() ? 'Cargando…' : 'Sin incidencias abiertas.' }}</p>
-    }
-  </section>
+      </select>
+      <label class="sr-only" for="f-cat">Tipo</label>
+      <select id="f-cat" class="input" [ngModel]="filtroCategoria()" (ngModelChange)="filtroCategoria.set($event)">
+        <option value="">Cualquier tipo</option>
+        @for (c of categorias; track c) {
+          <option [value]="c">{{ nombreCategoria[c] }}</option>
+        }
+      </select>
+    </div>
+  </div>
 
-  <section class="bloque">
-    <button type="button" class="btn btn-ghost" (click)="verResueltas.set(!verResueltas())" [attr.aria-expanded]="verResueltas()">
-      {{ verResueltas() ? 'Ocultar' : 'Ver' }} resueltas · {{ resueltas().length }}
-    </button>
-    @if (verResueltas()) {
-      @for (i of resueltas(); track i.id) {
-        <article class="incidencia resuelta">
+  <section class="bloque" aria-label="Lista de incidencias" data-tour="incidencias">
+    @if (error()) {
+      <app-estado-vista tipo="error" titulo="No se pudieron cargar las incidencias" [texto]="error()!" (reintentar)="cargar()" />
+    } @else {
+      @for (i of visibles(); track i.id) {
+        <article class="incidencia" [attr.data-incidencia]="i.id" [class.grave]="grave(i) && i.estado !== 'RESUELTA'">
           <div>
-            <p class="titulo">{{ i.titulo }}</p>
-            <p class="suave">
-              {{ nombreCategoria[i.categoria] }} · resuelta {{ i.resueltaEn | date: 'd MMM, HH:mm' }}
-              @if (todas()) { · {{ gestion.nombreTienda(i.tiendaId) }} }
+            <p class="titulo">
+              <span class="codigo">#{{ i.id }}</span>
+              {{ i.titulo }}
             </p>
-            @if (i.solucion) {
-              <p class="descripcion">{{ i.solucion }}</p>
+            <p class="etiquetas">
+              <span class="estado" [class.rojo]="grave(i)" [class.ambar]="i.severidad === 'MEDIA'">
+                @if (grave(i)) { <app-icono nombre="alerta" [tamano]="13" /> }
+                Severidad {{ nombreSeveridad[i.severidad].toLowerCase() }}
+              </span>
+              <span class="estado">{{ nombreCategoria[i.categoria] }}</span>
+              <span class="estado" [class.verde]="i.estado === 'RESUELTA'" [class.azul]="i.estado === 'EN_CURSO'">
+                <app-icono [nombre]="i.estado === 'RESUELTA' ? 'hecho' : 'reloj'" [tamano]="13" />{{ nombreEstado[i.estado] }}
+              </span>
+            </p>
+            <p class="meta">
+              Reportó {{ i.reportadaPor }} el {{ i.creadaEn | date: 'd MMM, HH:mm' }}
+              @if (todas()) { · {{ gestion.nombreTienda(i.tiendaId) }} }
+              @if (i.tareaId) { · <a routerLink="../tablero">Tarea #{{ i.tareaId }}</a> }
+            </p>
+            @if (i.descripcion) {
+              <p class="descripcion">{{ i.descripcion }}</p>
+            }
+            @if (i.estado === 'RESUELTA' && i.solucion) {
+              <p class="solucion"><strong>Solución ({{ i.resueltaEn | date: 'd MMM, HH:mm' }}):</strong> {{ i.solucion }}</p>
             }
           </div>
+          @if (i.estado !== 'RESUELTA') {
+            <div class="acciones">
+              @if (i.estado === 'ABIERTA') {
+                <button type="button" class="btn btn-secondary btn-sm" [disabled]="trabajando() === i.id" (click)="cambiar(i, 'EN_CURSO')">Atender</button>
+              }
+              <button type="button" class="btn btn-primary btn-sm" [disabled]="trabajando() === i.id" (click)="cambiar(i, 'RESUELTA')">Resolver</button>
+            </div>
+          }
         </article>
+      } @empty {
+        <app-estado-vista
+          [tipo]="cargando() ? 'cargando' : 'vacio'"
+          [titulo]="cargando() ? 'Cargando…' : filtroEstado() === 'abiertas' ? 'No hay incidencias sin resolver' : 'Nada coincide con los filtros'"
+          icono="hecho"
+        />
       }
     }
   </section>

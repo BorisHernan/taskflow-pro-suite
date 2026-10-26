@@ -1,36 +1,46 @@
 .total {
   margin: 0;
-  color: var(--text-secondary);
+  font-size: 14px;
+  color: var(--tf-text-secondary);
 
   strong {
-    color: var(--text-primary);
-    font-weight: 500;
+    margin-left: 6px;
+    color: var(--tf-text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 }
 
-.nota-admin {
-  padding: 14px 16px;
-  margin: 0 0 16px;
-  background: var(--info-bg);
-  color: var(--info-text);
-}
-
-.aviso-robo {
-  margin: 12px 0 0;
-  font-size: 14px;
-  color: var(--danger-text);
+.ayuda {
+  margin: 10px 0 0;
 }
 
 .columnas {
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
   gap: 16px;
+  align-items: start;
 }
 
-.suave {
+.titulo-tabla {
+  margin: 0;
+  padding: 16px 20px;
+  font-size: 16px;
+}
+
+.nota {
   display: block;
-  font-size: 13px;
-  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.relacion {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--tf-primary);
 }
 
 .motivo {
@@ -50,13 +60,15 @@
 }
 
 .barra {
-  height: 8px;
-  background: var(--surface-alt);
+  height: 6px;
+  border-radius: 3px;
+  background: var(--tf-surface-alt);
 
   span {
     display: block;
     height: 100%;
-    background: var(--c-tienda);
+    border-radius: 3px;
+    background: var(--tf-serie-2);
   }
 }
 

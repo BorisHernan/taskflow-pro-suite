@@ -1,37 +1,42 @@
-.nota-admin {
-  padding: 14px 16px;
-  margin: 0 0 16px;
-  background: var(--info-bg);
-  color: var(--info-text);
-}
-
-.turno-cabecera {
+.progreso {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 8px 28px;
+  margin: 0 0 16px;
+  padding: 0 0 16px;
+  list-style: none;
+  border-bottom: 1px solid var(--tf-border);
+  font-size: 13px;
 
-  h2 {
-    margin: 4px 0 0;
-    font-size: 28px;
-    letter-spacing: -0.03em;
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--tf-text-secondary);
+
+    &[data-estado='hecho'] {
+      color: var(--tf-success);
+    }
+
+    &[data-estado='actual'] {
+      color: var(--tf-text);
+      font-weight: 600;
+    }
   }
 }
 
-.etiqueta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.turno-cabecera h2 {
   margin: 0;
-  font-size: 14px;
-  color: var(--success-text);
+  font-size: 20px;
 }
 
 .suave {
   margin: 4px 0 0;
   font-size: 13px;
-  color: var(--text-secondary);
+}
+
+.intro {
+  margin: -6px 0 14px;
 }
 
 .nota {
@@ -39,74 +44,167 @@
   font-size: 14px;
 }
 
+.columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 20px;
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: 14px;
+  }
+}
+
+.barra {
+  height: 6px;
+  margin-bottom: 8px;
+  border-radius: 3px;
+  background: var(--tf-surface-alt);
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--tf-primary);
+    transition: width 0.2s var(--ease);
+  }
+}
+
+.checklist {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--tf-border);
+    font-size: 14px;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--tf-primary);
+  }
+
+  .hecho span:not(.estado-paso) {
+    color: var(--tf-text-secondary);
+    text-decoration: line-through;
+  }
+}
+
+.estado-paso {
+  margin: 0;
+  font-size: 12px;
+}
+
 .cifras {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  margin: 20px 0 0;
+  margin: 0;
 
   div {
     display: grid;
     gap: 2px;
-    padding: 14px;
-    background: var(--surface-alt);
+    padding: 12px;
+    border-radius: var(--radius);
+    background: var(--tf-surface-alt);
   }
 
   dt {
-    font-size: 13px;
-    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--tf-text-secondary);
   }
 
   dd {
     margin: 0;
-    font-size: 24px;
-    font-weight: 500;
-    letter-spacing: -0.02em;
+    font-size: 20px;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
 
-  span {
-    font-size: 13px;
-    color: var(--text-secondary);
+  span,
+  a {
+    font-size: 12px;
+    color: var(--tf-text-secondary);
+  }
+
+  a {
+    color: var(--tf-primary);
   }
 }
 
 .cerrar {
   margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--tf-border);
 }
 
 .cierre {
-  background: var(--success-bg);
+  border-color: color-mix(in srgb, var(--tf-success) 40%, transparent);
 
-  .cifras div {
-    background: var(--surface);
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--tf-success);
+  }
+
+  .cifras {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 .pendientes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin: 14px 0 0;
   font-size: 14px;
-  color: var(--warning-text);
+  color: var(--tf-warning);
 
   &.ok {
-    color: var(--success-text);
+    color: var(--tf-success);
   }
 }
 
+.titulo-tabla {
+  margin: 0;
+  padding: 16px 20px;
+  font-size: 16px;
+}
+
 .detalle td {
-  background: var(--surface-alt);
+  background: var(--tf-surface-alt);
 
   .cifras {
-    margin: 0;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 
     div {
-      background: var(--surface);
+      background: var(--tf-surface);
     }
   }
 }
 
-@media (max-width: 760px) {
-  .cifras {
-    grid-template-columns: 1fr 1fr;
+@media (max-width: 900px) {
+  .columnas,
+  .cierre .cifras,
+  .detalle td .cifras {
+    grid-template-columns: 1fr;
   }
 }

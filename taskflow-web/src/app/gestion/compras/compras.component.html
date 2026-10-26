@@ -3,31 +3,23 @@
     <div>
       <h1 class="page-title">Compras</h1>
       <p>
-        Pedidos de reposición al almacén central. {{ sesion.esAdmin() ? 'Tú apruebas o rechazas; la tienda confirma cuando llega.' : 'El administrador los aprueba; tú confirmas cuando llega la mercadería.' }}
+        Pedidos de reposición al almacén central: la tienda solicita, la administración aprueba o rechaza y la tienda
+        confirma la recepción.
       </p>
     </div>
-    <p class="gasto">Comprometido en pedidos abiertos: <strong>{{ gastoEnCurso() | soles }}</strong></p>
+    <p class="gasto">Comprometido en pedidos abiertos <strong>{{ gastoEnCurso() | soles }}</strong></p>
   </header>
 
-  @if (aviso()) {
-    <p class="aviso-ok" role="status">{{ aviso() }}</p>
-  }
-  @if (error()) {
-    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
-  }
-
   @if (puedePedir()) {
-    <section class="bloque">
-      <h2>Nuevo pedido</h2>
+    <section class="bloque" aria-labelledby="nuevo-titulo" data-tour="compras">
+      <h2 id="nuevo-titulo">Nuevo pedido</h2>
       <form class="formulario-linea" (ngSubmit)="pedir()">
         <label class="ancho">
           Producto
           <select class="input" name="producto" [ngModel]="productoId" (ngModelChange)="alElegirProducto($event)" required>
             <option [ngValue]="null" disabled>Elige un producto…</option>
             @for (f of productos(); track f.id) {
-              <option [ngValue]="f.productoId">
-                {{ f.producto }} · stock {{ f.stock }}{{ f.estado !== 'OK' ? ' (bajo el mínimo)' : '' }}
-              </option>
+              <option [ngValue]="f.productoId">{{ f.producto }} · stock {{ f.stock }}{{ f.estado !== 'OK' ? ' (bajo el mínimo)' : '' }}</option>
             }
           </select>
         </label>
@@ -36,97 +28,126 @@
           <input class="input" type="number" name="cantidad" min="1" max="500" [(ngModel)]="cantidad" />
         </label>
         <label>
-          Nota (opcional)
-          <input class="input" name="nota" maxlength="300" [(ngModel)]="nota" placeholder="Ej.: urgente para el fin de semana" />
+          ¿Quién lo solicita?
+          <select class="input" name="empleado" [(ngModel)]="empleadoId">
+            <option [ngValue]="null">Yo ({{ sesion.usuario()?.nombre }})</option>
+            @for (e of presentes(); track e.id) {
+              <option [ngValue]="e.id">{{ e.nombre }} · {{ nombrePuesto[e.puesto] }}</option>
+            }
+          </select>
         </label>
-        <button type="submit" class="btn btn-primary" [disabled]="!productoId || cantidad < 1">Enviar pedido</button>
+        <label>
+          Nota (opcional)
+          <input class="input" name="nota" maxlength="300" [(ngModel)]="nota" placeholder="Por ejemplo: urgente para el fin de semana" />
+        </label>
+        <button type="submit" class="btn btn-primary" [disabled]="!productoId || cantidad < 1 || enviando()" [attr.aria-busy]="enviando()">
+          {{ enviando() ? 'Enviando…' : 'Enviar pedido' }}
+        </button>
       </form>
     </section>
   } @else {
-    <p class="nota-admin">Elige una tienda en el menú para crear un pedido a su nombre.</p>
+    <p class="alerta"><app-icono nombre="info" [tamano]="16" /><span>Elige una sede en la barra superior para solicitar un pedido a su nombre.</span></p>
   }
 
-  <section class="bloque">
-    <h2>Por aprobar · {{ porAprobar().length }}</h2>
-    @for (p of porAprobar(); track p.id) {
-      <article class="pedido">
-        <div class="pedido-datos">
-          <p class="pedido-titulo">{{ p.cantidad }} × {{ p.productoNombre }}</p>
-          <p class="suave">
-            #{{ p.id }} · {{ gestion.nombreTienda(p.tiendaId) }} · pidió {{ p.solicitadoPor }} el {{ p.creadoEn | date: 'd MMM, HH:mm' }}
-            @if (p.nota) { · “{{ p.nota }}” }
-          </p>
-        </div>
-        <span class="costo">{{ p.costo | soles }}</span>
-        @if (sesion.esAdmin()) {
-          <div class="pedido-acciones">
-            <button type="button" class="btn btn-primary btn-sm" [disabled]="trabajando() === p.id" (click)="accion(p, 'aprobar')">Aprobar</button>
-            <button type="button" class="btn btn-ghost btn-sm" (click)="rechazando.set(rechazando() === p.id ? null : p.id)">Rechazar</button>
-          </div>
-        } @else {
-          <span class="estado ambar">Esperando aprobación</span>
-        }
-        @if (rechazando() === p.id) {
-          <form class="rechazo" (ngSubmit)="accion(p, 'rechazar')">
-            <input class="input" name="motivo" maxlength="300" [(ngModel)]="motivoRechazo" placeholder="Motivo (opcional): sin stock en el almacén…" />
-            <button type="submit" class="btn btn-secondary btn-sm">Confirmar rechazo</button>
-          </form>
-        }
-      </article>
-    } @empty {
-      <p class="suave">{{ cargando() ? 'Cargando…' : 'No hay pedidos esperando aprobación.' }}</p>
-    }
-  </section>
+  @if (error()) {
+    <div class="bloque"><app-estado-vista tipo="error" titulo="No se pudieron cargar los pedidos" [texto]="error()!" (reintentar)="cargar()" /></div>
+  } @else {
+    <section class="bloque" aria-labelledby="aprobar-titulo" data-tour="compras">
+      <div class="bloque-cabecera">
+        <h2 id="aprobar-titulo">Pendientes de aprobación <span class="contador">{{ porAprobar().length }}</span></h2>
+      </div>
+      @for (p of porAprobar(); track p.id) {
+        <ng-container *ngTemplateOutlet="tarjeta; context: { $implicit: p }" />
+      } @empty {
+        <app-estado-vista [tipo]="cargando() ? 'cargando' : 'vacio'" [titulo]="cargando() ? 'Cargando…' : 'No hay pedidos pendientes de aprobación'" icono="hecho" />
+      }
+    </section>
 
-  <section class="bloque">
-    <h2>En camino · {{ enCamino().length }}</h2>
-    @for (p of enCamino(); track p.id) {
-      <article class="pedido">
-        <div class="pedido-datos">
-          <p class="pedido-titulo">{{ p.cantidad }} × {{ p.productoNombre }}</p>
-          <p class="suave">#{{ p.id }} · {{ gestion.nombreTienda(p.tiendaId) }} · aprobó {{ p.revisadoPor }} el {{ p.actualizadoEn | date: 'd MMM, HH:mm' }}</p>
-        </div>
-        <span class="costo">{{ p.costo | soles }}</span>
-        <div class="pedido-acciones">
-          <button type="button" class="btn btn-primary btn-sm" [disabled]="trabajando() === p.id" (click)="accion(p, 'recibir')">Marcar como recibido</button>
-        </div>
-      </article>
-    } @empty {
-      <p class="suave">{{ cargando() ? 'Cargando…' : 'Nada en camino.' }}</p>
-    }
-  </section>
+    <section class="bloque" aria-labelledby="camino-titulo">
+      <div class="bloque-cabecera">
+        <h2 id="camino-titulo">En camino <span class="contador">{{ enCamino().length }}</span></h2>
+      </div>
+      @for (p of enCamino(); track p.id) {
+        <ng-container *ngTemplateOutlet="tarjeta; context: { $implicit: p }" />
+      } @empty {
+        <app-estado-vista [tipo]="cargando() ? 'cargando' : 'vacio'" [titulo]="cargando() ? 'Cargando…' : 'Nada en camino'" icono="envio" />
+      }
+    </section>
 
-  <section class="bloque">
-    <h2>Historial</h2>
-    <div class="tabla-envoltura">
-      <table class="tabla">
-        <thead>
-          <tr>
-            <th>Pedido</th>
-            @if (todas()) {
-              <th>Tienda</th>
-            }
-            <th class="num">Costo</th>
-            <th>Estado</th>
-            <th>Actualizado</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (p of historial(); track p.id) {
-            <tr>
-              <td>#{{ p.id }} · {{ p.cantidad }} × {{ p.productoNombre }}@if (p.nota) { <span class="suave"> · {{ p.nota }}</span> }</td>
-              @if (todas()) {
-                <td class="suave">{{ gestion.nombreTienda(p.tiendaId) }}</td>
+    <section class="bloque sin-relleno" aria-labelledby="hist-titulo">
+      <h2 id="hist-titulo" class="titulo-tabla">Historial</h2>
+      @if (historial().length) {
+        <div class="tabla-envoltura">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th scope="col">Pedido</th>
+                <th scope="col">Producto</th>
+                @if (todas()) { <th scope="col">Sede</th> }
+                <th scope="col" class="num">Costo</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Actualizado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of historial(); track p.id) {
+                <tr>
+                  <td><span class="codigo">#{{ p.id }}</span></td>
+                  <td>
+                    {{ p.cantidad }} × {{ p.productoNombre }}
+                    @if (p.nota) { <span class="suave nota">{{ p.nota }}</span> }
+                  </td>
+                  @if (todas()) { <td class="suave">{{ gestion.nombreTienda(p.tiendaId) }}</td> }
+                  <td class="num">{{ p.costo | soles }}</td>
+                  <td>
+                    <span class="estado" [class]="claseEstado(p.estado)">
+                      <app-icono [nombre]="p.estado === 'RECIBIDO' ? 'hecho' : 'error'" [tamano]="13" />{{ nombreEstado[p.estado] }}
+                    </span>
+                  </td>
+                  <td class="suave">{{ p.actualizadoEn | date: 'd MMM, HH:mm' }}</td>
+                </tr>
               }
-              <td class="num">{{ p.costo | soles }}</td>
-              <td><span class="estado" [class]="claseEstado(p.estado)">{{ nombreEstado[p.estado] }}</span></td>
-              <td class="suave">{{ p.actualizadoEn | date: 'd MMM, HH:mm' }}</td>
-            </tr>
-          } @empty {
-            <tr><td colspan="5" class="suave">Sin pedidos cerrados todavía.</td></tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </section>
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <app-estado-vista titulo="Sin pedidos cerrados todavía" texto="Aquí aparecerán los pedidos recibidos y rechazados." icono="historial" />
+      }
+    </section>
+  }
 </main>
+
+<ng-template #tarjeta let-p>
+  <article class="pedido" [attr.data-pedido]="p.id">
+    <div class="pedido-datos">
+      <p class="pedido-titulo"><span class="codigo">#{{ p.id }}</span> {{ p.cantidad }} × {{ p.productoNombre }}</p>
+      <p class="suave pedido-detalle">
+        {{ gestion.nombreTienda(p.tiendaId) }} · pidió {{ p.solicitadoPor }} el {{ p.creadoEn | date: 'd MMM, HH:mm' }}
+        @if (p.revisadoPor) { · aprobó {{ p.revisadoPor }} }
+        @if (p.nota) { · “{{ p.nota }}” }
+      </p>
+      <ol class="ciclo" aria-label="Ciclo del pedido">
+        @for (paso of pasos(p); track paso.nombre) {
+          <li [attr.data-estado]="paso.estado">
+            <app-icono [nombre]="paso.estado === 'hecho' ? 'hecho' : paso.estado === 'rechazado' ? 'error' : 'reloj'" [tamano]="14" />
+            {{ paso.nombre }}
+            <span class="sr-only">{{ paso.estado === 'actual' ? '(paso actual)' : paso.estado === 'pendiente' ? '(pendiente)' : '' }}</span>
+          </li>
+        }
+      </ol>
+    </div>
+    <span class="costo">{{ p.costo | soles }}</span>
+    <div class="pedido-acciones">
+      @if (p.estado === 'SOLICITADO') {
+        @if (sesion.esAdmin()) {
+          <button type="button" class="btn btn-primary btn-sm" [disabled]="trabajando() === p.id" (click)="accion(p, 'aprobar')">Aprobar</button>
+          <button type="button" class="btn btn-peligro btn-sm" [disabled]="trabajando() === p.id" (click)="accion(p, 'rechazar')">Rechazar</button>
+        } @else {
+          <span class="estado ambar"><app-icono nombre="reloj" [tamano]="13" />Esperando aprobación</span>
+        }
+      } @else if (p.estado === 'APROBADO') {
+        <button type="button" class="btn btn-primary btn-sm" [disabled]="trabajando() === p.id" (click)="accion(p, 'recibir')">Confirmar recepción</button>
+      }
+    </div>
+  </article>
+</ng-template>

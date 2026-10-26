@@ -1,0 +1,168 @@
+// Los KPI también filtran la lista.
+button.kpi {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &[aria-pressed='true'] {
+    border-color: var(--tf-primary);
+    box-shadow: inset 0 0 0 1px var(--tf-primary);
+  }
+}
+
+.personas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.persona {
+  display: grid;
+  grid-template-columns: 36px minmax(160px, 1.1fr) minmax(220px, 1.6fr) minmax(120px, 0.7fr) auto;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 12px 16px;
+
+  & + & {
+    border-top: 1px solid var(--tf-border);
+  }
+
+  &[data-estado='FUERA_DE_TURNO'] .quien,
+  &[data-estado='FUERA_DE_TURNO'] .avatar {
+    opacity: 0.6;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+
+    .ahora,
+    .turno {
+      grid-column: 2 / -1;
+    }
+  }
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--tf-primary-subtle);
+  color: var(--tf-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+[data-estado='AUSENTE'] .avatar {
+  background: var(--tf-danger-bg);
+  color: var(--tf-danger);
+}
+
+.nombre {
+  margin: 0;
+  font-weight: 600;
+}
+
+.puesto,
+.detalle {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--tf-text-secondary);
+}
+
+.ahora {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+
+.detalle a {
+  color: var(--tf-text);
+}
+
+.turno {
+  display: grid;
+  gap: 4px;
+}
+
+.turno-texto {
+  font-size: 12px;
+  color: var(--tf-text-secondary);
+}
+
+.barra {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--tf-surface-alt);
+  overflow: hidden;
+
+  &.fina {
+    height: 4px;
+  }
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--tf-primary);
+    transition: width 0.9s linear;
+  }
+}
+
+.dialogo {
+  width: min(440px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid var(--tf-border);
+  border-radius: var(--radius-lg);
+  background: var(--tf-surface);
+  color: var(--tf-text);
+  box-shadow: var(--tf-shadow-pop);
+
+  &::backdrop {
+    background: rgb(0 0 0 / 0.45);
+  }
+
+  form {
+    display: grid;
+    gap: 14px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .suave {
+    margin: 0;
+  }
+}
+
+.campo {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dialogo-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barra span {
+    transition: none;
+  }
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}

@@ -2,21 +2,14 @@
   <header class="gestion-cabecera">
     <div>
       <h1 class="page-title">Mermas</h1>
-      <p>Producto que se pierde y ya no se puede vender. Descuenta stock y se valoriza al costo (60 % del precio).</p>
+      <p>Producto que se pierde y ya no se puede vender. Descuenta el stock y se valoriza al costo (60 % del precio de venta).</p>
     </div>
-    <p class="total">Últimas registradas: <strong>{{ total() | soles }}</strong></p>
+    <p class="total">Últimas 200 registradas <strong>{{ total() | soles }}</strong></p>
   </header>
 
-  @if (aviso()) {
-    <p class="aviso-ok" role="status">{{ aviso() }}</p>
-  }
-  @if (error()) {
-    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
-  }
-
   @if (!todas()) {
-    <section class="bloque">
-      <h2>Registrar merma</h2>
+    <section class="bloque" aria-labelledby="registrar-titulo" data-tour="mermas">
+      <h2 id="registrar-titulo">Registrar merma</h2>
       <form class="formulario-linea" (ngSubmit)="registrar()">
         <label class="ancho">
           Producto
@@ -29,7 +22,8 @@
         </label>
         <label>
           Unidades
-          <input class="input" type="number" name="cantidad" min="1" [max]="stockElegido() ?? 500" [(ngModel)]="cantidad" />
+          <input class="input" type="number" name="cantidad" min="1" [max]="elegido()?.stock ?? 500" [(ngModel)]="cantidad"
+            [attr.aria-invalid]="!!elegido() && cantidad > elegido()!.stock" aria-describedby="ayuda-cantidad" />
         </label>
         <label>
           Motivo
@@ -40,72 +34,90 @@
           </select>
         </label>
         <label class="ancho">
-          Nota
-          <input class="input" name="nota" maxlength="300" [(ngModel)]="nota" placeholder="Ej.: caja aplastada en la recepción" />
+          Nota (opcional)
+          <input class="input" name="nota" maxlength="300" [(ngModel)]="nota" placeholder="Por ejemplo: caja aplastada en la recepción" />
         </label>
-        <button type="submit" class="btn btn-primary" [disabled]="!productoId || cantidad < 1">Registrar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!productoId || cantidad < 1 || enviando() || (!!elegido() && cantidad > elegido()!.stock)">
+          {{ enviando() ? 'Registrando…' : 'Registrar' }}
+        </button>
       </form>
-      @if (motivo === 'ROBO') {
-        <p class="aviso-robo">Un robo también abre una incidencia de seguridad con su tarea en el tablero.</p>
-      }
+      <p class="campo-ayuda ayuda" id="ayuda-cantidad">
+        @if (elegido() && cantidad > elegido()!.stock) {
+          <span class="campo-error">Solo hay {{ elegido()!.stock }} unidades en stock.</span>
+        } @else if (motivo === 'ROBO') {
+          Un robo también abre una incidencia de seguridad con su tarea en el tablero.
+        } @else {
+          Se pedirá confirmación antes de descontar el stock.
+        }
+      </p>
     </section>
   } @else {
-    <p class="nota-admin">Elige una tienda en el menú para registrar una merma a su nombre.</p>
+    <p class="alerta"><app-icono nombre="info" [tamano]="16" /><span>Elige una sede en la barra superior para registrar una merma a su nombre.</span></p>
   }
 
-  <div class="columnas">
-    <section class="bloque">
-      <h2>Registro</h2>
-      <div class="tabla-envoltura">
-        <table class="tabla">
-          <thead>
-            <tr>
-              <th>Producto</th>
-              @if (todas()) {
-                <th>Tienda</th>
-              }
-              <th>Motivo</th>
-              <th class="num">Costo</th>
-              <th>Fecha</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (m of mermas(); track m.id) {
-              <tr>
-                <td>
-                  {{ m.cantidad }} × {{ m.productoNombre }}
-                  @if (m.nota) {
-                    <span class="suave">{{ m.nota }}</span>
-                  }
-                </td>
-                @if (todas()) {
-                  <td class="suave">{{ gestion.nombreTienda(m.tiendaId) }}</td>
+  @if (error()) {
+    <div class="bloque"><app-estado-vista tipo="error" titulo="No se pudieron cargar las mermas" [texto]="error()!" (reintentar)="cargar()" /></div>
+  } @else {
+    <div class="columnas">
+      <section class="bloque sin-relleno" aria-labelledby="registro-titulo" data-tour="mermas">
+        <h2 id="registro-titulo" class="titulo-tabla">Registro</h2>
+        @if (mermas().length) {
+          <div class="tabla-envoltura">
+            <table class="tabla">
+              <thead>
+                <tr>
+                  <th scope="col">Merma</th>
+                  <th scope="col">Producto</th>
+                  @if (todas()) { <th scope="col">Sede</th> }
+                  <th scope="col">Motivo</th>
+                  <th scope="col" class="num">Costo</th>
+                  <th scope="col">Fecha y responsable</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (m of mermas(); track m.id) {
+                  <tr [attr.data-merma]="m.id">
+                    <td><span class="codigo">#{{ m.id }}</span></td>
+                    <td>
+                      {{ m.cantidad }} × {{ m.productoNombre }}
+                      @if (m.nota) { <span class="suave nota">{{ m.nota }}</span> }
+                      @if (incidenciaDe(m); as inc) {
+                        <a class="relacion" routerLink="../incidencias"><app-icono nombre="incidencia" [tamano]="13" />Incidencia #{{ inc.id }}</a>
+                      }
+                    </td>
+                    @if (todas()) { <td class="suave">{{ gestion.nombreTienda(m.tiendaId) }}</td> }
+                    <td>
+                      <span class="estado" [class.rojo]="m.motivo === 'ROBO'">
+                        @if (m.motivo === 'ROBO') { <app-icono nombre="alerta" [tamano]="13" /> }
+                        {{ nombreMotivo[m.motivo] }}
+                      </span>
+                    </td>
+                    <td class="num">{{ m.costo | soles }}</td>
+                    <td class="suave">{{ m.creadaEn | date: 'd MMM, HH:mm' }} · {{ m.registradoPor }}</td>
+                  </tr>
                 }
-                <td><span class="estado" [class.rojo]="m.motivo === 'ROBO'">{{ nombreMotivo[m.motivo] }}</span></td>
-                <td class="num">{{ m.costo | soles }}</td>
-                <td class="suave">{{ m.creadaEn | date: 'd MMM, HH:mm' }} · {{ m.registradoPor }}</td>
-              </tr>
-            } @empty {
-              <tr><td colspan="5" class="suave">{{ cargando() ? 'Cargando…' : 'Sin mermas registradas.' }}</td></tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="bloque">
-      <h2>Por motivo</h2>
-      @for (m of porMotivo(); track m.motivo) {
-        <div class="motivo">
-          <div class="motivo-fila">
-            <span>{{ nombreMotivo[m.motivo] }}</span>
-            <span class="num">{{ m.costo | soles }}</span>
+              </tbody>
+            </table>
           </div>
-          <span class="barra"><span [style.width.%]="m.ancho"></span></span>
-        </div>
-      } @empty {
-        <p class="suave">Sin datos.</p>
-      }
-    </section>
-  </div>
+        } @else {
+          <app-estado-vista [tipo]="cargando() ? 'cargando' : 'vacio'" [titulo]="cargando() ? 'Cargando…' : 'Sin mermas registradas'" icono="merma" />
+        }
+      </section>
+
+      <section class="bloque" aria-labelledby="motivo-titulo">
+        <h2 id="motivo-titulo">Costo por motivo</h2>
+        @for (m of porMotivo(); track m.motivo) {
+          <div class="motivo">
+            <div class="motivo-fila">
+              <span>{{ nombreMotivo[m.motivo] }}</span>
+              <span class="num">{{ m.costo | soles }}</span>
+            </div>
+            <span class="barra" aria-hidden="true"><span [style.width.%]="m.ancho"></span></span>
+          </div>
+        } @empty {
+          <p class="suave">Sin datos.</p>
+        }
+      </section>
+    </div>
+  }
 </main>
