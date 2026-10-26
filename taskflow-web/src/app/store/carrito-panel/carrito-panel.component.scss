@@ -276,3 +276,92 @@
     animation: none;
   }
 }
+
+.entrega {
+  display: grid;
+  gap: 10px;
+  padding: 14px 0;
+  border-top: 1px solid var(--tf-border);
+
+  h3 {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .segmentado button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.entrega-mapa {
+  height: 220px;
+  min-height: 220px;
+}
+
+.entrega-acciones {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.entrega-ayuda {
+  font-size: 12px;
+  color: var(--tf-text-secondary);
+}
+
+.entrega-detalle {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--tf-text-secondary);
+
+  strong {
+    color: var(--tf-text);
+  }
+
+  &.pendiente {
+    color: var(--tf-warning);
+  }
+}
+
+.campo-cliente {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tf-text-secondary);
+}
+
+.calculo {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--tf-surface-alt);
+  font-size: 13px;
+
+  div {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: 8px;
+  }
+
+  dt {
+    color: var(--tf-text-secondary);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.entrega-detalle.fuera {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--tf-danger-bg);
+  color: var(--tf-danger);
+}

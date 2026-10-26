@@ -1,0 +1,265 @@
+.seguimiento {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.cabecera {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+  }
+}
+
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  font-size: 14px;
+  color: var(--tf-text-secondary);
+}
+
+.buscar {
+  display: flex;
+  gap: 8px;
+  max-width: 420px;
+
+  .codigo-input {
+    font-family: var(--tf-font-mono, 'IBM Plex Mono', monospace);
+    text-transform: uppercase;
+  }
+}
+
+.recientes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--tf-text-secondary);
+
+  a[aria-current] {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+}
+
+.ficha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 24px;
+  padding: 24px;
+  background: var(--tf-surface);
+  border: 1px solid var(--tf-border);
+  border-radius: 12px;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tf-primary);
+}
+
+h2 {
+  margin: 6px 0 4px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--tf-text-secondary);
+}
+
+.pasos {
+  list-style: none;
+  margin: 20px 0;
+  padding: 0;
+  display: grid;
+
+  li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 12px;
+    padding-bottom: 18px;
+
+    // Línea que une los pasos.
+    &:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 13px;
+      top: 28px;
+      bottom: 0;
+      width: 2px;
+      background: var(--tf-border);
+    }
+
+    &.hecho:not(:last-child)::before {
+      background: var(--tf-primary);
+    }
+  }
+
+  .marca {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--tf-border-strong, var(--tf-border));
+    background: var(--tf-surface);
+    color: var(--tf-primary-on);
+  }
+
+  .hecho .marca {
+    background: var(--tf-primary);
+    border-color: var(--tf-primary);
+  }
+
+  .actual .marca {
+    border-color: var(--tf-primary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--tf-primary) 18%, transparent);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .paso-nombre {
+    font-weight: 600;
+    line-height: 28px;
+  }
+
+  li:not(.hecho):not(.actual) .paso-nombre {
+    color: var(--tf-text-secondary);
+  }
+
+  .paso-detalle {
+    font-size: 13px;
+    color: var(--tf-text-secondary);
+  }
+}
+
+.lineas {
+  display: grid;
+  gap: 6px;
+  padding-top: 14px;
+  border-top: 1px solid var(--tf-border);
+
+  p {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .total {
+    font-weight: 600;
+    padding-top: 6px;
+  }
+}
+
+.lado {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.mapa {
+  height: 320px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.donde {
+  margin: 0;
+  font-size: 14px;
+}
+
+.nota {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--tf-text-secondary);
+}
+
+.cargando,
+.vacio {
+  color: var(--tf-text-secondary);
+}
+
+.simulador {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px dashed var(--tf-border-strong);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--tf-text-secondary);
+
+  &.activo {
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--tf-primary) 45%, transparent);
+    background: var(--tf-primary-subtle);
+  }
+
+  .en-curso {
+    flex: 1 1 200px;
+    color: var(--tf-text);
+    font-weight: 500;
+  }
+}
+
+.calculo {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  font-size: 14px;
+
+  div {
+    display: grid;
+    grid-template-columns: 84px 1fr;
+    gap: 10px;
+  }
+
+  dt {
+    color: var(--tf-text-secondary);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.vehiculo-dato {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pasos li {
+  transition: opacity 0.2s;
+}
+
+.pasos .marca {
+  transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}

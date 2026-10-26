@@ -15,7 +15,7 @@
   @if (producto(); as p) {
     <article class="detalle">
       <div class="galeria">
-        <div class="galeria-imagen" [style.view-transition-name]="'producto-' + p.id" [class.agotado]="p.stock === 0">
+        <div class="galeria-imagen" [attr.data-categoria]="p.category" [style.view-transition-name]="'producto-' + p.id" [class.agotado]="p.stock === 0">
           <app-product-icon [icon]="p.icon || ''" [size]="120" />
         </div>
       </div>

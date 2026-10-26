@@ -1,9 +1,12 @@
 import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { CartItem, Product, ReceiptData, VALID_COUPONS } from '../../models/product.model';
+import { CartItem, Product, ReceiptData, VALID_COUPONS, DatosEntrega } from '../../models/product.model';
 import { CatalogoService } from './catalogo.service';
-import { ProductService } from '../../services/product.service';
+import { Punto } from '../../models/gestion.model';
+import { COBERTURA_KM, estimarEnvio } from '../../shared/entrega/entrega';
+import { OrdenService } from '../../services/orden.service';
+import { OrdenVista } from '../../models/orden.model';
 
 const CLAVE_GUARDADO = 'taskflow-carrito';
 
@@ -12,7 +15,7 @@ export type Resultado = { ok: true } | { ok: false; mensaje: string };
 /** Carrito de la tienda: lo comparten el catálogo, el detalle y el panel lateral. */
 @Injectable({ providedIn: 'root' })
 export class CarritoService {
-  private readonly api = inject(ProductService);
+  private readonly ordenes = inject(OrdenService);
   private readonly catalogo = inject(CatalogoService);
 
   readonly items = signal<CartItem[]>(leerGuardado());
@@ -114,52 +117,106 @@ export class CarritoService {
     this.cupon.set(null);
   }
 
-  /** Compra producto por producto; si uno falla, en el carrito queda solo lo que no se compró. */
+  /** Modo de entrega elegido en el carrito y, para envío, el punto marcado en el mapa. */
+  readonly modoEntrega = signal<'recojo' | 'envio'>('recojo');
+  readonly destino = signal<Punto | null>(null);
+  /** Datos del cliente para el pedido; la referencia solo aplica al envío. */
+  readonly clienteNombre = signal(leerNombre());
+  readonly referencia = signal('');
+
+  /** Sede elegida con su ubicación, distancia al destino y tiempo estimado de envío. */
+  readonly entrega = computed<DatosEntrega>(() => {
+    const t = this.catalogo.tiendas().find((x) => x.id === this.catalogo.sede());
+    const d = this.destino();
+    const base: DatosEntrega = { modo: this.modoEntrega(), sede: t?.nombre ?? '', direccionSede: t?.direccion, horario: t?.horario };
+    if (this.modoEntrega() === 'recojo' || !d || t?.latitud == null || t.longitud == null) return base;
+    const e = estimarEnvio({ lat: t.latitud, lng: t.longitud }, d, this.unidades());
+    return {
+      ...base,
+      destino: d,
+      distanciaKm: e.lineaRectaKm,
+      recorridoKm: e.recorridoKm,
+      minutos: e.minutos,
+      vehiculo: `${e.vehiculo.nombre} (${e.vehiculo.regla})`,
+      fueraDeCobertura: !e.enCobertura,
+    };
+  });
+  readonly puedePagar = computed(
+    () =>
+      this.clienteNombre().trim().length > 0 &&
+      (this.modoEntrega() === 'recojo' || (this.destino() !== null && !this.entrega().fueraDeCobertura)),
+  );
+
+  /** Un solo pedido al servidor: o se cobra todo, o nada (el carrito queda igual). */
   async pagar(): Promise<Resultado> {
     const items = this.items();
     if (items.length === 0 || this.pagando()) return { ok: false, mensaje: 'El carrito está vacío.' };
+    if (!this.clienteNombre().trim()) return { ok: false, mensaje: 'Escribe tu nombre para el pedido.' };
+    if (this.entrega().fueraDeCobertura) return { ok: false, mensaje: `Solo repartimos hasta ${COBERTURA_KM} km de la sede.` };
+    if (!this.puedePagar()) return { ok: false, mensaje: 'Marca en el mapa la dirección de envío.' };
 
+    const envio = this.modoEntrega() === 'envio';
+    const destino = this.destino();
     this.pagando.set(true);
-    const comprados: CartItem[] = [];
     try {
-      for (const item of items) {
-        try {
-          await firstValueFrom(this.api.purchase(item.product.id, item.quantity, this.catalogo.sede()));
-          comprados.push(item);
-        } catch (err) {
-          this.items.update((actual) => actual.filter((c) => !comprados.some((p) => p.product.id === c.product.id)));
-          const previos = comprados.length > 0 ? ' Los productos anteriores de esta compra ya se descontaron del stock.' : '';
-          return { ok: false, mensaje: mensajeDeError(err, `No se pudo completar la compra de "${item.product.name}".`) + previos };
-        }
-      }
-      this.boleta.set(this.armarBoleta(items));
+      const vista = await firstValueFrom(
+        this.ordenes.crear({
+          tiendaId: this.catalogo.sede(),
+          clienteNombre: this.clienteNombre().trim(),
+          modalidad: envio ? 'ENVIO' : 'RECOJO',
+          direccion: envio ? this.referencia().trim() || undefined : undefined,
+          latitud: envio ? destino?.lat : undefined,
+          longitud: envio ? destino?.lng : undefined,
+          cupon: this.cupon()?.code,
+          lineas: items.map((i) => ({ productoId: i.product.id, cantidad: i.quantity })),
+        }),
+      );
+      try {
+        localStorage.setItem(CLAVE_NOMBRE, this.clienteNombre().trim());
+      } catch {}
+      this.ordenes.recordar(vista.orden.codigo);
+      this.boleta.set(this.armarBoleta(vista));
       this.items.set([]);
       this.cupon.set(null);
       this.abierto.set(false);
       return { ok: true };
+    } catch (err) {
+      return { ok: false, mensaje: mensajeDeError(err, 'No se pudo completar la compra.') + ' No se cobró nada.' };
     } finally {
       this.pagando.set(false);
     }
   }
 
-  private armarBoleta(items: CartItem[]): ReceiptData {
-    const subtotal = items.reduce((s, i) => s + i.product.price * i.quantity, 0);
-    const cupon = this.cupon();
-    const discount = subtotal * (cupon?.discount ?? 0);
+  /** La boleta sale de lo que guardó el servidor (precios y descuento incluidos). */
+  private armarBoleta(v: OrdenVista): ReceiptData {
+    const o = v.orden;
     return {
-      number: 'TF-' + Math.floor(100000 + Math.random() * 900000),
-      date: new Date(),
-      lines: items.map((i) => ({
-        name: i.product.name,
-        quantity: i.quantity,
-        unitPrice: i.product.price,
-        lineTotal: i.product.price * i.quantity,
+      number: o.codigo,
+      codigo: o.codigo,
+      cliente: o.clienteNombre,
+      date: new Date(o.creadaEn),
+      lines: v.lineas.map((l) => ({
+        name: l.producto,
+        quantity: l.cantidad,
+        unitPrice: l.total / l.cantidad,
+        lineTotal: l.total,
       })),
-      subtotal,
-      discount,
-      couponCode: cupon?.code,
-      total: subtotal - discount,
+      subtotal: o.subtotal,
+      discount: o.descuento,
+      couponCode: o.cupon ?? undefined,
+      total: o.total,
+      entrega: { ...this.entrega(), distanciaKm: o.distanciaKm ?? this.entrega().distanciaKm },
     };
+  }
+}
+
+const CLAVE_NOMBRE = 'taskflow-cliente';
+
+function leerNombre(): string {
+  try {
+    return localStorage.getItem(CLAVE_NOMBRE) ?? '';
+  } catch {
+    return '';
   }
 }
 

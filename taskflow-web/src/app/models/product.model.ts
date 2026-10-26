@@ -46,6 +46,21 @@ export interface ReceiptLine {
   lineTotal: number;
 }
 
+/** Cómo recibe el cliente su compra. El envío es referencial: la demo no despacha pedidos. */
+export interface DatosEntrega {
+  modo: 'recojo' | 'envio';
+  sede: string;
+  direccionSede?: string;
+  horario?: string;
+  destino?: { lat: number; lng: number };
+  /** Distancia en línea recta y estimada por calles. */
+  distanciaKm?: number;
+  recorridoKm?: number;
+  minutos?: number;
+  vehiculo?: string;
+  fueraDeCobertura?: boolean;
+}
+
 export interface ReceiptData {
   number: string;
   date: Date;
@@ -54,6 +69,10 @@ export interface ReceiptData {
   discount: number;
   couponCode?: string;
   total: number;
+  entrega?: DatosEntrega;
+  /** Código del pedido para seguirlo. */
+  codigo?: string;
+  cliente?: string;
 }
 
 /** Cupones válidos de mentira, fijos en el frontend — solo afectan el total simulado. */

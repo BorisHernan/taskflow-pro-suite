@@ -1,8 +1,8 @@
 @let p = producto();
 <article class="producto card" [class.agotado]="p.stock === 0">
   <a class="producto-enlace" [routerLink]="['/tienda/producto', p.id]" [attr.aria-label]="'Ver detalle de ' + p.name">
-    <div class="producto-icono" [style.view-transition-name]="'producto-' + p.id">
-      <app-product-icon [icon]="p.icon || ''" [size]="40" />
+    <div class="producto-icono" [attr.data-categoria]="p.category" [style.view-transition-name]="'producto-' + p.id">
+      <span class="halo"><app-product-icon [icon]="p.icon || ''" [size]="44" /></span>
       @if (p.stock === 0) {
         <span class="sello">Agotado</span>
       } @else if (p.stock <= stockBajo) {

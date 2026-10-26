@@ -1,0 +1,133 @@
+:host {
+  display: block;
+  position: relative;
+  min-height: 260px;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--tf-border);
+  background: var(--tf-surface-alt);
+}
+
+.lienzo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  font-family: var(--font-sans);
+}
+
+// Marcadores propios (HTML), con los colores del sistema.
+:host ::ng-deep .pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 6px;
+  border-radius: 999px;
+  background: var(--tf-surface);
+  color: var(--tf-text);
+  border: 1px solid var(--tf-border-strong);
+  box-shadow: 0 4px 12px -4px rgb(0 0 0 / 0.35);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    width: 10px;
+    height: 10px;
+    background: inherit;
+    border-right: 1px solid var(--tf-border-strong);
+    border-bottom: 1px solid var(--tf-border-strong);
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  &.activo {
+    background: var(--tf-primary);
+    color: var(--tf-primary-on);
+    border-color: var(--tf-primary);
+    transform: translate(-50%, -100%) scale(1.12);
+
+    .pin-punto {
+      background: var(--tf-primary-on);
+    }
+  }
+}
+
+:host ::ng-deep .pin-punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--tf-primary);
+}
+
+:host ::ng-deep .casa {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--tf-accent);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px -4px rgb(0 0 0 / 0.35);
+}
+
+:host ::ng-deep .ruta {
+  stroke: var(--tf-accent);
+}
+
+// En tema oscuro, los mosaicos del mapa se oscurecen para no deslumbrar.
+:host-context(html[data-theme='dark']) ::ng-deep .leaflet-tile-pane {
+  filter: invert(0.92) hue-rotate(180deg) saturate(0.35) brightness(0.95);
+}
+
+:host ::ng-deep .leaflet-control-attribution {
+  font-size: 10px;
+}
+
+// Vehículo del reparto: avanza a saltos por la ruta.
+:host ::ng-deep .vehiculo {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin: -8px 0 0 -17px;
+  border-radius: 50%;
+  background: var(--tf-primary);
+  color: var(--tf-primary-on);
+  border: 2px solid var(--tf-surface);
+  box-shadow: 0 6px 14px -4px rgb(0 0 0 / 0.45);
+  animation: salto 0.45s cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+@keyframes salto {
+  0% {
+    transform: translateY(0) scale(0.95);
+  }
+  45% {
+    transform: translateY(-10px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Evita las líneas finas entre mosaicos que aparecen con zoom fraccionado o el filtro oscuro.
+:host ::ng-deep .leaflet-tile-container img {
+  width: 256.6px !important;
+  height: 256.6px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host ::ng-deep .vehiculo {
+    animation: none;
+  }
+}

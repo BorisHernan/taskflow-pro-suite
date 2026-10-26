@@ -78,6 +78,64 @@
           }
         </div>
 
+        <section class="entrega" aria-labelledby="entrega-titulo">
+          <h3 id="entrega-titulo">Entrega</h3>
+          <label class="campo-cliente">
+            <span>¿A nombre de quién?</span>
+            <input class="input" name="cliente" maxlength="80" autocomplete="name" placeholder="Tu nombre"
+              [value]="carrito.clienteNombre()" (input)="carrito.clienteNombre.set($any($event.target).value)" />
+          </label>
+          <div class="segmentado" role="group" aria-label="Modo de entrega">
+            <button type="button" [attr.aria-pressed]="carrito.modoEntrega() === 'recojo'" (click)="carrito.modoEntrega.set('recojo')">
+              <app-icono nombre="sede" [tamano]="14" /> Recojo en tienda
+            </button>
+            <button type="button" [attr.aria-pressed]="carrito.modoEntrega() === 'envio'" (click)="carrito.modoEntrega.set('envio')">
+              <app-icono nombre="envio" [tamano]="14" /> Envío a domicilio
+            </button>
+          </div>
+
+          @if (carrito.entrega(); as e) {
+            @if (e.modo === 'recojo') {
+              <p class="entrega-detalle">
+                Recoges en <strong>{{ e.sede }}</strong>, {{ e.direccionSede }}.<br />
+                {{ e.horario }} · listo en unos 30 minutos.
+              </p>
+            } @else {
+              <app-mapa-sedes class="entrega-mapa" modo="entrega" [tiendas]="catalogo.tiendas()" [seleccionada]="catalogo.sede()"
+                [destino]="carrito.destino()" (destinoCambio)="carrito.destino.set($event)" (elegir)="catalogo.elegirSede($event)"
+                etiqueta="Mapa para marcar la dirección de envío" />
+              <div class="entrega-acciones">
+                <button type="button" class="btn btn-sm btn-secondary" (click)="usarMiUbicacion()" [disabled]="ubicando">
+                  <app-icono nombre="sede" [tamano]="14" />{{ ubicando ? 'Ubicando…' : 'Usar mi ubicación' }}
+                </button>
+                <span class="entrega-ayuda">o toca el mapa donde está tu casa</span>
+              </div>
+              <label class="campo-cliente">
+                <span>Dirección y referencia (opcional)</span>
+                <input class="input" name="referencia" maxlength="200" autocomplete="street-address"
+                  placeholder="Calle, número, depto. · frente al parque"
+                  [value]="carrito.referencia()" (input)="carrito.referencia.set($any($event.target).value)" />
+              </label>
+              @if (e.fueraDeCobertura) {
+                <p class="entrega-detalle fuera" role="alert">
+                  Ese punto está a {{ e.distanciaKm }} km de <strong>{{ e.sede }}</strong>. Solo repartimos hasta {{ cobertura }} km de la sede:
+                  marca un punto en Lima, más cerca, o cambia de sede.
+                </p>
+              } @else if (e.distanciaKm != null) {
+                <dl class="calculo">
+                  <div><dt>Sale de</dt><dd><strong>{{ e.sede }}</strong></dd></div>
+                  <div><dt>Distancia</dt><dd>{{ e.distanciaKm }} km en línea recta · ≈ {{ e.recorridoKm }} km por calles</dd></div>
+                  <div><dt>Vehículo</dt><dd>{{ e.vehiculo }}</dd></div>
+                  <div><dt>Llega en</dt><dd>unos {{ e.minutos }} min (20 de preparación + viaje)</dd></div>
+                </dl>
+                <p class="entrega-ayuda">Envío gratis en la demo: no se despachan pedidos reales.</p>
+              } @else {
+                <p class="entrega-detalle pendiente">Marca tu dirección en el mapa para calcular la distancia y el tiempo de llegada.</p>
+              }
+            }
+          }
+        </section>
+
         <div class="totales">
           <div class="fila-total">
             <span>Subtotal</span>
@@ -95,7 +153,10 @@
           </div>
         </div>
 
-        <button type="button" class="btn btn-success btn-lg pagar" [disabled]="carrito.pagando()" (click)="pagar()">
+        @if (!carrito.clienteNombre().trim()) {
+          <p class="entrega-detalle pendiente">Escribe a nombre de quién va el pedido para poder pagar.</p>
+        }
+        <button type="button" class="btn btn-success btn-lg pagar" [disabled]="carrito.pagando() || !carrito.puedePagar()" (click)="pagar()">
           @if (carrito.pagando()) {
             Procesando…
           } @else {
@@ -104,7 +165,7 @@
         </button>
         <p class="garantia">
           <app-icono nombre="garantia" [tamano]="14" />
-          Pago simulado: el stock baja de verdad, tu tarjeta no.
+          Pago simulado: el stock baja de verdad y la tienda recibe tu pedido; tu tarjeta no se toca.
         </p>
       </footer>
     }

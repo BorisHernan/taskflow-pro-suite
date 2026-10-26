@@ -142,3 +142,14 @@
     animation: none;
   }
 }
+
+.boleta-entrega {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed currentColor;
+  font-size: 13px;
+
+  p {
+    margin: 0;
+  }
+}

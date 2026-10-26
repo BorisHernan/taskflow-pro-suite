@@ -10,11 +10,11 @@
           <span class="punto" [class.en-vivo]="catalogo.enVivo()"></span>
           {{ catalogo.enVivo() ? 'Stock en vivo' : 'Conectando…' }}
         </span>
-        <span>Retiro en tienda: ves y compras el stock real de la sede que elijas.</span>
+        <span>El surtido, el stock y la entrega dependen de la sede que elijas.</span>
       </p>
     </div>
     <div class="cabecera-acciones">
-      <label class="sede">
+      <label class="sede" data-tour="sede">
         <span>Comprar en</span>
         <select class="input" [value]="catalogo.sede()" (change)="catalogo.elegirSede(+$any($event.target).value)">
           @for (t of catalogo.tiendas(); track t.id) {
@@ -22,12 +22,34 @@
           }
         </select>
       </label>
-      <app-boton-carrito />
+      <a class="btn btn-ghost seguir-pedido" routerLink="/tienda/pedido"><app-icono nombre="envio" [tamano]="16" />Mis pedidos</a>
+      <app-boton-carrito data-tour="carrito" />
     </div>
   </header>
 
+  <!-- La sede elegida: dónde está, qué la distingue y el mapa para cambiarla -->
+  @if (sedeActual(); as t) {
+    <section class="sede-info" aria-label="Sede elegida">
+      <div class="sede-texto">
+        <p class="sede-nombre"><app-icono nombre="sede" [tamano]="16" />{{ t.nombre }} · {{ catalogo.productos().length }} productos</p>
+        <p class="sede-detalle">{{ t.direccion }} · {{ t.horario }}</p>
+        <p class="sede-enfoque">{{ t.enfoque }}</p>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" (click)="verMapa.set(!verMapa())" [attr.aria-expanded]="verMapa()" aria-controls="mapa-sedes">
+        <app-icono nombre="sede" [tamano]="14" />{{ verMapa() ? 'Ocultar mapa' : 'Ver sedes en el mapa' }}
+      </button>
+    </section>
+    @if (verMapa()) {
+      <div class="sede-mapa" id="mapa-sedes">
+        <app-mapa-sedes [tiendas]="catalogo.tiendas()" [seleccionada]="catalogo.sede()" (elegir)="catalogo.elegirSede($event)"
+          etiqueta="Mapa de las sedes: toca una para comprar en ella" />
+        <p>Toca un marcador para comprar en esa sede. El envío a domicilio se coordina al pagar, desde el carrito.</p>
+      </div>
+    }
+  }
+
   <!-- Banner de promociones -->
-  <section class="promo" aria-label="Promociones">
+  <section class="promo" aria-label="Promociones" data-tour="cupon">
     <div class="promo-texto">
       <span class="promo-etiqueta"><app-icono nombre="chispas" [tamano]="14" /> Oferta de bienvenida</span>
       <p class="promo-titulo">10 % de descuento en tu primera compra</p>
@@ -40,7 +62,7 @@
     </ul>
   </section>
 
-  <div class="barra-filtros" id="catalogo">
+  <div class="barra-filtros" id="catalogo" data-tour="categorias">
     <div class="categorias" role="group" aria-label="Categorías">
       <button type="button" class="categoria" [class.activa]="!categoria()" [attr.aria-pressed]="!categoria()" (click)="filtrar({ cat: '' })">
         Todo <span>{{ catalogo.productos().length }}</span>
@@ -109,6 +131,7 @@
 
     @for (p of visibles(); track p.id; let i = $index) {
       <app-tarjeta-producto
+        [attr.data-tour]="i === 0 ? 'producto' : null"
         class="entrar"
         [style.--i]="i"
         [producto]="p"

@@ -3,7 +3,9 @@ import {
   Armchair, Backpack, BatteryCharging, Box, Bug, Cable, Calendar, Clock, Coffee, CupSoda, Dices,
   Footprints, GlassWater, Headphones, Key, Keyboard, Lamp, Laptop, Monitor, Moon, Mouse,
   MousePointerClick, Notebook, Package, PenLine, Power, Puzzle, Shirt, Sprout, StickyNote, Swords,
-  Tag, Usb, type IconNode,
+  Tag, Usb, GraduationCap, Glasses, Umbrella, Gift, Map, Watch, Briefcase, Webcam, Speaker, Router,
+  Smartphone, BookOpen, Scissors, Palette, Flower2, Flame, BedDouble, Pizza, Gamepad2, Spade, Rocket,
+  type IconNode,
 } from 'lucide';
 import { IconoComponent } from '../../shared/icono/icono.component';
 
@@ -15,6 +17,10 @@ const ICONOS_PRODUCTO: Record<string, IconNode> = {
   headphones: Headphones, cable: Cable, usb: Usb, monitor: Monitor, battery: BatteryCharging,
   lamp: Lamp, calendar: Calendar, pen: PenLine, sticky: StickyNote, sprout: Sprout, clock: Clock,
   box: Box, dices: Dices, puzzle: Puzzle, swords: Swords, bug: Bug,
+  cap: GraduationCap, glasses: Glasses, umbrella: Umbrella, gift: Gift, map: Map, watch: Watch,
+  briefcase: Briefcase, webcam: Webcam, speaker: Speaker, router: Router, phone: Smartphone, book: BookOpen,
+  scissors: Scissors, palette: Palette, flower: Flower2, flame: Flame, blanket: BedDouble, pizza: Pizza,
+  gamepad: Gamepad2, cards: Spade, rocket: Rocket,
 };
 
 @Component({
@@ -22,7 +28,7 @@ const ICONOS_PRODUCTO: Record<string, IconNode> = {
   standalone: true,
   imports: [IconoComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<app-icono [icono]="nodo()" [tamano]="size()" [grosor]="1.6" />`,
+  template: `<app-icono [icono]="nodo()" [tamano]="size()" [grosor]="1.5" [relleno]="0.16" />`,
   styles: `:host { display: inline-flex; line-height: 0; }`,
 })
 export class ProductIconComponent {

@@ -1,0 +1,107 @@
+<main class="seguimiento">
+  <header class="cabecera">
+    <a class="volver" routerLink="/tienda"><app-icono nombre="anterior" [tamano]="16" />Volver a la tienda</a>
+    <h1>Seguir mi pedido</h1>
+    <form class="buscar" (submit)="$event.preventDefault(); buscar()">
+      <label class="sr-only" for="codigo">Código del pedido</label>
+      <input id="codigo" class="input codigo-input" name="codigo" maxlength="12" placeholder="TF-XXXXXX" autocomplete="off"
+        [value]="buscado" (input)="buscado = $any($event.target).value" />
+      <button type="submit" class="btn btn-secondary"><app-icono nombre="buscar" [tamano]="16" />Buscar</button>
+    </form>
+    @if (recientes().length) {
+      <p class="recientes">
+        Tus pedidos en este navegador:
+        @for (c of recientes(); track c) {
+          <a class="codigo" [routerLink]="['/tienda/pedido', c]" [attr.aria-current]="c === codigo() ? 'page' : null">{{ c }}</a>
+        }
+      </p>
+    }
+  </header>
+
+  @if (error()) {
+    <p class="alerta" role="alert"><app-icono nombre="error" [tamano]="16" /><span>{{ error() }}</span></p>
+  } @else if (vista(); as v) {
+    <section class="ficha" aria-labelledby="pedido-titulo">
+      <div class="resumen">
+        <p class="eyebrow">{{ v.orden.modalidad === 'ENVIO' ? 'Envío a domicilio' : 'Recojo en tienda' }} · {{ v.tiendaNombre }}</p>
+        <h2 id="pedido-titulo"><span class="codigo">{{ v.orden.codigo }}</span> · {{ nombreEstado[estado()!] }}</h2>
+        <p class="meta">
+          A nombre de {{ v.orden.clienteNombre }} · {{ v.orden.creadaEn | date: 'd MMM, HH:mm' }}
+          @if (!simulado() && v.orden.estado !== 'ENTREGADA') { · se actualiza solo }
+        </p>
+
+        <div class="simulador" [class.activo]="simulado()">
+          @if (!simulado()) {
+            <button type="button" class="btn btn-primary btn-sm" (click)="simular()">
+              <app-icono nombre="rayo" [tamano]="15" />Simular la entrega (12 s)
+            </button>
+            <span>Recorre todo el flujo en pantalla; el pedido real no cambia.</span>
+          } @else if (!simulacionTerminada()) {
+            <span class="en-curso" role="status">Simulación en curso: {{ nombreEstado[estado()!].toLowerCase() }}…</span>
+            <button type="button" class="btn btn-ghost btn-sm" (click)="verEstadoReal()">Detener</button>
+          } @else {
+            <span class="en-curso" role="status">Simulación terminada. En el sistema real, cada paso lo marca la sede.</span>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="verEstadoReal()">Ver estado real</button>
+            <button type="button" class="btn btn-ghost btn-sm" (click)="simular()">Repetir</button>
+          }
+        </div>
+
+        <ol class="pasos" aria-label="Estado del pedido">
+          @for (p of pasos(); track p.estado) {
+            <li [class.hecho]="p.hecho" [class.actual]="p.actual" [attr.aria-current]="p.actual ? 'step' : null">
+              <span class="marca">
+                @if (p.hecho) { <app-icono nombre="check" [tamano]="14" [grosor]="2.5" /> }
+              </span>
+              <div>
+                <p class="paso-nombre">{{ p.nombre }}</p>
+                <p class="paso-detalle">{{ p.detalle }}</p>
+              </div>
+            </li>
+          }
+        </ol>
+
+        <div class="lineas">
+          @for (l of v.lineas; track $index) {
+            <p><span>{{ l.cantidad }} × {{ l.producto }}</span><span>{{ l.total | soles }}</span></p>
+          }
+          @if (v.orden.descuento > 0) {
+            <p class="suave"><span>Descuento ({{ v.orden.cupon }})</span><span>− {{ v.orden.descuento | soles }}</span></p>
+          }
+          <p class="total"><span>Total pagado</span><span>{{ v.orden.total | soles }}</span></p>
+        </div>
+      </div>
+
+      <div class="lado">
+        <app-mapa-sedes class="mapa" [tiendas]="tienda()" [seleccionada]="v.orden.tiendaId" [destino]="destino()"
+          [vehiculo]="vehiculo()?.icono ?? null" [progreso]="progreso()" etiqueta="Mapa con la tienda y el destino del pedido" />
+        @if (envio() && estimado(); as e) {
+          <dl class="calculo">
+            <div><dt>Sale de</dt><dd><strong>{{ v.tiendaNombre }}</strong>, {{ v.tiendaDireccion }}</dd></div>
+            <div><dt>Hacia</dt><dd>{{ v.orden.direccion || 'la ubicación marcada en el mapa' }}</dd></div>
+            <div><dt>Distancia</dt><dd>{{ e.lineaRectaKm }} km en línea recta · ≈ {{ e.recorridoKm }} km por calles</dd></div>
+            <div>
+              <dt>Vehículo</dt>
+              <dd class="vehiculo-dato"><app-icono [icono]="e.vehiculo.icono" [tamano]="16" />{{ e.vehiculo.nombre }} · {{ unidades() }} {{ unidades() === 1 ? 'unidad' : 'unidades' }} ({{ e.vehiculo.regla }})</dd>
+            </div>
+            <div><dt>Tiempo</dt><dd>unos {{ e.minutos }} min: 20 de preparación + {{ e.viajeMin }} de viaje</dd></div>
+          </dl>
+        }
+        <p class="donde">
+          @if (v.orden.modalidad === 'ENVIO') {
+            Moto hasta 8 unidades, auto de 9 a 12 y camión desde 13. Reparto hasta {{ cobertura }} km de la sede.
+          } @else {
+            Recoges en <strong>{{ v.tiendaNombre }}</strong>, {{ v.tiendaDireccion }}. Muestra el código {{ v.orden.codigo }}.
+          }
+        </p>
+        <p class="nota">
+          <app-icono nombre="info" [tamano]="14" />
+          Los estados los marca el encargado de la sede desde la gestión. Ingresa como encargado de {{ v.tiendaNombre }} para despacharlo tú.
+        </p>
+      </div>
+    </section>
+  } @else if (codigo()) {
+    <p class="cargando">Buscando el pedido…</p>
+  } @else {
+    <p class="vacio">Escribe el código que aparece en tu boleta (por ejemplo TF-7KQ2MD).</p>
+  }
+</main>

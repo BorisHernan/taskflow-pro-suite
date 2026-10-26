@@ -4,15 +4,26 @@
     <section class="boleta-contenedor" aria-labelledby="boleta-titulo">
       <div class="boleta-exito no-imprimir">
         <span class="boleta-check"><app-icono nombre="check" [tamano]="22" [grosor]="2.5" /></span>
-        <h2 id="boleta-titulo">¡Compra lista!</h2>
-        <p>El stock ya bajó para todos los visitantes. Esta es tu boleta de demostración.</p>
+        <h2 id="boleta-titulo">¡Pedido recibido!</h2>
+        <p>
+          El stock ya bajó para todos y la tienda tiene la tarea de prepararlo.
+          @if (r.codigo) { Tu código de seguimiento es <strong class="codigo">{{ r.codigo }}</strong>. }
+        </p>
+        @if (r.codigo) {
+          <a class="btn btn-primary" [routerLink]="['/tienda/pedido', r.codigo]">
+            <app-icono nombre="envio" [tamano]="16" />Seguir mi pedido
+          </a>
+        }
       </div>
 
       <article class="boleta">
         <header class="boleta-cabecera">
           <p class="boleta-tienda">TaskFlow Store</p>
           <p class="boleta-falsa">Boleta de demostración, no es un comprobante real</p>
-          <p class="boleta-meta">N.º {{ r.number }} · {{ r.date | date: 'dd/MM/yyyy HH:mm' }}</p>
+          <p class="boleta-meta">Pedido {{ r.number }} · {{ r.date | date: 'dd/MM/yyyy HH:mm' }}</p>
+          @if (r.cliente) {
+            <p class="boleta-meta">Cliente: {{ r.cliente }}</p>
+          }
         </header>
 
         <div class="boleta-lineas">
@@ -40,6 +51,15 @@
             <span>{{ r.total | soles }}</span>
           </div>
         </div>
+        @if (r.entrega; as e) {
+          <div class="boleta-entrega">
+            @if (e.modo === 'recojo') {
+              <p><strong>Recojo en tienda:</strong> {{ e.sede }}, {{ e.direccionSede }}. {{ e.horario }}.</p>
+            } @else {
+              <p><strong>Envío a domicilio</strong> desde {{ e.sede }}: {{ e.distanciaKm }} km en línea recta (≈ {{ e.recorridoKm }} km por calles), en {{ e.vehiculo }}, llega en unos {{ e.minutos }} minutos (referencial).</p>
+            }
+          </div>
+        }
         <p class="boleta-gracias">Gracias por tu compra simulada.</p>
       </article>
 
@@ -48,7 +68,7 @@
           <app-icono nombre="imprimir" />
           Imprimir o guardar en PDF
         </button>
-        <a class="btn btn-primary btn-lg" routerLink="/tienda">Seguir comprando</a>
+        <a class="btn btn-secondary btn-lg" routerLink="/tienda">Seguir comprando</a>
       </div>
     </section>
   }

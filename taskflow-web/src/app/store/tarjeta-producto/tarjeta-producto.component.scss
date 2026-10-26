@@ -42,12 +42,31 @@
   height: 112px;
   margin-bottom: 12px;
   border-radius: var(--radius);
-  background: var(--seccion-suave);
-  color: var(--seccion);
+  background: color-mix(in srgb, var(--cat) 9%, var(--tf-surface));
+  color: var(--cat);
 
   app-product-icon {
-    transition: transform 0.3s var(--ease);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
+}
+
+.halo {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--cat) 16%, var(--tf-surface));
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--cat) 7%, transparent);
+  transition: box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.producto:hover .halo {
+  box-shadow: 0 0 0 14px color-mix(in srgb, var(--cat) 9%, transparent);
+}
+
+.producto:hover app-product-icon {
+  transform: scale(1.08) rotate(-4deg);
 }
 
 .sello {

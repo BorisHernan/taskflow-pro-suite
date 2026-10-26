@@ -325,3 +325,60 @@
     min-width: 190px;
   }
 }
+
+.sede-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  border: 1px solid var(--tf-border);
+  border-radius: var(--radius-lg);
+  background: var(--tf-surface);
+
+  p {
+    margin: 0;
+  }
+}
+
+.sede-nombre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+
+  app-icono {
+    color: var(--tf-primary);
+  }
+}
+
+.sede-detalle,
+.sede-enfoque {
+  margin-top: 2px !important;
+  font-size: 13px;
+  color: var(--tf-text-secondary);
+}
+
+.sede-mapa {
+  margin-bottom: 16px;
+  animation: abre 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  app-mapa-sedes {
+    height: 320px;
+  }
+
+  p {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: var(--tf-text-secondary);
+  }
+}
+
+@keyframes abre {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}

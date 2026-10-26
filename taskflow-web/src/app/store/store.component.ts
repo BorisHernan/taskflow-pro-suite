@@ -1,12 +1,13 @@
-import { Component, DestroyRef, OnInit, computed, effect, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { IconoComponent } from '../shared/icono/icono.component';
 import { CatalogoService } from './servicios/catalogo.service';
 import { CarritoService } from './servicios/carrito.service';
 import { TarjetaProductoComponent } from './tarjeta-producto/tarjeta-producto.component';
 import { BotonCarritoComponent } from './boton-carrito/boton-carrito.component';
+import { MapaSedesComponent } from '../shared/mapa/mapa-sedes.component';
 
 type Orden = 'destacados' | 'precio-asc' | 'precio-desc' | 'valoracion' | 'stock';
 
@@ -16,12 +17,15 @@ const POR_PAGINA = 12;
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [FormsModule, IconoComponent, TarjetaProductoComponent, BotonCarritoComponent],
+  imports: [FormsModule, RouterLink, IconoComponent, TarjetaProductoComponent, BotonCarritoComponent, MapaSedesComponent],
   templateUrl: './store.component.html',
   styleUrl: './store.component.scss',
 })
 export class StoreComponent implements OnInit {
   readonly catalogo = inject(CatalogoService);
+  /** Panel con el mapa de las sedes. */
+  readonly verMapa = signal(false);
+  readonly sedeActual = computed(() => this.catalogo.tiendas().find((t) => t.id === this.catalogo.sede()) ?? null);
   private readonly carrito = inject(CarritoService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);

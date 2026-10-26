@@ -17,7 +17,7 @@ describe('CarritoService', () => {
   beforeEach(() => {
     localStorage.clear();
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), { provide: CatalogoService, useValue: { sede: signal(2) } }],
+      providers: [provideHttpClient(), provideHttpClientTesting(), { provide: CatalogoService, useValue: { sede: signal(2), tiendas: signal([]) } }],
     });
     carrito = TestBed.inject(CarritoService);
     http = TestBed.inject(HttpTestingController);
@@ -66,35 +66,50 @@ describe('CarritoService', () => {
     expect(carrito.items()[0].product.stock).toBe(3);
   });
 
-  it('al pagar arma la boleta con el descuento y vacía el carrito', async () => {
+  const vista = (total: number) => ({
+    orden: {
+      id: 7, codigo: 'TF-ABC234', tiendaId: 2, clienteNombre: 'Lucía', modalidad: 'RECOJO', subtotal: 200, descuento: 20,
+      total, cupon: 'BIENVENIDO10', estado: 'RECIBIDA', creadaEn: '2026-10-25T10:00:00', actualizadaEn: '2026-10-25T10:00:00',
+    },
+    lineas: [{ producto: 'Producto 1', cantidad: 2, total: 200, fecha: '2026-10-25T10:00:00' }],
+    tiendaNombre: 'Tienda San Isidro',
+  });
+
+  it('al pagar envía un solo pedido y arma la boleta con lo que guardó el servidor', async () => {
     carrito.agregar(producto(1, 5, 100), 2);
     carrito.aplicarCupon('BIENVENIDO10');
+    carrito.clienteNombre.set('Lucía');
 
     const pago = carrito.pagar();
-    const compra = http.expectOne((r) => r.url.endsWith('/1/purchase'));
-    expect(compra.request.body).toEqual({ quantity: 2, tiendaId: 2 });
-    compra.flush(producto(1, 3, 100));
+    const pedido = http.expectOne((r) => r.url.endsWith('/api/ordenes'));
+    expect(pedido.request.body).toEqual(
+      expect.objectContaining({ tiendaId: 2, clienteNombre: 'Lucía', modalidad: 'RECOJO', cupon: 'BIENVENIDO10', lineas: [{ productoId: 1, cantidad: 2 }] }),
+    );
+    pedido.flush(vista(180));
     const r = await pago;
 
     expect(r.ok).toBe(true);
+    expect(carrito.boleta()?.codigo).toBe('TF-ABC234');
     expect(carrito.boleta()?.total).toBe(180);
     expect(carrito.items()).toEqual([]);
   });
 
-  it('si una compra falla, deja en el carrito solo lo que no se compró', async () => {
+  it('si el pedido falla no se cobra nada y el carrito queda igual', async () => {
     carrito.agregar(producto(1, 5));
     carrito.agregar(producto(2, 5));
+    carrito.clienteNombre.set('Lucía');
 
     const pago = carrito.pagar();
-    http.expectOne((r) => r.url.endsWith('/1/purchase')).flush(producto(1, 4));
-    await Promise.resolve();
-    await Promise.resolve();
-    http
-      .expectOne((r) => r.url.endsWith('/2/purchase'))
-      .flush({ error: 'Solo quedan 0 unidades' }, { status: 409, statusText: 'Conflict' });
+    http.expectOne((r) => r.url.endsWith('/api/ordenes')).flush({ error: 'Solo quedan 0 unidades' }, { status: 409, statusText: 'Conflict' });
     const r = await pago;
 
     expect(r.ok).toBe(false);
-    expect(carrito.items().map((i) => i.product.id)).toEqual([2]);
+    expect(carrito.items().map((i) => i.product.id)).toEqual([1, 2]);
+  });
+
+  it('sin nombre no deja pagar', () => {
+    carrito.agregar(producto(1, 5));
+    carrito.clienteNombre.set(' ');
+    expect(carrito.puedePagar()).toBe(false);
   });
 });
