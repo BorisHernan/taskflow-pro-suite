@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 public interface ProductRepository extends ReactiveCrudRepository<Product, Long> {
 
     String CON_STOCK = """
-            SELECT p.id, p.name, p.description, p.price, i.stock, p.icon, p.category, p.details, p.initial_stock
+            SELECT p.id, p.name, p.description, p.price, i.stock, p.icon, p.category, p.subcategory, p.brand, p.list_price, p.promo, p.details, p.initial_stock
             FROM products p JOIN inventario i ON i.producto_id = p.id WHERE i.tienda_id = :tienda""";
 
     Flux<Product> findAllByOrderByIdAsc();

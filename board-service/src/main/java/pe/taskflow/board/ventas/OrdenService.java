@@ -97,6 +97,11 @@ public class OrdenService {
                         .flatMap(lineas -> guardar(req, tienda, lineas, descuento.orElse(BigDecimal.ZERO), envio)));
     }
 
+    /** Con 2×1, por cada par de unidades se paga una: con 3 se pagan 2; con 4, 2. */
+    static int unidadesPagadas(Product p, int cantidad) {
+        return "2X1".equals(p.getPromo()) ? cantidad - cantidad / 2 : cantidad;
+    }
+
     private Mono<LineaCobrada> cobrarLinea(long tiendaId, long productoId, int cantidad) {
         return productRepository.findById(productoId)
                 .switchIfEmpty(Mono.error(Errores.noEncontrado("Producto no encontrado: " + productoId)))
@@ -104,7 +109,7 @@ public class OrdenService {
                         .switchIfEmpty(Mono.defer(() -> inventario.stockActual(tiendaId, productoId)
                                 .flatMap(stock -> Mono.<Inventario>error(Errores.conflicto(
                                         "Solo quedan " + stock + " unidades de \"" + p.getName() + "\" en esta sede.")))))
-                        .thenReturn(new LineaCobrada(p, cantidad, p.getPrice().multiply(BigDecimal.valueOf(cantidad)))));
+                        .thenReturn(new LineaCobrada(p, cantidad, p.getPrice().multiply(BigDecimal.valueOf(unidadesPagadas(p, cantidad))))));
     }
 
     private Mono<OrdenVista> guardar(NuevaOrden req, Tienda tienda, List<LineaCobrada> lineas, BigDecimal tasaDescuento,

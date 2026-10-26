@@ -34,6 +34,16 @@ public class Product {
 
     private String category;
 
+    // Departamento (category) → subcategoría; marca genérica y precio anterior para mostrar el descuento.
+    private String subcategory;
+
+    private String brand;
+
+    private BigDecimal listPrice;
+
+    // Promoción vigente: "2X1" (por cada par, una unidad va gratis) o null.
+    private String promo;
+
     private String details;
 
     // Stock al que vuelve el producto en el reset diario; no se expone en la API.

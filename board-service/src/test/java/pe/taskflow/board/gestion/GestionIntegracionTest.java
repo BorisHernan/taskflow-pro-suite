@@ -52,6 +52,8 @@ class GestionIntegracionTest {
         registro.add("spring.flyway.user", () -> "postgres");
         registro.add("spring.flyway.password", () -> "postgres");
         registro.add("app.auth.jwt-secret", () -> "clave-de-pruebas-de-al-menos-32-bytes!!");
+        // El catálogo completo de una sede ya pesa más que el límite de 256 KB del cliente de pruebas.
+        registro.add("spring.codec.max-in-memory-size", () -> "4MB");
     }
 
     private String token(String usuario) {
@@ -238,11 +240,34 @@ class GestionIntegracionTest {
             productos.forEach(p -> nombres.add(p.get("name").asText()));
             catalogo.put(id, nombres);
         }
-        // La webcam es exclusiva de San Isidro; la manta, de Surco.
+        // La cámara web es exclusiva de San Isidro; la manta, de Surco.
         long sanIsidro = tiendas.get(1).get("id").asLong();
         long surco = tiendas.get(2).get("id").asLong();
-        assertThat(catalogo.get(sanIsidro)).contains("Webcam \"Daily en HD\"").doesNotContain("Manta \"Fin de sprint\"");
-        assertThat(catalogo.get(surco)).contains("Manta \"Fin de sprint\"").doesNotContain("Webcam \"Daily en HD\"");
+        assertThat(catalogo.get(sanIsidro)).contains("Cámara web Full HD").doesNotContain("Manta polar 150 × 200 cm");
+        assertThat(catalogo.get(surco)).contains("Manta polar 150 × 200 cm").doesNotContain("Cámara web Full HD");
+    }
+
+    @Test
+    void unaPromocionDosPorUnoCobraSoloUnaUnidadPorCadaPar() {
+        String miraflores = token("miraflores");
+        long tienda = json(miraflores, "/api/auth/yo").get("tiendaId").asLong();
+        JsonNode catalogo = http.get().uri("/api/products?tienda=" + tienda).exchange()
+                .expectStatus().isOk().expectBody(JsonNode.class).returnResult().getResponseBody();
+        JsonNode promo = null;
+        for (JsonNode p : catalogo) {
+            if ("2X1".equals(p.path("promo").asText()) && p.get("stock").asInt() >= 4) {
+                promo = p;
+                break;
+            }
+        }
+        assertThat(promo).as("hay productos con 2×1 y stock").isNotNull();
+
+        JsonNode creada = http.post().uri("/api/ordenes").bodyValue(Map.of("tiendaId", tienda, "clienteNombre", "Marta",
+                        "modalidad", "RECOJO", "lineas", java.util.List.of(Map.of("productoId", promo.get("id").asLong(), "cantidad", 3))))
+                .exchange().expectStatus().isCreated().expectBody(JsonNode.class).returnResult().getResponseBody();
+        // Tres unidades: un par (se paga una) más una suelta = dos unidades cobradas.
+        assertThat(creada.get("orden").get("total").decimalValue())
+                .isEqualByComparingTo(promo.get("price").decimalValue().multiply(java.math.BigDecimal.valueOf(2)));
     }
 
     @Test
