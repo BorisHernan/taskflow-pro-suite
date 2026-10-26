@@ -49,6 +49,8 @@ public class SeguridadConfig {
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         .pathMatchers("/api/auth/login", "/api/tiendas", "/api/products/**", "/ws/arena").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/stats").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/ordenes").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/ordenes/seguimiento/**").permitAll()
                         .pathMatchers("/actuator/health/**", "/actuator/info").permitAll()
                         .pathMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**").permitAll()
                         .pathMatchers("/api/stats/**", "/api/reportes/**", "/actuator/**").hasRole(Usuario.ADMIN)

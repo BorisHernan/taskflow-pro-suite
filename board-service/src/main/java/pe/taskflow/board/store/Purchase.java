@@ -35,5 +35,7 @@ public class Purchase {
 
     private Long turnoId;
 
+    private Long ordenId;
+
     private LocalDateTime createdAt;
 }
