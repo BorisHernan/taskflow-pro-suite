@@ -149,13 +149,13 @@ export const PASOS_CLIENTE: PasoTour[] = [
     ruta: '/tienda',
     ancla: 'producto',
     titulo: 'Stock real, en vivo',
-    texto: 'La barra muestra cuántas unidades quedan en esa sede. Si otra persona compra, baja al instante.',
+    texto: 'Cada producto avisa cuando quedan pocas unidades en esa sede. Si otra persona compra, el stock baja al instante.',
   },
   {
     ruta: '/tienda',
     ancla: 'categorias',
     titulo: 'Encuentra lo que buscas',
-    texto: 'Filtra por categoría, busca por nombre u ordena por precio o valoración.',
+    texto: 'Explora por departamento y subcategoría, filtra por precio o marca, busca por nombre u ordena por precio o valoración.',
   },
   {
     ruta: '/tienda',

@@ -1,0 +1,24 @@
+<section class="riel" [attr.data-categoria]="categoria() || null" [attr.aria-label]="titulo()">
+  <aside class="riel-panel" [style.background]="fondo() || null" [style.color]="texto() || null">
+    <span class="riel-icono"><app-product-icon [icon]="icono()" [size]="56" /></span>
+    <div class="riel-titulo">
+      <h2>{{ titulo() }}</h2>
+      @if (detalle()) {
+        <p>{{ detalle() }}</p>
+      }
+    </div>
+    <a class="riel-ver" routerLink="/tienda" [queryParams]="consulta()" fragment="catalogo">Ver todo →</a>
+    <div class="riel-flechas">
+      <button type="button" (click)="mover(-1)" aria-label="Ver los anteriores"><app-icono nombre="anterior" [tamano]="18" /></button>
+      <button type="button" (click)="mover(1)" aria-label="Ver los siguientes"><app-icono nombre="siguiente" [tamano]="18" /></button>
+    </div>
+  </aside>
+
+  <ul class="riel-pista" #pista>
+    @for (p of productos(); track p.id; let i = $index) {
+      <li>
+        <app-tarjeta-producto [attr.data-tour]="primero() && i === 0 ? 'producto' : null" [producto]="p" [valoracion]="valoraciones()[p.id]" />
+      </li>
+    }
+  </ul>
+</section>

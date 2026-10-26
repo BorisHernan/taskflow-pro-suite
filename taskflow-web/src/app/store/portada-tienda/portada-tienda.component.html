@@ -1,0 +1,116 @@
+<section class="temas" aria-roledescription="carrusel" aria-label="Productos por tema" data-tour="cupon"
+  [class.pausado]="pausado()" (mouseenter)="pausado.set(true)" (mouseleave)="pausado.set(false)" (focusin)="pausado.set(true)" (focusout)="pausado.set(false)">
+  <div class="temas-pista" [style.transform]="'translateX(-' + indice() * 100 + '%)'">
+    @for (t of temas(); track t.id; let i = $index) {
+      <article class="tema" [style.background]="t.fondo" [style.color]="t.texto" [attr.aria-hidden]="i !== indice()" [attr.inert]="i !== indice() ? '' : null">
+        <div class="tema-texto">
+          <span class="tema-etiqueta">{{ t.etiqueta }}</span>
+          <h2 class="tema-titulo" [class.gigante]="t.id === 'dos-por-uno'">{{ t.id === 'dos-por-uno' ? '2 × 1' : t.titulo }}</h2>
+          <p>{{ t.id === 'dos-por-uno' ? t.titulo + '. ' + t.detalle : t.detalle }}</p>
+          <a class="tema-cta" routerLink="/tienda" [queryParams]="t.enlace" fragment="catalogo" [style.background]="t.texto" [style.color]="t.fondo">{{ t.cta }}</a>
+        </div>
+
+        <ul class="mosaico">
+          @for (p of t.productos; track p.id; let j = $index) {
+            <li [style.--j]="j">
+              <a class="ficha" [routerLink]="['/tienda/producto', p.id]">
+                <span class="ficha-circulo"><app-product-icon [icon]="p.icon || ''" [size]="64" /></span>
+                <span class="ficha-nombre">{{ p.name }}</span>
+                <span class="ficha-precio">
+                  {{ p.price | soles }}
+                  @if (p.promo === '2X1') {
+                    <b>2×1</b>
+                  }
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      </article>
+    }
+  </div>
+
+  <div class="temas-pestanas" role="tablist" aria-label="Temas">
+    @for (t of temas(); track t.id; let i = $index) {
+      <button type="button" role="tab" class="pestana" [class.activa]="i === indice()" [attr.aria-selected]="i === indice()" (click)="ir(i)" (animationend)="alTerminar(i)"
+        [style.--seg]="segundos + 's'" [class.sin-animar]="reducido">
+        <app-product-icon [icon]="t.icono" [size]="18" />
+        <span>{{ t.nombre }}</span>
+      </button>
+    }
+  </div>
+</section>
+
+<p class="cupon">
+  <strong>10 % en tu primera compra.</strong> Usa el cupón <code>BIENVENIDO10</code> al pagar en el carrito.
+</p>
+
+<nav class="deptos" data-tour="categorias" aria-label="Comprar por departamento">
+  <h2 class="sr-only">Departamentos</h2>
+  <ul>
+    @for (d of departamentos; track d.nombre) {
+      <li [attr.data-categoria]="d.nombre">
+        <a routerLink="/tienda" [queryParams]="{ cat: d.nombre }" fragment="catalogo">
+          <span class="depto-circulo"><app-product-icon [icon]="d.icono" [size]="34" /></span>
+          <span class="depto-nombre">{{ d.nombre }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+</nav>
+
+@if (relampago().length >= 4) {
+  <section class="relampago" aria-labelledby="relampago-titulo">
+    <header class="relampago-cabecera">
+      <div>
+        <h2 id="relampago-titulo">Ofertas relámpago</h2>
+        <p>Los mayores descuentos de hoy en tu sede</p>
+      </div>
+      <p class="cuenta" aria-label="Tiempo que queda de las ofertas de hoy">
+        <span>Terminan en</span>
+        <strong>{{ resto() }}</strong>
+      </p>
+      <a class="relampago-ver" routerLink="/tienda" [queryParams]="{ oferta: 'dscto' }" fragment="catalogo">Ver todas →</a>
+    </header>
+
+    <ul class="relampago-mosaico">
+      @for (p of relampago(); track p.id; let i = $index) {
+        <li [class.grande]="i < 2" [attr.data-categoria]="p.category" [style.--i]="i">
+          <a class="oferta" [routerLink]="['/tienda/producto', p.id]">
+            <span class="oferta-descuento">-{{ p.descuento }} %</span>
+            <span class="oferta-circulo"><app-product-icon [icon]="p.icon || ''" [size]="i < 2 ? 92 : 64" /></span>
+            <span class="oferta-marca">{{ p.brand || p.category }}</span>
+            <span class="oferta-nombre">{{ p.name }}</span>
+            <span class="oferta-precios">
+              <span class="oferta-precio"><small>Oferta</small>{{ p.price | soles }}</span>
+              <span class="oferta-regular"><small>Regular</small><s>{{ p.listPrice | soles }}</s></span>
+            </span>
+          </a>
+          <button type="button" class="oferta-agregar" (click)="carrito.agregarYAvisar(p)" [attr.aria-label]="'Agregar al carrito ' + p.name">
+            <app-icono nombre="carrito" [tamano]="18" />
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+}
+
+<div class="rieles">
+  @if (dosPorUno().length) {
+    <app-riel-productos titulo="Ofertas 2 × 1" detalle="Lleva 2 y paga 1" icono="soda" fondo="#d92300" texto="#ffffff" [productos]="dosPorUno()" [valoraciones]="valoraciones()" [consulta]="{ oferta: '2x1' }" [primero]="true" />
+  }
+  @if (conDescuento().length) {
+    <app-riel-productos titulo="Más ofertas" detalle="Precios rebajados en tu sede" icono="tag" fondo="#e08c05" texto="#1f0c03" [productos]="conDescuento()" [valoraciones]="valoraciones()" [consulta]="{ oferta: 'dscto' }" [primero]="!dosPorUno().length" />
+  }
+  @for (g of grupos(); track g.nombre) {
+    @defer (on viewport) {
+      <app-riel-productos [titulo]="g.nombre" [detalle]="g.total + ' productos'" [icono]="g.icono" [categoria]="g.nombre" [productos]="g.productos" [valoraciones]="valoraciones()" [consulta]="{ cat: g.nombre }" />
+    } @placeholder {
+      <div class="riel-reserva" [attr.aria-label]="g.nombre"></div>
+    }
+  }
+</div>
+
+<p class="todos">
+  <a class="todos-enlace" routerLink="/tienda" [queryParams]="{ todos: '1' }" fragment="catalogo">Ver los {{ productos().length }} productos</a>
+</p>

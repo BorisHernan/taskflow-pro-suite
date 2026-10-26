@@ -2,7 +2,7 @@
   <header class="gestion-cabecera">
     <div>
       <h1 class="page-title">Pedidos online</h1>
-      <p>Compras de la tienda online. Cada una llega con su tarea en el tablero; al avanzarla aquí, el cliente lo ve en su seguimiento.</p>
+      <p>Compras de Quechuti, la tienda online. Cada una llega con su tarea en el tablero; al avanzarla aquí, el cliente lo ve en su seguimiento.</p>
     </div>
     <div class="cabecera-acciones">
       <a class="btn btn-secondary" routerLink="/tienda" target="_blank" rel="noopener">
@@ -71,7 +71,7 @@
         <app-estado-vista
           [tipo]="cargando() ? 'cargando' : 'vacio'"
           [titulo]="cargando() ? 'Cargando…' : filtro() === 'pendientes' ? 'No hay pedidos por atender' : 'Aún no se entregó ningún pedido'"
-          [texto]="cargando() ? '' : 'Haz una compra en la tienda online y aparecerá aquí al instante.'"
+          [texto]="cargando() ? '' : 'Haz una compra en Quechuti y aparecerá aquí al instante.'"
           icono="carrito"
         />
       }

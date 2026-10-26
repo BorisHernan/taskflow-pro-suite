@@ -31,14 +31,14 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('sin sesión la navegación ofrece ingresar, la tienda online y la arena', async () => {
+  it('sin sesión la cabecera ofrece buscar en la tienda e ingresar', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    const links = Array.from(compiled.querySelectorAll('.app-nav-links a')).map((a) => a.textContent?.trim());
     const accion = compiled.querySelector('.app-nav-acciones a')?.textContent?.trim();
 
-    expect(links).toEqual(['Tienda online', 'Arena']);
+    expect(compiled.querySelector('form[role=search] input')).toBeTruthy();
+    expect(compiled.textContent).not.toContain('Arena');
     expect(accion).toBe('Ingresar');
   });
 

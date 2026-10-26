@@ -51,15 +51,15 @@
 @mixin tema-oscuro {
   color-scheme: dark;
 
-  --tf-bg: #101816;
-  --tf-surface: #17211e;
-  --tf-surface-alt: #202d29;
-  --tf-surface-hover: #293832;
+  --tf-bg: #0a0a0b;
+  --tf-surface: #151516;
+  --tf-surface-alt: #1e1e20;
+  --tf-surface-hover: #29292c;
 
-  --tf-text: #e8f1ed;
-  --tf-text-secondary: #a7b7b0;
-  --tf-border: #34443e;
-  --tf-border-strong: #4b5e57;
+  --tf-text: #f5f5f7;
+  --tf-text-secondary: #a1a1a6;
+  --tf-border: #2b2b2e;
+  --tf-border-strong: #48484c;
 
   --tf-primary: #55c5b4;
   --tf-primary-hover: #70d5c5;
@@ -78,8 +78,8 @@
   --tf-info-bg: #203557;
 
   --tf-focus: #91b7ff;
-  --tf-disabled-bg: #28322e;
-  --tf-disabled-text: #91a098;
+  --tf-disabled-bg: #26262a;
+  --tf-disabled-text: #8e8e93;
 
   --tf-serie-1: #55c5b4;
   --tf-serie-2: #e6a080;
@@ -107,8 +107,101 @@ html[data-theme='dark'] {
   }
 }
 
+/* ── Paleta de la tienda online (rojo anaranjado, naranja, oliva, ámbar, crema, marrón) ──
+   Solo cambia en /tienda: la gestión conserva su verde azulado. Cada color tiene un rol:
+   naranja = acciones, rojo = ofertas, ámbar = pocas unidades, oliva = fresco, marrón = tinta. */
+@mixin paleta-tienda-claro {
+  --tf-bg: #f6efe6;
+  --tf-surface: #fffcf8;
+  --tf-surface-alt: #eee3d6;
+  --tf-surface-hover: #e5d6c5;
+
+  --tf-text: #2a1409;
+  --tf-text-secondary: #6a584a;
+  --tf-border: #e1d3c3;
+  --tf-border-strong: #bba995;
+
+  --tf-primary: #7a2306;
+  --tf-primary-hover: #5e1a04;
+  --tf-primary-subtle: #fbe4d4;
+  --tf-primary-on: #fff7ef;
+
+  --tf-accent: #a85f00;
+  --tf-success: #6b5f04;
+  --tf-success-bg: #f1edc8;
+  --tf-warning: #9a5800;
+  --tf-warning-bg: #fde8c2;
+  --tf-danger: #c21f00;
+  --tf-danger-bg: #fde0d9;
+
+  --tf-focus: #c24a00;
+  --tf-disabled-bg: #ece2d6;
+  --tf-disabled-text: #7a6a5c;
+
+  --tf-serie-1: #c45508;
+  --tf-serie-2: #8f2a06;
+  --tf-serie-3: #6b5f04;
+  --tf-serie-4: #b8760b;
+  --tf-serie-5: #a3341a;
+  --tf-serie-6: #6a584a;
+}
+
+@mixin paleta-tienda-oscuro {
+  --tf-bg: #14120f;
+  --tf-surface: #1e1b18;
+  --tf-surface-alt: #28241f;
+  --tf-surface-hover: #332e28;
+
+  --tf-text: #f1e8de;
+  --tf-text-secondary: #b5aa9e;
+  --tf-border: #35302a;
+  --tf-border-strong: #52493f;
+
+  --tf-primary: #ff7a00;
+  --tf-primary-hover: #ff9333;
+  --tf-primary-subtle: #3b1d0a;
+  --tf-primary-on: #1f0c03;
+
+  --tf-accent: #e08c05;
+  --tf-success: #b9a615;
+  --tf-success-bg: #2e2a0a;
+  --tf-warning: #f0a52b;
+  --tf-warning-bg: #40290a;
+  --tf-danger: #ff5a3c;
+  --tf-danger-bg: #4a1d14;
+
+  --tf-focus: #ffb454;
+  --tf-disabled-bg: #2a2622;
+  --tf-disabled-text: #948a7f;
+
+  --tf-serie-1: #ff7a00;
+  --tf-serie-2: #ff5a3c;
+  --tf-serie-3: #b9a615;
+  --tf-serie-4: #f0a52b;
+  --tf-serie-5: #e6c3ad;
+  --tf-serie-6: #b5aa9e;
+}
+
+html[data-seccion='tienda']:not([data-theme='dark']) {
+  @include paleta-tienda-claro;
+}
+
+html[data-seccion='tienda'][data-theme='dark'] {
+  @include paleta-tienda-oscuro;
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-seccion='tienda']:not([data-theme]) {
+    @include paleta-tienda-oscuro;
+  }
+}
+
 :root {
   /* Alias de compatibilidad: todos apuntan a los tokens semánticos. */
+  /* Colores de rol de la tienda: acción (naranja), su texto, y oferta (rojo). */
+  --accion: #ff7a00;
+  --sobre-accion: #1f0c03;
+  --oferta: #d92300;
   --bg: var(--tf-bg);
   --surface: var(--tf-surface);
   --surface-alt: var(--tf-surface-alt);
@@ -276,6 +369,11 @@ h3 {
   max-width: 1240px;
   margin: 0 auto;
   padding: 32px var(--gutter) 72px;
+}
+
+html[data-seccion='tienda'] .app-nav,
+html[data-seccion='tienda'] .page {
+  max-width: 1680px;
 }
 
 .page-header {
@@ -1131,4 +1229,35 @@ a.kpi:hover {
   body.con-consola {
     padding-right: 340px;
   }
+}
+
+/* Departamentos de supermercado (tienda online). */
+[data-categoria='Despensa'],
+[data-categoria^='Panader'] {
+  --cat: var(--tf-serie-4);
+}
+[data-categoria*='cteos'],
+[data-categoria='Bebidas'] {
+  --cat: var(--tf-serie-3);
+}
+[data-categoria^='Frutas'] {
+  --cat: var(--tf-success);
+}
+[data-categoria^='Carnes'],
+[data-categoria='Mascotas'] {
+  --cat: var(--tf-serie-2);
+}
+[data-categoria^='Snacks'],
+[data-categoria='Cuidado personal'] {
+  --cat: var(--tf-serie-5);
+}
+[data-categoria='Limpieza'] {
+  --cat: var(--tf-serie-1);
+}
+[data-categoria='Congelados'],
+[data-categoria='Electrohogar'] {
+  --cat: var(--tf-serie-6);
+}
+[data-categoria^='Deportes'] {
+  --cat: var(--tf-serie-1);
 }

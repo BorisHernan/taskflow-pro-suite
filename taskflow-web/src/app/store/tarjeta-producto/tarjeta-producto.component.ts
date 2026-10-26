@@ -6,6 +6,7 @@ import { IconoComponent } from '../../shared/icono/icono.component';
 import { ProductIconComponent } from '../product-icon/product-icon.component';
 import { EstrellasComponent } from '../estrellas/estrellas.component';
 import { CarritoService } from '../servicios/carrito.service';
+import { fotosDe } from '../fotos-productos';
 
 @Component({
   selector: 'app-tarjeta-producto',
@@ -20,11 +21,13 @@ export class TarjetaProductoComponent {
 
   readonly producto = input.required<Product>();
   readonly valoracion = input<RatingSummary | undefined>();
-  /** Stock máximo del catálogo, para que las barras sean comparables entre tarjetas. */
-  readonly stockMaximo = input(50);
 
   readonly stockBajo = STOCK_BAJO;
+  readonly fotos = computed(() => fotosDe(this.producto().id));
+  readonly descuento = computed(() => {
+    const { price, listPrice } = this.producto();
+    return listPrice && listPrice > price ? Math.round((1 - price / listPrice) * 100) : 0;
+  });
   readonly enCarrito = computed(() => this.carrito.cantidad(this.producto().id));
-  readonly porcentaje = computed(() => Math.round((this.producto().stock / Math.max(1, this.stockMaximo())) * 100));
   readonly sinMas = computed(() => this.producto().stock === 0 || this.enCarrito() >= this.producto().stock);
 }

@@ -67,6 +67,10 @@ import { CarritoService } from '../servicios/carrito.service';
     @keyframes pop {
       40% { transform: scale(1.45); }
     }
+    @media (max-width: 640px) {
+      .texto { display: none; }
+      .boton { gap: 0; }
+    }
     .aviso-error { background: var(--danger); color: #fff; }
     @media (prefers-reduced-motion: reduce) {
       .salta, .salta .contador { animation: none; }

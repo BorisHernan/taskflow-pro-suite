@@ -1,0 +1,94 @@
+<button type="button" class="menu-boton" [attr.aria-expanded]="abierto()" aria-controls="menu-panel" (click)="alternar()">
+  <app-icono [nombre]="abierto() ? 'cerrar' : 'menu'" [tamano]="20" />
+  Menú
+</button>
+
+@if (abierto()) {
+  <div class="menu-fondo" (click)="cerrar()" aria-hidden="true"></div>
+  <nav id="menu-panel" class="menu-panel" aria-label="Departamentos">
+    <div class="menu-contenido">
+      <ul class="menu-deps">
+        @for (d of departamentos; track d.nombre; let i = $index) {
+          <li [attr.data-categoria]="d.nombre" [style.--i]="i">
+            <button type="button" [class.activo]="d.nombre === activo()" (mouseenter)="activo.set(d.nombre)" (focus)="activo.set(d.nombre)" (click)="activo.set(d.nombre)">
+              <span class="dep-icono"><app-product-icon [icon]="d.icono" [size]="20" /></span>
+              <span class="dep-nombre">{{ d.nombre }}</span>
+              <app-icono nombre="siguiente" [tamano]="14" />
+            </button>
+          </li>
+        }
+      </ul>
+
+      @for (d of [actual()]; track d.nombre) {
+        <section class="menu-detalle" [attr.data-categoria]="d.nombre" [attr.aria-label]="d.nombre">
+          <header class="detalle-cabecera">
+            <div>
+              <h2>{{ d.nombre }}</h2>
+              <p>
+                @if (cargado()) {
+                  {{ total() }} productos en tu sede
+                } @else {
+                  Cargando productos…
+                }
+              </p>
+            </div>
+            <a class="detalle-ver" routerLink="/tienda" [queryParams]="{ cat: d.nombre }" fragment="catalogo">
+              Ver todo
+              <app-icono nombre="siguiente" [tamano]="16" />
+            </a>
+          </header>
+
+          <ul class="subtiles-menu">
+            @for (s of subs(); track s.nombre; let i = $index) {
+              <li [style.--i]="i">
+                <a routerLink="/tienda" [queryParams]="{ cat: d.nombre, sub: s.nombre }" fragment="catalogo">
+                  <span class="sub-icono"><app-product-icon [icon]="s.icono" [size]="34" /></span>
+                  <span class="sub-texto">
+                    <strong>{{ s.nombre }}</strong>
+                    @if (cargado()) {
+                      <small>{{ s.total }} productos</small>
+                    }
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+
+          @if (descuentoMax() > 0) {
+            <p class="oferta-banda">
+              <strong>Hasta {{ descuentoMax() }} % de descuento</strong> en {{ d.nombre }}
+            </p>
+          }
+
+          @if (destacados().length) {
+            <h3 class="destacados-titulo">{{ descuentoMax() > 0 ? 'Ofertas de la semana' : 'Destacados' }}</h3>
+            <ul class="destacados">
+              @for (p of destacados(); track p.id; let i = $index) {
+                <li [style.--i]="i + subs().length">
+                  <a [routerLink]="['/tienda/producto', p.id]">
+                    <span class="dest-imagen">
+                      @if (fotosDe(p.id)[0]; as foto) {
+                        <img [src]="foto" alt="" width="800" height="800" />
+                      } @else {
+                        <app-product-icon [icon]="p.icon || ''" [size]="34" />
+                      }
+                    </span>
+                    <span class="dest-texto">
+                      <strong>{{ p.name }}</strong>
+                      <span>
+                        {{ p.price | soles }}
+                        @if (p.descuento > 0) {
+                          <b>-{{ p.descuento }} %</b>
+                        }
+                      </span>
+                    </span>
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+    </div>
+  </nav>
+}

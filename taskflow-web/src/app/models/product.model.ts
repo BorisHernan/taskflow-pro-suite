@@ -10,6 +10,12 @@ export interface Product {
   // Clave de ícono (no un emoji): la resuelve <app-product-icon>.
   icon?: string;
   category: string;
+  subcategory?: string;
+  brand?: string;
+  /** Precio antes del descuento, si el producto está en oferta. */
+  listPrice?: number;
+  /** Promoción vigente: '2X1' = por cada par de unidades, una va gratis. */
+  promo?: string;
   details?: string;
 }
 

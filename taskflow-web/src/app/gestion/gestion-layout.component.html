@@ -16,7 +16,7 @@
             <li>
               <a [routerLink]="e.ruta" routerLinkActive="activo" ariaCurrentWhenActive="page" [attr.data-tour]="e.ruta === 'tablero' ? 'menu-tareas' : null"
                 [class.en-recorrido]="tour.activo() && tour.paso()?.ruta === '/gestion/' + e.ruta">
-                <app-icono [nombre]="e.icono" [tamano]="18" />
+                <span class="ico"><app-icono [nombre]="e.icono" [tamano]="16" /></span>
                 {{ e.nombre }}
               </a>
             </li>
@@ -26,7 +26,10 @@
     </nav>
 
     <div class="externos">
-      <a routerLink="/tienda"><app-icono nombre="tienda" [tamano]="18" />Tienda online</a>
+      <a routerLink="/tienda">
+        <span class="ico"><app-icono nombre="tienda" [tamano]="16" /></span>
+        <span class="externo-texto"><strong>Quechuti</strong><small>Tienda online</small></span>
+      </a>
     </div>
   </aside>
 

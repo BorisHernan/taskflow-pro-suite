@@ -1,8 +1,23 @@
 @let p = producto();
 <article class="producto card" [class.agotado]="p.stock === 0">
   <a class="producto-enlace" [routerLink]="['/tienda/producto', p.id]" [attr.aria-label]="'Ver detalle de ' + p.name">
-    <div class="producto-icono" [attr.data-categoria]="p.category" [style.view-transition-name]="'producto-' + p.id">
-      <span class="halo"><app-product-icon [icon]="p.icon || ''" [size]="44" /></span>
+    <div class="producto-icono" [class.con-foto]="fotos().length" [attr.data-categoria]="p.category" [style.view-transition-name]="'producto-' + p.id">
+      @if (fotos(); as f) {
+        @if (f.length) {
+          <img class="foto" [src]="f[0]" [alt]="p.name" loading="lazy" decoding="async" width="800" height="800" />
+          @if (f.length > 1) {
+            <img class="foto foto-otra" [src]="f[1]" alt="" loading="lazy" decoding="async" width="800" height="800" />
+          }
+        } @else {
+          <span class="halo"><app-product-icon [icon]="p.icon || ''" [size]="74" /></span>
+          @if (p.brand && p.description) {
+            <span class="medida">{{ p.description }}</span>
+          }
+        }
+      }
+      @if (p.promo === '2X1') {
+        <span class="sello sello-promo">2×1</span>
+      }
       @if (p.stock === 0) {
         <span class="sello">Agotado</span>
       } @else if (p.stock <= stockBajo) {
@@ -10,7 +25,7 @@
       }
     </div>
 
-    <span class="producto-categoria">{{ p.category }}</span>
+    <span class="producto-categoria">{{ p.brand || p.category }}</span>
     <h2 class="producto-nombre">{{ p.name }}</h2>
   </a>
 
@@ -25,22 +40,30 @@
 
   <div class="producto-pie">
     <div class="producto-precio-fila">
-      <p class="producto-precio">{{ p.price | soles }}</p>
+      <div>
+        <p class="producto-precio">{{ p.price | soles }}</p>
+        @if (descuento() > 0) {
+          <span class="precio-extra"><s>{{ p.listPrice | soles }}</s><b>-{{ descuento() }} %</b></span>
+        } @else if (p.promo === '2X1') {
+          <span class="precio-extra"><b>2×1</b>Lleva 2, paga 1</span>
+        }
+      </div>
       @if (enCarrito() > 0) {
-        <span class="chip chip-accent">{{ enCarrito() }} en carrito</span>
+        <div class="contador" role="group" [attr.aria-label]="'Cantidad de ' + p.name">
+          <button type="button" class="contador-menos" (click)="carrito.quitarUno(p.id)" aria-label="Quitar uno">
+            <app-icono nombre="menos" [tamano]="16" />
+          </button>
+          <span aria-live="polite">{{ enCarrito() }}</span>
+          <button type="button" class="btn btn-primary comprar contador-mas" [disabled]="sinMas()" (click)="carrito.agregarYAvisar(p)" aria-label="Agregar otro">
+            <app-icono nombre="mas" [tamano]="16" />
+          </button>
+        </div>
+      } @else {
+        <button type="button" class="btn btn-primary comprar" [disabled]="sinMas()" (click)="carrito.agregarYAvisar(p)"
+          [attr.aria-label]="'Agregar al carrito ' + p.name">
+          <app-icono nombre="carrito" [tamano]="20" />
+        </button>
       }
     </div>
-
-    <div class="stock" [class.bajo]="p.stock <= stockBajo">
-      <div class="stock-barra" aria-hidden="true">
-        <span [style.width.%]="porcentaje()"></span>
-      </div>
-      <span class="stock-texto">{{ p.stock === 0 ? 'Sin stock' : p.stock + ' en stock' }}</span>
-    </div>
-
-    <button type="button" class="btn btn-primary" [disabled]="sinMas()" (click)="carrito.agregarYAvisar(p)">
-      <app-icono [nombre]="enCarrito() > 0 ? 'mas' : 'carrito'" [tamano]="16" />
-      {{ enCarrito() > 0 ? 'Agregar otro' : 'Agregar al carrito' }}
-    </button>
   </div>
 </article>

@@ -147,42 +147,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.stock {
-  display: grid;
-  gap: 4px;
-  --color-stock: var(--success);
-
-  &.bajo {
-    --color-stock: var(--warning);
-
-    .stock-texto {
-      color: var(--warning-text);
-      font-weight: 600;
-    }
-  }
-}
-
-.stock-barra {
-  height: 5px;
-  border-radius: var(--radius-pill);
-  background: var(--surface-alt);
-  overflow: hidden;
-
-  span {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: var(--color-stock);
-    transition: width 0.4s var(--ease);
-  }
-}
-
-.stock-texto {
-  font-size: var(--fs-xs);
-  color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
-}
-
 @media (max-width: 760px) {
   .producto {
     padding: 10px;
@@ -205,5 +169,232 @@
     .producto-icono app-product-icon {
       transform: none;
     }
+  }
+}
+
+// Con foto: recuadro blanco cuadrado; al pasar el mouse aparece la segunda foto.
+.producto-icono.con-foto {
+  height: auto;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.foto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.foto-otra {
+  opacity: 0;
+}
+
+.producto:hover {
+  .foto {
+    transform: scale(1.04);
+  }
+
+  .foto-otra {
+    opacity: 1;
+  }
+}
+
+.producto-icono .sello {
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foto {
+    transition: none;
+  }
+}
+
+// Estilo IKEA: sin marco ni sombra, la foto manda y el texto va debajo como pie de foto.
+.producto.card {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.producto:hover {
+  transform: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.producto-categoria {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.producto-nombre {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.producto-enlace:hover .producto-nombre {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.producto-precio {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.en-carrito {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.sello {
+  border-radius: 4px;
+}
+
+.sello-bajo {
+  background: #e08c05;
+  color: #1f0c03;
+}
+
+.producto-pie .comprar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--text-primary);
+  color: var(--bg);
+
+  &:hover:not(:disabled) {
+    background: var(--accion, #ff7a00);
+    color: #1f0c03;
+  }
+}
+
+.precio-extra {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+
+  b {
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--oferta);
+    color: #ffffff;
+    font-size: 12px;
+  }
+}
+
+// Sin foto: pictograma a color en un círculo claro, sobre un fondo suave del color del departamento.
+.producto-icono:not(.con-foto) {
+  height: auto;
+  aspect-ratio: 1;
+  background: color-mix(in srgb, var(--cat) 12%, var(--tf-surface));
+}
+
+.halo {
+  width: 108px;
+  height: 108px;
+  background: var(--tf-surface);
+  box-shadow: 0 0 0 10px color-mix(in srgb, var(--cat) 12%, transparent);
+}
+
+.producto:hover .halo {
+  box-shadow: 0 0 0 16px color-mix(in srgb, var(--cat) 16%, transparent);
+}
+
+.medida {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--tf-surface);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sello-promo {
+  top: 8px;
+  right: 8px;
+  left: auto;
+  padding: 3px 10px;
+  background: var(--oferta);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+// Contador − 1 + que reemplaza al botón cuando el producto ya está en el carrito.
+.contador {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--tf-surface);
+  box-shadow: inset 0 0 0 2px var(--text-primary);
+  animation: contador-entra 0.2s var(--ease) both;
+
+  span {
+    min-width: 22px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+}
+
+.contador-menos {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--text-primary);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+}
+
+.producto-pie .contador-mas {
+  width: 32px;
+  height: 32px;
+}
+
+@keyframes contador-entra {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contador {
+    animation: none;
   }
 }

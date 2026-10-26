@@ -1,100 +1,79 @@
 <main class="home">
-  <!-- 1. El sistema -->
-  <section class="hero contenedor" aria-labelledby="home-titulo">
+  <section class="hero" aria-labelledby="home-titulo">
     <div class="hero-texto">
       <p class="sobretitulo">Operaciones para cadenas de tiendas</p>
       <h1 id="home-titulo">Cada venta mueve el trabajo de la tienda</h1>
       <p class="lead">
-        TaskFlow conecta ventas, inventario, compras, mermas, incidencias y turnos de tres sedes en Lima. Cuando algo pasa
-        en la operación, la tarea correcta aparece en el tablero de la sede correcta, en tiempo real.
+        TaskFlow conecta ventas, inventario, compras, mermas, incidencias y turnos de tres sedes en Lima, en tiempo real.
       </p>
-      <div class="acciones">
-        <a class="btn btn-primary btn-lg" [routerLink]="sesion.activa() ? '/gestion' : '/ingresar'">
-          {{ sesion.activa() ? 'Ir a la gestión' : 'Explorar el sistema' }}
-        </a>
-        <a class="btn btn-secondary btn-lg" routerLink="/tienda">Ver la tienda online</a>
-      </div>
-      <p class="estado-servidor" [attr.data-estado]="estado()" aria-live="polite">
-        <span class="punto" [class.en-vivo]="estado() === 'en-linea'" [class.problema]="estado() === 'sin-respuesta'"></span>
-        @switch (estado()) {
-          @case ('despertando') {
-            Iniciando el servidor (plan gratuito): la primera carga puede tardar hasta un minuto.
-          }
-          @case ('en-linea') {
-            Servidor en línea
-          }
-          @case ('sin-respuesta') {
-            El servidor aún no responde. La aplicación se reconecta automáticamente.
-          }
+
+      <ol class="pasos" aria-label="Del pedido a la reposición">
+        @for (p of pasos; track p.texto) {
+          <li><app-icono [nombre]="p.icono" [tamano]="14" />{{ p.texto }}</li>
         }
-      </p>
+      </ol>
+
+      <div class="caras">
+        <a class="cara cara-gestion" [routerLink]="sesion.activa() ? '/gestion' : '/ingresar'">
+          <span class="cara-etiqueta">Para quien opera</span>
+          <strong>Gestión de tres sedes</strong>
+          <span class="cara-detalle">Tareas, stock, compras, turnos y pedidos</span>
+          <span class="cara-accion">{{ sesion.activa() ? 'Ir a la gestión' : 'Explorar el sistema' }} →</span>
+        </a>
+        <a class="cara cara-tienda" routerLink="/tienda">
+          <span class="cara-etiqueta">Para quien compra</span>
+          <strong>Quechuti, la tienda online</strong>
+          <span class="cara-detalle">900+ productos · 19 departamentos · recojo o envío</span>
+          <span class="cara-accion">Ver la tienda →</span>
+        </a>
+      </div>
     </div>
-    <figure class="captura captura-hero">
+
+    <figure class="captura">
       <img src="img/gestion-resumen.png" width="1440" height="900"
         alt="Resumen del día de la administración: ventas, productos bajo el mínimo, tareas urgentes y comparación entre sedes" />
     </figure>
   </section>
 
-  <!-- 2. Quién lo construyó y cómo, en corto -->
-  <section class="banda" aria-labelledby="autor-titulo">
-    <div class="contenedor autor">
-      <div class="autor-perfil">
-        <p class="sobretitulo">Quién lo construyó</p>
-        <h2 id="autor-titulo">Boris Medrano</h2>
-        <p class="autor-rol">Desarrollador Full Stack Java · Lima, Perú · trabajo remoto</p>
-        <p class="autor-texto">
-          Diseñé y programé TaskFlow de punta a punta: modelo de datos, API reactiva, seguridad por roles, interfaz y despliegue.
-        </p>
-        <div class="contacto">
-          <a class="btn btn-primary" href="mailto:mdrncastro@gmail.com"><app-icono nombre="correo" [tamano]="16" />Escríbeme</a>
-          <a class="btn btn-secondary" href="https://www.linkedin.com/in/boris-hernan-dev" target="_blank" rel="noopener"><app-icono nombre="linkedin" [tamano]="16" />LinkedIn</a>
-          <a class="btn btn-secondary" href="https://github.com/BorisHernan" target="_blank" rel="noopener"><app-icono nombre="github" [tamano]="16" />GitHub</a>
-        </div>
-      </div>
-
-      <div class="como">
-        <h3>Cómo está hecho, en corto</h3>
-        <dl>
-          @for (c of como; track c[0]) {
-            <div>
-              <dt>{{ c[0] }}</dt>
-              <dd>{{ c[1] }}</dd>
-            </div>
-          }
-        </dl>
-        <p class="enlaces">
-          <a href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">Ver el código</a>
-          <a [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">Documentación de la API</a>
-        </p>
+  <section class="datos" aria-label="Autor y tecnología">
+    <div class="autor">
+      <p class="sobretitulo">Quién lo construyó</p>
+      <h2>Boris Medrano</h2>
+      <p class="autor-rol">Desarrollador Full Stack Java · Lima, Perú · remoto</p>
+      <div class="contacto">
+        <a class="btn btn-primary btn-sm" href="mailto:mdrncastro@gmail.com"><app-icono nombre="correo" [tamano]="14" />Escríbeme</a>
+        <a class="btn btn-secondary btn-sm" href="https://www.linkedin.com/in/boris-hernan-dev" target="_blank" rel="noopener"><app-icono nombre="linkedin" [tamano]="14" />LinkedIn</a>
+        <a class="btn btn-secondary btn-sm" href="https://github.com/BorisHernan" target="_blank" rel="noopener"><app-icono nombre="github" [tamano]="14" />GitHub</a>
       </div>
     </div>
-  </section>
 
-  <!-- 3. Cómo funciona -->
-  <section class="seccion contenedor" aria-labelledby="flujo-titulo">
-    <header class="seccion-cabecera">
-      <h2 id="flujo-titulo">De una venta a una tarea, sin que nadie la anote</h2>
-      <p>Lo mismo pasa con las incidencias graves, las mermas por robo y el checklist de cada turno.</p>
-    </header>
-    <ol class="flujo">
-      @for (p of flujo; track p.titulo) {
-        <li>
-          <span class="flujo-icono"><app-icono [nombre]="p.icono" [tamano]="20" /></span>
-          <h3>{{ p.titulo }}</h3>
-          <p>{{ p.texto }}</p>
-        </li>
+    <dl class="como">
+      @for (c of como; track c[0]) {
+        <dt>{{ c[0] }}</dt>
+        <dd>{{ c[1] }}</dd>
       }
-    </ol>
-    <div class="cierre">
-      <p>La mejor forma de entenderlo es verlo: entra con un rol y sigue el recorrido guiado de menos de un minuto.</p>
-      <a class="btn btn-primary" [routerLink]="sesion.activa() ? '/gestion' : '/ingresar'">
-        {{ sesion.activa() ? 'Ir a la gestión' : 'Explorar el sistema' }}
-      </a>
+    </dl>
+
+    <div class="extras">
+      <p class="estado-servidor" [attr.data-estado]="estado()" aria-live="polite">
+        <span class="punto" [class.en-vivo]="estado() === 'en-linea'" [class.problema]="estado() === 'sin-respuesta'"></span>
+        @switch (estado()) {
+          @case ('despertando') {
+            Iniciando el servidor gratuito: la primera carga puede tardar un minuto.
+          }
+          @case ('en-linea') {
+            Servidor en línea
+          }
+          @case ('sin-respuesta') {
+            El servidor aún no responde; se reconecta solo.
+          }
+        }
+      </p>
+      <p class="enlaces">
+        <a href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">Ver el código</a>
+        <a [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">Documentación de la API</a>
+      </p>
+      <p class="copyright">© {{ anio }} Boris Medrano · TaskFlow</p>
     </div>
   </section>
-
-  <footer class="pie contenedor">
-    <span>© {{ anio }} Boris Medrano · TaskFlow</span>
-    <a routerLink="/arena">Arena, módulo multijugador</a>
-  </footer>
 </main>

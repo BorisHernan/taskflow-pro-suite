@@ -32,7 +32,7 @@ export const appConfig: ApplicationConfig = {
           }
         },
       }),
-      withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
+      withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' }),
     ),
     provideHttpClient(withInterceptors([authInterceptor, registroHttpInterceptor, demoInterceptor])),
     { provide: LOCALE_ID, useValue: 'es-PE' },

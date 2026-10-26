@@ -7,25 +7,31 @@
 // ── Barra lateral ──────────────────────────────────────────────────────
 
 .lateral {
+  --lat-fondo: #0f1d1a;
+  --lat-texto: #c9dcd6;
+  --lat-suave: #7d968f;
+  --lat-hover: rgb(255 255 255 / 0.06);
+  --lat-activo: rgb(85 197 180 / 0.16);
+  --lat-acento: #55c5b4;
+
   position: sticky;
   top: 0;
   display: flex;
   flex-direction: column;
   height: 100svh;
-  padding: 16px 12px;
+  padding: 20px 12px 16px;
   overflow-y: auto;
-  background: var(--tf-surface);
-  border-right: 1px solid var(--tf-border);
+  background: var(--lat-fondo);
+  color: var(--lat-texto);
 }
 
 .marca {
   display: flex;
   align-items: center;
   gap: 10px;
-  height: 32px;
   padding: 0 8px;
-  margin-bottom: 20px;
-  color: var(--tf-text);
+  margin-bottom: 28px;
+  color: #ffffff;
   text-decoration: none;
 
   span {
@@ -34,13 +40,14 @@
   }
 
   strong {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 
   small {
     font-size: 12px;
-    color: var(--tf-text-secondary);
+    color: var(--lat-suave);
   }
 }
 
@@ -50,64 +57,113 @@
   ul {
     display: grid;
     gap: 2px;
-    margin: 0 0 16px;
+    margin: 0 0 20px;
     padding: 0;
     list-style: none;
   }
 
   a {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 10px;
-    min-height: 36px;
+    gap: 12px;
+    min-height: 40px;
     padding: 0 10px;
     border-radius: var(--radius);
-    color: var(--tf-text-secondary);
+    color: var(--lat-texto);
     font-size: 14px;
     font-weight: 500;
     text-decoration: none;
     transition: background-color 0.12s var(--ease), color 0.12s var(--ease);
 
     &:hover {
-      background: var(--tf-surface-hover);
-      color: var(--tf-text);
+      background: var(--lat-hover);
+      color: #ffffff;
     }
 
     &.activo {
-      background: var(--tf-primary-subtle);
-      color: var(--tf-primary);
+      background: var(--lat-activo);
+      color: #ffffff;
       font-weight: 600;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: -12px;
+        top: 8px;
+        bottom: 8px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: var(--lat-acento);
+      }
+
+      .ico {
+        background: var(--lat-acento);
+        color: var(--lat-fondo);
+      }
     }
   }
 }
 
+.ico {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--lat-hover);
+  color: var(--lat-suave);
+  transition: background-color 0.12s var(--ease), color 0.12s var(--ease);
+}
+
 .grupo {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   padding: 0 10px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--tf-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lat-suave);
 }
 
 .externos {
   padding-top: 12px;
-  border-top: 1px solid var(--tf-border);
 
   a {
     display: flex;
     align-items: center;
-    gap: 10px;
-    min-height: 36px;
-    padding: 0 10px;
+    gap: 12px;
+    padding: 10px;
     border-radius: var(--radius);
-    color: var(--tf-text-secondary);
-    font-size: 14px;
+    background: var(--lat-hover);
+    color: var(--lat-texto);
     text-decoration: none;
 
     &:hover {
-      background: var(--tf-surface-hover);
-      color: var(--tf-text);
+      background: var(--lat-activo);
+      color: #ffffff;
     }
+  }
+
+  .ico {
+    background: #ff7a00;
+    color: #1f0c03;
+  }
+}
+
+.externo-texto {
+  display: grid;
+  line-height: 1.2;
+
+  strong {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  small {
+    font-size: 12px;
+    color: var(--lat-suave);
   }
 }
 

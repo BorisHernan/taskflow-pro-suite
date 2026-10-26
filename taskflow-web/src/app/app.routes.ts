@@ -85,28 +85,28 @@ export const routes: Routes = [
   },
   {
     path: 'tienda',
-    title: 'Tienda online · TaskFlow',
+    title: 'Quechuti · Supermercado online',
     loadComponent: () => import('./store/store.component').then((m) => m.StoreComponent),
   },
   {
     path: 'tienda/producto/:id',
-    title: 'Producto · Tienda · TaskFlow',
+    title: 'Producto · Quechuti',
     loadComponent: () =>
       import('./store/producto-detalle/producto-detalle.component').then((m) => m.ProductoDetalleComponent),
   },
   {
     path: 'tienda/boleta',
-    title: 'Tu boleta · Tienda · TaskFlow',
+    title: 'Tu boleta · Quechuti',
     loadComponent: () => import('./store/boleta/boleta.component').then((m) => m.BoletaComponent),
   },
   {
     path: 'tienda/pedido',
-    title: 'Seguir mi pedido · Tienda · TaskFlow',
+    title: 'Seguir mi pedido · Quechuti',
     loadComponent: () => import('./store/seguimiento/seguimiento.component').then((m) => m.SeguimientoComponent),
   },
   {
     path: 'tienda/pedido/:codigo',
-    title: 'Seguir mi pedido · Tienda · TaskFlow',
+    title: 'Seguir mi pedido · Quechuti',
     loadComponent: () => import('./store/seguimiento/seguimiento.component').then((m) => m.SeguimientoComponent),
   },
   {

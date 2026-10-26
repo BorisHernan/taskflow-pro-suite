@@ -28,7 +28,7 @@ export class ReportesComponent {
   private readonly avisos = inject(AvisosService);
 
   readonly reportes: Reporte[] = [
-    { tipo: 'ventas', nombre: 'Ventas', detalle: 'Cada compra de la tienda online con su sede, producto, cantidad y total.', usaFechas: true },
+    { tipo: 'ventas', nombre: 'Ventas', detalle: 'Cada compra de Quechuti con su sede, producto, cantidad y total.', usaFechas: true },
     { tipo: 'inventario', nombre: 'Inventario', detalle: 'Foto actual del stock por sede, con mínimo y objetivo.', usaFechas: false },
     { tipo: 'mermas', nombre: 'Mermas', detalle: 'Pérdidas por motivo, valorizadas al costo, con quién las registró.', usaFechas: true },
     { tipo: 'pedidos', nombre: 'Compras', detalle: 'Pedidos de reposición, su estado, quién pidió y quién aprobó.', usaFechas: true },

@@ -10,6 +10,11 @@ import { OrdenVista } from '../../models/orden.model';
 
 const CLAVE_GUARDADO = 'taskflow-carrito';
 
+/** Con 2×1 se paga una unidad por cada par: con 3 se pagan 2, con 4 también 2. */
+export function unidadesPagadas(p: Product, cantidad: number): number {
+  return p.promo === '2X1' ? cantidad - Math.floor(cantidad / 2) : cantidad;
+}
+
 export type Resultado = { ok: true } | { ok: false; mensaje: string };
 
 /** Carrito de la tienda: lo comparten el catálogo, el detalle y el panel lateral. */
@@ -30,7 +35,11 @@ export class CarritoService {
   private avisoTimer: ReturnType<typeof setTimeout> | undefined;
 
   readonly unidades = computed(() => this.items().reduce((n, i) => n + i.quantity, 0));
-  readonly subtotal = computed(() => this.items().reduce((s, i) => s + i.product.price * i.quantity, 0));
+  /** Lo que costaría sin promociones. */
+  readonly bruto = computed(() => this.items().reduce((s, i) => s + i.product.price * i.quantity, 0));
+  readonly ahorroPromo = computed(() => this.items().reduce((s, i) => s + i.product.price * (i.quantity - unidadesPagadas(i.product, i.quantity)), 0));
+  /** Después de las promociones: es el subtotal que guarda el servidor, y sobre él va el cupón. */
+  readonly subtotal = computed(() => this.bruto() - this.ahorroPromo());
   readonly descuento = computed(() => this.subtotal() * (this.cupon()?.discount ?? 0));
   readonly total = computed(() => this.subtotal() - this.descuento());
 
@@ -44,6 +53,10 @@ export class CarritoService {
         // Sin almacenamiento (modo privado): el carrito vive solo en memoria.
       }
     });
+  }
+
+  totalLinea(item: CartItem): number {
+    return item.product.price * unidadesPagadas(item.product, item.quantity);
   }
 
   avisar(texto: string, error = false): void {
@@ -88,6 +101,12 @@ export class CarritoService {
     }
     this.items.update((items) => items.map((i) => (i.product.id === item.product.id ? { ...i, quantity: nueva } : i)));
     return { ok: true };
+  }
+
+  /** Resta una unidad desde la tarjeta del producto (si era la última, lo saca del carrito). */
+  quitarUno(productId: number): void {
+    const item = this.items().find((i) => i.product.id === productId);
+    if (item) this.cambiarCantidad(item, -1);
   }
 
   quitar(item: CartItem): void {

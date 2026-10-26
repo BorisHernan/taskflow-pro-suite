@@ -4,25 +4,46 @@
       <a routerLink="/tienda"><app-icono nombre="izquierda" [tamano]="15" /> Tienda</a>
       @if (producto(); as p) {
         <span aria-hidden="true">/</span>
-        <a routerLink="/tienda" [queryParams]="{ cat: p.category }">{{ p.category }}</a>
+        <a routerLink="/tienda" [queryParams]="{ cat: p.category }" fragment="catalogo">{{ p.category }}</a>
+        @if (p.subcategory) {
+          <span aria-hidden="true">/</span>
+          <a routerLink="/tienda" [queryParams]="{ cat: p.category, sub: p.subcategory }" fragment="catalogo">{{ p.subcategory }}</a>
+        }
         <span aria-hidden="true">/</span>
         <span class="migas-actual" aria-current="page">{{ p.name }}</span>
       }
     </nav>
-    <app-boton-carrito />
   </header>
 
   @if (producto(); as p) {
     <article class="detalle">
       <div class="galeria">
-        <div class="galeria-imagen" [attr.data-categoria]="p.category" [style.view-transition-name]="'producto-' + p.id" [class.agotado]="p.stock === 0">
-          <app-product-icon [icon]="p.icon || ''" [size]="120" />
+        <div class="galeria-imagen" [class.con-foto]="fotos().length" [attr.data-categoria]="p.category" [style.view-transition-name]="'producto-' + p.id" [class.agotado]="p.stock === 0">
+          @if (fotos().length) {
+            @for (f of [fotos()[fotoActual()]]; track f) {
+              <img class="foto-grande" [src]="f" [alt]="p.name" width="800" height="800" />
+            }
+          } @else {
+            <app-product-icon [icon]="p.icon || ''" [size]="120" />
+          }
         </div>
+        @if (fotos().length > 1) {
+          <div class="miniaturas" role="group" aria-label="Fotos del producto">
+            @for (f of fotos(); track f; let i = $index) {
+              <button type="button" class="miniatura" [attr.aria-pressed]="i === fotoActual()" [attr.aria-label]="'Ver foto ' + (i + 1)" (click)="fotoActual.set(i)">
+                <img [src]="f" alt="" loading="lazy" width="800" height="800" />
+              </button>
+            }
+          </div>
+        }
       </div>
 
       <div class="info entrar">
-        <span class="chip chip-accent">{{ p.category }}</span>
+        <a class="categoria-enlace" routerLink="/tienda" [queryParams]="{ cat: p.category }" fragment="catalogo">{{ p.category }}</a>
         <h1 class="nombre">{{ p.name }}</h1>
+        @if (p.brand) {
+          <p class="marca">Marca: <strong>{{ p.brand }}</strong></p>
+        }
 
         <button type="button" class="valoracion" (click)="irAResenas()">
           <app-estrellas [valor]="promedio()" [tamano]="16" />
@@ -34,6 +55,9 @@
         </button>
 
         <p class="precio">{{ p.price | soles }}</p>
+        @if (descuento() > 0) {
+          <p class="precio-anterior"><s>{{ p.listPrice | soles }}</s><b>-{{ descuento() }} %</b></p>
+        }
 
         @if (p.description) {
           <p class="resumen">{{ p.description }}</p>
@@ -42,13 +66,13 @@
           <p class="detalles">{{ p.details }}</p>
         }
 
-        <div class="compra card">
+        <div class="compra">
           <p class="estado-stock" [class.bajo]="p.stock > 0 && p.stock <= stockBajo" [class.sin]="p.stock === 0">
             <span class="punto" [class.en-vivo]="p.stock > stockBajo"></span>
             @if (p.stock === 0) {
               Agotado por ahora
             } @else if (p.stock <= stockBajo) {
-              ¡Solo quedan {{ p.stock }}! Otros visitantes también lo están viendo.
+              ¡Últimas {{ p.stock }} unidades!
             } @else {
               En stock: {{ p.stock }} unidades
             }
@@ -77,8 +101,8 @@
           </div>
 
           <ul class="beneficios">
-            <li><app-icono nombre="envio" [tamano]="16" /> Envío instantáneo y gratis (no llega nada, es un demo)</li>
-            <li><app-icono nombre="garantia" [tamano]="16" /> El stock se descuenta en PostgreSQL y baja para todos en vivo</li>
+            <li><app-icono nombre="sede" [tamano]="16" /> Recojo en tienda en unos 30 minutos</li>
+            <li><app-icono nombre="envio" [tamano]="16" /> Envío a domicilio hasta 15 km de la sede, con seguimiento del pedido</li>
           </ul>
         </div>
       </div>
@@ -86,7 +110,7 @@
 
     <!-- Reseñas -->
     <section class="resenas" id="resenas" aria-labelledby="resenas-titulo">
-      <h2 id="resenas-titulo" class="seccion-titulo">Opiniones de los visitantes</h2>
+      <h2 id="resenas-titulo" class="seccion-titulo">Opiniones de clientes</h2>
 
       <div class="resenas-grid">
         <aside class="resumen-resenas">

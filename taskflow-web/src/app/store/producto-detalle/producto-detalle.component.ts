@@ -10,9 +10,9 @@ import { IconoComponent } from '../../shared/icono/icono.component';
 import { ProductIconComponent } from '../product-icon/product-icon.component';
 import { EstrellasComponent } from '../estrellas/estrellas.component';
 import { TarjetaProductoComponent } from '../tarjeta-producto/tarjeta-producto.component';
-import { BotonCarritoComponent } from '../boton-carrito/boton-carrito.component';
 import { CatalogoService } from '../servicios/catalogo.service';
 import { CarritoService, mensajeDeError } from '../servicios/carrito.service';
+import { fotosDe } from '../fotos-productos';
 
 const RESENAS_POR_PAGINA = 5;
 const RELATIVO = new Intl.RelativeTimeFormat('es', { numeric: 'auto' });
@@ -28,7 +28,7 @@ function aFecha(texto: string): Date {
   standalone: true,
   imports: [
     RouterLink, FormsModule, SolesPipe, IconoComponent, ProductIconComponent,
-    EstrellasComponent, TarjetaProductoComponent, BotonCarritoComponent,
+    EstrellasComponent, TarjetaProductoComponent,
   ],
   templateUrl: './producto-detalle.component.html',
   styleUrl: './producto-detalle.component.scss',
@@ -42,9 +42,16 @@ export class ProductoDetalleComponent implements OnInit {
   readonly id = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => Number(p.get('id')))), { requireSync: true });
   readonly producto = computed(() => this.catalogo.producto(this.id()));
   readonly stockBajo = STOCK_BAJO;
+  readonly fotos = computed(() => fotosDe(this.id()));
+  /** Foto elegida en la galería (vuelve a la principal al cambiar de producto). */
+  readonly fotoActual = signal(0);
 
   readonly cantidad = signal(1);
   readonly enCarrito = computed(() => this.carrito.cantidad(this.id()));
+  readonly descuento = computed(() => {
+    const p = this.producto();
+    return p?.listPrice && p.listPrice > p.price ? Math.round((1 - p.price / p.listPrice) * 100) : 0;
+  });
   readonly maximo = computed(() => Math.max(0, (this.producto()?.stock ?? 0) - this.enCarrito()));
 
   // Reseñas
@@ -95,6 +102,10 @@ export class ProductoDetalleComponent implements OnInit {
   readonly etiquetas = ['', 'Muy malo', 'Malo', 'Regular', 'Bueno', 'Excelente'];
 
   constructor() {
+    effect(() => {
+      this.id();
+      this.fotoActual.set(0);
+    });
     // Al cambiar de producto (clic en un relacionado) se recargan sus reseñas.
     effect((onCleanup) => {
       const id = this.id();

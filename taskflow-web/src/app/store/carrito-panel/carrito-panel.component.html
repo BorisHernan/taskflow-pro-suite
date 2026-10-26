@@ -25,11 +25,18 @@
         @for (item of carrito.items(); track item.product.id; let i = $index) {
           <li class="item entrar" [style.--i]="i">
             <a class="item-icono" [routerLink]="['/tienda/producto', item.product.id]" (click)="cerrar()" [attr.aria-label]="'Ver ' + item.product.name">
-              <app-product-icon [icon]="item.product.icon || ''" [size]="24" />
+              @if (fotosDe(item.product.id)[0]; as foto) {
+                <img class="item-foto" [src]="foto" alt="" width="800" height="800" />
+              } @else {
+                <app-product-icon [icon]="item.product.icon || ''" [size]="24" />
+              }
             </a>
             <div class="item-info">
               <span class="item-nombre">{{ item.product.name }}</span>
               <span class="item-unitario">{{ item.product.price | soles }} c/u</span>
+              @if (item.product.promo === '2X1') {
+                <span class="item-promo">{{ item.quantity % 2 ? '2×1: agrega 1 más y te sale gratis' : '2×1 aplicado' }}</span>
+              }
             </div>
             <button type="button" class="btn btn-icon btn-sm btn-danger-hover item-quitar" (click)="carrito.quitar(item)" [attr.aria-label]="'Quitar ' + item.product.name">
               <app-icono nombre="basura" [tamano]="15" />
@@ -43,7 +50,7 @@
                 <app-icono nombre="mas" [tamano]="14" />
               </button>
             </div>
-            <span class="item-total">{{ item.product.price * item.quantity | soles }}</span>
+            <span class="item-total">{{ carrito.totalLinea(item) | soles }}</span>
           </li>
         }
       </ul>
@@ -128,7 +135,7 @@
                   <div><dt>Vehículo</dt><dd>{{ e.vehiculo }}</dd></div>
                   <div><dt>Llega en</dt><dd>unos {{ e.minutos }} min (20 de preparación + viaje)</dd></div>
                 </dl>
-                <p class="entrega-ayuda">Envío gratis en la demo: no se despachan pedidos reales.</p>
+                <p class="entrega-ayuda">Envío gratis.</p>
               } @else {
                 <p class="entrega-detalle pendiente">Marca tu dirección en el mapa para calcular la distancia y el tiempo de llegada.</p>
               }
@@ -139,11 +146,17 @@
         <div class="totales">
           <div class="fila-total">
             <span>Subtotal</span>
-            <span>{{ carrito.subtotal() | soles }}</span>
+            <span>{{ carrito.bruto() | soles }}</span>
           </div>
+          @if (carrito.ahorroPromo() > 0) {
+            <div class="fila-total descuento">
+              <span>Promoción 2×1</span>
+              <span>− {{ carrito.ahorroPromo() | soles }}</span>
+            </div>
+          }
           @if (carrito.descuento() > 0) {
             <div class="fila-total descuento">
-              <span>Descuento</span>
+              <span>Cupón</span>
               <span>− {{ carrito.descuento() | soles }}</span>
             </div>
           }
@@ -165,7 +178,7 @@
         </button>
         <p class="garantia">
           <app-icono nombre="garantia" [tamano]="14" />
-          Pago simulado: el stock baja de verdad y la tienda recibe tu pedido; tu tarjeta no se toca.
+          Tienda de demostración: no se cobra nada ni se despacha ningún pedido real.
         </p>
       </footer>
     }

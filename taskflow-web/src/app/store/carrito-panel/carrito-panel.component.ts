@@ -8,6 +8,7 @@ import { ProductIconComponent } from '../product-icon/product-icon.component';
 import { CarritoService } from '../servicios/carrito.service';
 import { CatalogoService } from '../servicios/catalogo.service';
 import { MapaSedesComponent } from '../../shared/mapa/mapa-sedes.component';
+import { fotosDe } from '../fotos-productos';
 import { COBERTURA_KM, estimarEnvio, puntoDeEjemplo } from '../../shared/entrega/entrega';
 
 /** Panel lateral del carrito, igual en el catálogo y en el detalle de producto. */
@@ -23,6 +24,7 @@ export class CarritoPanelComponent {
   readonly carrito = inject(CarritoService);
   readonly catalogo = inject(CatalogoService);
   ubicando = false;
+  readonly fotosDe = fotosDe;
   readonly cobertura = COBERTURA_KM;
   private readonly router = inject(Router);
   private readonly dialogo = viewChild.required<ElementRef<HTMLDialogElement>>('dialogo');

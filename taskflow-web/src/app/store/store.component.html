@@ -1,17 +1,11 @@
 <main class="page">
-  <header class="page-header">
+  <header class="page-header" [class.compacta]="!portadaVisible()">
     <div>
       <div class="page-titulo-fila">
         <span class="page-icono"><app-icono nombre="tienda" [tamano]="24" /></span>
         <h1 class="page-title">Tienda</h1>
       </div>
-      <p class="page-subtitle">
-        <span class="chip" [class.chip-success]="catalogo.enVivo()">
-          <span class="punto" [class.en-vivo]="catalogo.enVivo()"></span>
-          {{ catalogo.enVivo() ? 'Stock en vivo' : 'Conectando…' }}
-        </span>
-        <span>El surtido, el stock y la entrega dependen de la sede que elijas.</span>
-      </p>
+      <p class="page-subtitle">Elige tu sede para ver su surtido, su stock y las opciones de entrega.</p>
     </div>
     <div class="cabecera-acciones">
       <label class="sede" data-tour="sede">
@@ -23,12 +17,11 @@
         </select>
       </label>
       <a class="btn btn-ghost seguir-pedido" routerLink="/tienda/pedido"><app-icono nombre="envio" [tamano]="16" />Mis pedidos</a>
-      <app-boton-carrito data-tour="carrito" />
     </div>
   </header>
 
   <!-- La sede elegida: dónde está, qué la distingue y el mapa para cambiarla -->
-  @if (sedeActual(); as t) {
+  @if (portadaVisible() && sedeActual(); as t) {
     <section class="sede-info" aria-label="Sede elegida">
       <div class="sede-texto">
         <p class="sede-nombre"><app-icono nombre="sede" [tamano]="16" />{{ t.nombre }} · {{ catalogo.productos().length }} productos</p>
@@ -48,129 +41,197 @@
     }
   }
 
-  <!-- Banner de promociones -->
-  <section class="promo" aria-label="Promociones" data-tour="cupon">
-    <div class="promo-texto">
-      <span class="promo-etiqueta"><app-icono nombre="chispas" [tamano]="14" /> Oferta de bienvenida</span>
-      <p class="promo-titulo">10 % de descuento en tu primera compra</p>
-      <p class="promo-detalle">Usa el cupón <strong>BIENVENIDO10</strong> en el carrito. Hay más escondidos.</p>
-    </div>
-    <ul class="promo-beneficios">
-      <li><app-icono nombre="envio" [tamano]="18" /> Envío instantáneo (es de mentira)</li>
-      <li><app-icono nombre="garantia" [tamano]="18" /> Stock real en PostgreSQL</li>
-      <li><app-icono nombre="comentario" [tamano]="18" /> Reseñas de otros visitantes</li>
-    </ul>
-  </section>
-
-  <div class="barra-filtros" id="catalogo" data-tour="categorias">
-    <div class="categorias" role="group" aria-label="Categorías">
-      <button type="button" class="categoria" [class.activa]="!categoria()" [attr.aria-pressed]="!categoria()" (click)="filtrar({ cat: '' })">
-        Todo <span>{{ catalogo.productos().length }}</span>
-      </button>
-      @for (c of catalogo.categorias(); track c.nombre) {
-        <button type="button" class="categoria" [class.activa]="categoria() === c.nombre" [attr.aria-pressed]="categoria() === c.nombre" (click)="filtrar({ cat: c.nombre })">
-          {{ c.nombre }} <span>{{ c.total }}</span>
-        </button>
-      }
-    </div>
-
-    <div class="filtros">
-      <div class="input-icono">
-        <app-icono nombre="buscar" [tamano]="16" />
-        <label class="sr-only" for="buscar-producto">Buscar productos</label>
-        <input
-          id="buscar-producto"
-          class="input"
-          type="search"
-          placeholder="Buscar productos…"
-          autocomplete="off"
-          [ngModel]="busqueda()"
-          (ngModelChange)="filtrar({ q: $event })"
-        />
-      </div>
-      <label class="sr-only" for="ordenar">Ordenar por</label>
-      <select id="ordenar" class="input" [ngModel]="orden()" (ngModelChange)="filtrar({ orden: $event })">
-        <option value="destacados">Destacados</option>
-        <option value="valoracion">Mejor valorados</option>
-        <option value="precio-asc">Precio: menor a mayor</option>
-        <option value="precio-desc">Precio: mayor a menor</option>
-        <option value="stock">Por agotarse primero</option>
-      </select>
-    </div>
-  </div>
-
-  @if (catalogo.error(); as error) {
-    <div class="alerta alerta-error" role="alert">
-      <app-icono nombre="alerta" />
-      <span>{{ error }}</span>
-      <button type="button" class="btn btn-sm btn-secondary" (click)="reintentar()">Reintentar</button>
-    </div>
-  }
-
-  @if (catalogo.cargado()) {
-    <p class="resultado" aria-live="polite">
-      @if (rango().total > 0) {
-        Mostrando {{ rango().desde }}–{{ rango().hasta }} de {{ rango().total }} productos
-        @if (categoria()) { en <strong>{{ categoria() }}</strong> }
-        @if (busqueda()) { para “{{ busqueda() }}” }
-      }
-    </p>
-  }
-
-  <section class="catalogo" aria-label="Productos">
-    @if (!catalogo.cargado() && !catalogo.error()) {
-      @for (n of [1, 2, 3, 4, 5, 6, 7, 8]; track n) {
-        <div class="esqueleto card" aria-hidden="true">
-          <span class="esq-img"></span>
-          <span class="esq-linea corta"></span>
-          <span class="esq-linea"></span>
-          <span class="esq-linea media"></span>
-        </div>
-      }
-    }
-
-    @for (p of visibles(); track p.id; let i = $index) {
-      <app-tarjeta-producto
-        [attr.data-tour]="i === 0 ? 'producto' : null"
-        class="entrar"
-        [style.--i]="i"
-        [producto]="p"
-        [valoracion]="catalogo.valoraciones()[p.id]"
-        [stockMaximo]="stockMaximo()"
-      />
-    } @empty {
-      @if (catalogo.cargado()) {
-        <div class="vacio catalogo-vacio">
-          <app-icono nombre="buscar" [tamano]="28" [grosor]="1.5" />
-          Ningún producto coincide con tu búsqueda.
-          <button type="button" class="btn btn-sm btn-secondary" (click)="filtrar({ q: '', cat: '' })">Ver todo el catálogo</button>
-        </div>
-      }
-    }
-  </section>
-
-  @if (totalPaginas() > 1) {
-    <nav class="paginacion" aria-label="Páginas del catálogo">
-      <button type="button" class="btn btn-secondary btn-sm" [disabled]="pagina() === 1" (click)="irAPagina(pagina() - 1)">
-        <app-icono nombre="anterior" [tamano]="16" /> Anterior
-      </button>
-      <div class="paginas">
-        @for (n of paginas(); track n) {
-          <button
-            type="button"
-            class="pagina"
-            [class.actual]="n === pagina()"
-            [attr.aria-current]="n === pagina() ? 'page' : null"
-            [attr.aria-label]="'Página ' + n"
-            (click)="irAPagina(n)"
-          >
-            {{ n }}
-          </button>
+  @if (portadaVisible()) {
+    <app-portada-tienda [productos]="catalogo.productos()" [valoraciones]="catalogo.valoraciones()" />
+  } @else {
+    <div class="zona" id="catalogo">
+      <nav class="migas" aria-label="Ubicación en la tienda">
+        <button type="button" class="miga" (click)="filtrar({ cat: '', sub: '', q: '' })">Inicio</button>
+        @if (departamento(); as d) {
+          <span aria-hidden="true">/</span>
+          <button type="button" class="miga" [class.actual]="!subcategoria()" (click)="filtrar({ sub: '' })">{{ d.nombre }}</button>
+          @if (subcategoria()) {
+            <span aria-hidden="true">/</span>
+            <span class="miga actual">{{ subcategoria() }}</span>
+          }
         }
+      </nav>
+
+      <h2 class="zona-titulo">{{ titulo() }}</h2>
+
+      @if (departamento() && subcategorias().length > 1) {
+        <ul class="subtiles" aria-label="Subcategorías">
+          @for (s of subcategorias(); track s.nombre) {
+            <li>
+              <button type="button" class="subtile" [class.activa]="subcategoria() === s.nombre" [attr.aria-pressed]="subcategoria() === s.nombre"
+                [attr.data-categoria]="categoria()" (click)="filtrar({ sub: subcategoria() === s.nombre ? '' : s.nombre })">
+                <span class="subtile-icono"><app-product-icon [icon]="s.icono" [size]="34" /></span>
+                <span class="subtile-nombre">{{ s.nombre }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+
+      <div class="cuerpo">
+        <aside class="lateral" [class.abierto]="filtrosAbiertos()" data-tour="categorias" aria-label="Filtros">
+          <section class="grupo">
+            @if (departamento(); as d) {
+              <h3>Subcategoría</h3>
+              <ul>
+                <li><button type="button" class="opcion" [class.activa]="!subcategoria()" (click)="filtrar({ sub: '' })">Todas <span>{{ departamentoTotal() }}</span></button></li>
+                @for (s of subcategorias(); track s.nombre) {
+                  <li><button type="button" class="opcion" [class.activa]="subcategoria() === s.nombre" (click)="filtrar({ sub: s.nombre })">{{ s.nombre }} <span>{{ s.total }}</span></button></li>
+                }
+              </ul>
+              <button type="button" class="enlace-lateral" (click)="filtrar({ cat: '', sub: '' })">← Todos los departamentos</button>
+            } @else {
+              <h3>Departamentos</h3>
+              <ul>
+                @for (d of conteoDepartamentos(); track d.nombre) {
+                  <li>
+                    <button type="button" class="opcion" (click)="filtrar({ cat: d.nombre })">
+                      <span class="opcion-nombre"><app-product-icon [icon]="d.icono" [size]="16" />{{ d.nombre }}</span> <span>{{ d.total }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+
+          <section class="grupo">
+            <h3>Ofertas</h3>
+            <ul>
+              <li><button type="button" class="opcion" [class.activa]="oferta() === '2x1'" [attr.aria-pressed]="oferta() === '2x1'" (click)="filtrar({ oferta: oferta() === '2x1' ? '' : '2x1' })">Promoción 2 × 1</button></li>
+              <li><button type="button" class="opcion" [class.activa]="oferta() === 'dscto'" [attr.aria-pressed]="oferta() === 'dscto'" (click)="filtrar({ oferta: oferta() === 'dscto' ? '' : 'dscto' })">Con descuento</button></li>
+            </ul>
+          </section>
+
+          <section class="grupo">
+            <h3>Precio</h3>
+            <ul>
+              @for (r of rangos; track r.id) {
+                <li><button type="button" class="opcion" [class.activa]="precio() === r.id" [attr.aria-pressed]="precio() === r.id" (click)="filtrar({ precio: precio() === r.id ? '' : r.id })">{{ r.etiqueta }}</button></li>
+              }
+            </ul>
+          </section>
+
+          @if (marcas().length > 0) {
+            <section class="grupo">
+              <h3>Marca</h3>
+              <ul>
+                @for (m of marcas(); track m.nombre) {
+                  <li><button type="button" class="opcion" [class.activa]="marca() === m.nombre" [attr.aria-pressed]="marca() === m.nombre" (click)="filtrar({ marca: marca() === m.nombre ? '' : m.nombre })">{{ m.nombre }} <span>{{ m.total }}</span></button></li>
+                }
+              </ul>
+            </section>
+          }
+
+          @if (hayFiltros()) {
+            <button type="button" class="btn btn-sm btn-secondary limpiar" (click)="limpiarFiltros()">Limpiar filtros</button>
+          }
+        </aside>
+
+        <div class="resultados">
+          <div class="barra">
+            <button type="button" class="btn btn-secondary btn-sm btn-filtros" (click)="filtrosAbiertos.set(!filtrosAbiertos())" [attr.aria-expanded]="filtrosAbiertos()">
+              <app-icono nombre="menu" [tamano]="16" />Filtros
+            </button>
+            @if (catalogo.cargado()) {
+              <p class="resultado" aria-live="polite">
+                @if (rango().total > 0) {
+                  {{ rango().desde }}–{{ rango().hasta }} de {{ rango().total }} productos
+                } @else {
+                  Sin resultados
+                }
+              </p>
+            }
+            <label class="orden">
+              <span class="sr-only">Ordenar por</span>
+              <select class="input" [ngModel]="orden()" (ngModelChange)="filtrar({ orden: $event })">
+                <option value="destacados">Destacados</option>
+                <option value="valoracion">Mejor valorados</option>
+                <option value="precio-asc">Precio: menor a mayor</option>
+                <option value="precio-desc">Precio: mayor a menor</option>
+                <option value="stock">Por agotarse primero</option>
+              </select>
+            </label>
+          </div>
+
+          @if (catalogo.error(); as error) {
+            <div class="alerta alerta-error" role="alert">
+              <app-icono nombre="alerta" />
+              <span>{{ error }}</span>
+              <button type="button" class="btn btn-sm btn-secondary" (click)="reintentar()">Reintentar</button>
+            </div>
+          }
+
+          <section class="catalogo" aria-label="Productos">
+            @if (!catalogo.cargado() && !catalogo.error()) {
+              @for (n of [1, 2, 3, 4, 5, 6, 7, 8]; track n) {
+                <div class="esqueleto card" aria-hidden="true">
+                  <span class="esq-img"></span>
+                  <span class="esq-linea corta"></span>
+                  <span class="esq-linea"></span>
+                  <span class="esq-linea media"></span>
+                </div>
+              }
+            }
+
+            @for (p of visibles(); track p.id; let i = $index) {
+              <app-tarjeta-producto
+                [attr.data-tour]="i === 0 ? 'producto' : null"
+                class="entrar"
+                [style.--i]="i % 12"
+                [producto]="p"
+                [valoracion]="catalogo.valoraciones()[p.id]"
+              />
+            } @empty {
+              @if (catalogo.cargado()) {
+                <div class="vacio catalogo-vacio">
+                  <app-icono nombre="buscar" [tamano]="28" [grosor]="1.5" />
+                  Ningún producto coincide con tu búsqueda.
+                  <button type="button" class="btn btn-sm btn-secondary" (click)="filtrar({ q: '', cat: '', sub: '', precio: '', marca: '' })">Ver todo el catálogo</button>
+                </div>
+              }
+            }
+          </section>
+
+          @if (totalPaginas() > 1) {
+            <nav class="paginacion" aria-label="Páginas del catálogo">
+              <button type="button" class="btn btn-secondary btn-sm" [disabled]="pagina() === 1" (click)="irAPagina(pagina() - 1)">
+                <app-icono nombre="anterior" [tamano]="16" /> Anterior
+              </button>
+              <div class="paginas">
+                @for (n of paginas(); track $index) {
+                  @if (n === 0) {
+                    <span class="puntos" aria-hidden="true">…</span>
+                  } @else {
+                    <button
+                      type="button"
+                      class="pagina"
+                      [class.actual]="n === pagina()"
+                      [attr.aria-current]="n === pagina() ? 'page' : null"
+                      [attr.aria-label]="'Página ' + n"
+                      (click)="irAPagina(n)"
+                    >
+                      {{ n }}
+                    </button>
+                  }
+                }
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" [disabled]="pagina() === totalPaginas()" (click)="irAPagina(pagina() + 1)">
+                Siguiente <app-icono nombre="siguiente" [tamano]="16" />
+              </button>
+            </nav>
+          }
+        </div>
       </div>
-      <button type="button" class="btn btn-secondary btn-sm" [disabled]="pagina() === totalPaginas()" (click)="irAPagina(pagina() + 1)">
-        Siguiente <app-icono nombre="siguiente" [tamano]="16" />
-      </button>
-    </nav>
+    </div>
   }
+
+  <p class="aviso-demo">
+    Tienda de demostración: los productos, los pagos y los pedidos no son reales.
+    Quechuti funciona sobre <a routerLink="/">TaskFlow</a>, el sistema de gestión de las sedes.
+  </p>
 </main>
