@@ -74,7 +74,7 @@ public class InventarioService {
     public Flux<InventarioVista> listar(Long tiendaId) {
         DatabaseClient.GenericExecuteSpec consulta = db.sql("""
                         SELECT i.id, i.tienda_id, i.producto_id, p.name, p.category, p.icon, p.price,
-                               i.stock, i.stock_minimo, i.stock_objetivo,
+                               i.stock, i.stock_minimo, i.stock_objetivo, i.almacen,
                                EXISTS (SELECT 1 FROM pedidos pe WHERE pe.tienda_id = i.tienda_id AND pe.producto_id = i.producto_id
                                        AND pe.estado IN ('SOLICITADO', 'APROBADO')) AS pedido_en_curso
                         FROM inventario i JOIN products p ON p.id = i.producto_id
@@ -87,7 +87,7 @@ public class InventarioService {
                     return new InventarioVista(
                             row.get("id", Long.class), row.get("tienda_id", Long.class), row.get("producto_id", Long.class),
                             row.get("name", String.class), row.get("category", String.class), row.get("icon", String.class),
-                            row.get("price", BigDecimal.class), stock, minimo, row.get("stock_objetivo", Integer.class),
+                            row.get("price", BigDecimal.class), stock, minimo, row.get("stock_objetivo", Integer.class), row.get("almacen", Integer.class),
                             InventarioVista.estadoDe(stock, minimo), Boolean.TRUE.equals(row.get("pedido_en_curso", Boolean.class)));
                 })
                 .all();

@@ -23,6 +23,8 @@ public class Inventario {
     private Integer stock;
     private Integer stockMinimo;
     private Integer stockObjetivo;
+    /** Unidades en el almacén de la tienda, listas para reponer el piso. */
+    private Integer almacen;
     private LocalDateTime actualizadoEn;
 
     public boolean bajoMinimo() {

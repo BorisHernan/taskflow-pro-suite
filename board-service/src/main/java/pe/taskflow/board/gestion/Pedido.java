@@ -34,6 +34,7 @@ public class Pedido {
     private String nota;
     private Long tareaId;
     private String solicitadoPor;
+    private Long solicitadoPorEmpleado;
     private String revisadoPor;
     private LocalDateTime creadoEn;
     private LocalDateTime actualizadoEn;

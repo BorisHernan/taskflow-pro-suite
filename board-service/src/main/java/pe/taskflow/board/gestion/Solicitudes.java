@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDate;
+
 /** Cuerpos de las peticiones de gestión. tiendaId solo lo usa el administrador. */
 public final class Solicitudes {
 
@@ -48,7 +50,9 @@ public final class Solicitudes {
             Long tiendaId,
             @NotNull Long productoId,
             @NotNull @Min(1) @Max(500) Integer cantidad,
-            @Size(max = 300) String nota) {
+            @Size(max = 300) String nota,
+            /** Quién de la sede hace la solicitud al distribuidor (opcional). */
+            Long empleadoId) {
     }
 
     public record RevisionPedido(@Size(max = 300) String nota) {
@@ -57,5 +61,20 @@ public final class Solicitudes {
     public record NivelesInventario(
             @NotNull @Min(0) @Max(1000) Integer stockMinimo,
             @NotNull @Min(1) @Max(5000) Integer stockObjetivo) {
+    }
+
+    /** rapido: la demo guiada usa 1 minuto para que se vea terminar la orden. */
+    public record Asignacion(@NotNull Long empleadoId, Boolean rapido) {
+    }
+
+    /** Puesto dentro de la tienda; null = sin puesto fijo. */
+    public record CambioPuesto(
+            @Pattern(regexp = "CAJA_[1-5]|ENTRADA|PASILLOS|ALMACEN|DESPACHO", message = "puesto inválido") String puesto) {
+    }
+
+    public record Ausencia(
+            @NotBlank @Pattern(regexp = "DESCANSO_MEDICO|VACACIONES|PERMISO|DESCANSO|FALTA", message = "tipo de ausencia inválido") String disponibilidad,
+            @NotBlank @Size(max = 200) String motivo,
+            LocalDate hasta) {
     }
 }

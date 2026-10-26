@@ -14,6 +14,7 @@ public record InventarioVista(
         int stock,
         int stockMinimo,
         int stockObjetivo,
+        int almacen,
         String estado,
         boolean pedidoEnCurso
 ) {

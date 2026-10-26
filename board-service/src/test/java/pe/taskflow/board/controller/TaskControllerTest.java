@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import pe.taskflow.board.auth.Sesiones;
 import pe.taskflow.board.config.TaskEventPublisher;
 import pe.taskflow.board.gestion.IncidenciaService;
+import pe.taskflow.board.ventas.OrdenService;
 import pe.taskflow.board.demo.ContentModerationService;
 import pe.taskflow.board.demo.DemoStatsService;
 import pe.taskflow.board.model.Task;
@@ -49,13 +50,16 @@ class TaskControllerTest {
     private DemoStatsService statsService;
     @Mock
     private IncidenciaService incidenciaService;
+    @Mock
+    private OrdenService ordenService;
 
     private TaskController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new TaskController(taskRepository, eventPublisher, moderationService, statsService, incidenciaService);
+        controller = new TaskController(taskRepository, eventPublisher, moderationService, statsService, incidenciaService, ordenService);
         lenient().when(incidenciaService.alCerrarTarea(any())).thenReturn(Mono.empty());
+        lenient().when(ordenService.alCerrarTarea(any())).thenReturn(Mono.empty());
         // maxTasksPerIp llega por @Value en tiempo real; fuera de un ApplicationContext
         // hay que fijarlo a mano para que la lógica de rate limiting sea comprobable.
         ReflectionTestUtils.setField(controller, "maxTasksPerIp", MAX_TASKS_PER_IP);

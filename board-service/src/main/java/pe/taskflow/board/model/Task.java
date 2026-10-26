@@ -42,7 +42,7 @@ public class Task {
     // Gestión de tiendas. null = tarea general (solo la ve el administrador).
     private Long tiendaId;
 
-    @Pattern(regexp = "MANUAL|REPOSICION|INCIDENCIA|TURNO", message = "tipo inválido")
+    @Pattern(regexp = "MANUAL|REPOSICION|INCIDENCIA|TURNO|PEDIDO", message = "tipo inválido")
     private String tipo;
 
     @Pattern(regexp = "BAJA|MEDIA|ALTA|CRITICA", message = "prioridad debe ser BAJA, MEDIA, ALTA o CRITICA")
@@ -58,6 +58,13 @@ public class Task {
     private String creadoPor;
 
     private String asignadoA;
+
+    // Persona de la sede que la está haciendo, desde cuándo y cuánto debería tardar.
+    private Long empleadoId;
+
+    private LocalDateTime asignadaEn;
+
+    private Integer minutosEstimados;
 
     private LocalDateTime cerradaEn;
 }

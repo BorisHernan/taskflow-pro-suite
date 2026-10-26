@@ -17,6 +17,7 @@ import org.springframework.web.server.ServerWebExchange;
 import pe.taskflow.board.auth.UsuarioActual;
 import pe.taskflow.board.config.TaskEventPublisher;
 import pe.taskflow.board.gestion.IncidenciaService;
+import pe.taskflow.board.ventas.OrdenService;
 import pe.taskflow.board.demo.ContentModerationService;
 import pe.taskflow.board.demo.DemoStatsService;
 import pe.taskflow.board.model.Task;
@@ -44,6 +45,7 @@ public class TaskController {
     private final ContentModerationService moderationService;
     private final DemoStatsService statsService;
     private final IncidenciaService incidenciaService;
+    private final OrdenService ordenService;
 
     @Value("${app.demo.max-tasks-per-ip}")
     private int maxTasksPerIp;
@@ -119,6 +121,9 @@ public class TaskController {
                             task.setProductoId(null);
                             task.setReferenciaId(null);
                             task.setTurnoId(null);
+                            task.setEmpleadoId(null);
+                            task.setAsignadaEn(null);
+                            task.setMinutosEstimados(null);
                             task.setCreatedAt(LocalDateTime.now());
                             task.setUpdatedAt(LocalDateTime.now());
                             if (task.getStatus() == null) {
@@ -193,13 +198,19 @@ public class TaskController {
         } else if (!"DONE".equals(nuevo)) {
             tarea.setCerradaEn(null);
         }
+        // Vuelve a "Por hacer": queda sin asignar.
+        if ("TODO".equals(nuevo) && !"TODO".equals(tarea.getStatus())) {
+            tarea.setEmpleadoId(null);
+            tarea.setAsignadaEn(null);
+            tarea.setMinutosEstimados(null);
+        }
         tarea.setStatus(nuevo);
         tarea.setUpdatedAt(LocalDateTime.now());
     }
 
     private Mono<Task> despuesDeGuardar(Task saved) {
         eventPublisher.publish(TaskEventType.UPDATED, saved);
-        return incidenciaService.alCerrarTarea(saved).thenReturn(saved);
+        return incidenciaService.alCerrarTarea(saved).then(ordenService.alCerrarTarea(saved)).thenReturn(saved);
     }
 
     @Operation(summary = "Elimina una tarea por id")

@@ -26,6 +26,7 @@ public class PedidoService {
     private final ProductRepository productRepository;
     private final InventarioService inventario;
     private final TareasAutomaticas tareas;
+    private final PersonalService personal;
     private final FiltroDeTexto filtro;
     private final DatabaseClient db;
     private final R2dbcEntityTemplate template;
@@ -48,9 +49,16 @@ public class PedidoService {
                 .map((row, meta) -> row.get("id", Long.class))
                 .one();
 
+        Mono<Optional<Empleado>> quien = req.empleadoId() == null ? Mono.just(Optional.empty())
+                : personal.deLaSede(req.empleadoId(), tienda).map(Optional::of);
+
         return productRepository.findById(req.productoId())
                 .switchIfEmpty(Mono.error(Errores.noEncontrado("Producto no encontrado")))
-                .flatMap(producto -> enCurso.flatMap(hay -> hay
+                .zipWith(quien)
+                .flatMap(par -> {
+                    var producto = par.getT1();
+                    Optional<Empleado> empleado = par.getT2();
+                    return enCurso.flatMap(hay -> hay
                         ? Mono.<Pedido>error(Errores.conflicto("Ya hay un pedido en curso de \"" + producto.getName() + "\"."))
                         : alerta.map(Optional::of).defaultIfEmpty(Optional.empty())
                                 .flatMap(tarea -> repository.save(Pedido.builder()
@@ -62,11 +70,19 @@ public class PedidoService {
                                         .estado(Pedido.SOLICITADO)
                                         .nota(req.nota())
                                         .tareaId(tarea.orElse(null))
-                                        .solicitadoPor(u.usuario())
+                                        .solicitadoPor(empleado.map(Empleado::getNombre).orElse(u.usuario()))
+                                        .solicitadoPorEmpleado(empleado.map(Empleado::getId).orElse(null))
                                         .creadoEn(LocalDateTime.now())
                                         .actualizadoEn(LocalDateTime.now())
-                                        .build()))))
-                .flatMap(p -> tareas.mover(p.getTareaId(), "IN_PROGRESS", "Pedido #" + p.getId() + " solicitado.").thenReturn(p));
+                                        .build())));
+                })
+                .flatMap(p -> p.getSolicitadoPorEmpleado() == null ? Mono.just(p)
+                        : personal.deLaSede(p.getSolicitadoPorEmpleado(), p.getTiendaId())
+                                .flatMap(e -> personal.avisar(e, e.getNombre() + ": enviaste al distribuidor el pedido #" + p.getId() + " · "
+                                        + p.getCantidad() + " u. de " + p.getProductoNombre() + "."))
+                                .thenReturn(p))
+                .flatMap(p -> tareas.mover(p.getTareaId(), "IN_PROGRESS", "Pedido #" + p.getId() + " al distribuidor, lo solicitó "
+                        + p.getSolicitadoPor() + ".").thenReturn(p));
     }
 
     public Mono<Pedido> aprobar(UsuarioActual u, long id) {
