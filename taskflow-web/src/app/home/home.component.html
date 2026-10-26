@@ -1,30 +1,27 @@
 <main class="home">
-  <!-- Presentación -->
+  <!-- 1. El sistema -->
   <section class="hero contenedor" aria-labelledby="home-titulo">
     <div class="hero-texto">
-      <p class="autor">Proyecto de Boris Medrano · Desarrollador Full Stack Java</p>
-      <h1 id="home-titulo">Gestión de tiendas en tiempo real</h1>
+      <p class="sobretitulo">Operaciones para cadenas de tiendas</p>
+      <h1 id="home-titulo">Cada venta mueve el trabajo de la tienda</h1>
       <p class="lead">
-        Inventario, compras, mermas, incidencias y turnos de una cadena de tres tiendas en Lima, conectados a un
-        tablero de tareas que se actualiza solo. Construido con Spring WebFlux, PostgreSQL y Angular.
+        TaskFlow conecta ventas, inventario, compras, mermas, incidencias y turnos de tres sedes en Lima. Cuando algo pasa
+        en la operación, la tarea correcta aparece en el tablero de la sede correcta, en tiempo real.
       </p>
       <div class="acciones">
         <a class="btn btn-primary btn-lg" [routerLink]="sesion.activa() ? '/gestion' : '/ingresar'">
-          {{ sesion.activa() ? 'Ir a la gestión' : 'Ingresar a la demo' }}
+          {{ sesion.activa() ? 'Ir a la gestión' : 'Explorar el sistema' }}
         </a>
         <a class="btn btn-secondary btn-lg" routerLink="/tienda">Ver la tienda online</a>
       </div>
       <p class="estado-servidor" [attr.data-estado]="estado()" aria-live="polite">
-        <span class="punto" [class.en-vivo]="estado() === 'en-linea'"></span>
+        <span class="punto" [class.en-vivo]="estado() === 'en-linea'" [class.problema]="estado() === 'sin-respuesta'"></span>
         @switch (estado()) {
           @case ('despertando') {
-            Iniciando el servidor (plan gratuito); la primera carga puede tardar hasta un minuto.
+            Iniciando el servidor (plan gratuito): la primera carga puede tardar hasta un minuto.
           }
           @case ('en-linea') {
             Servidor en línea
-            @if (visitas() !== null) {
-              · {{ visitas() }} {{ visitas() === '1' ? 'visita registrada' : 'visitas registradas' }}
-            }
           }
           @case ('sin-respuesta') {
             El servidor aún no responde. La aplicación se reconecta automáticamente.
@@ -32,113 +29,72 @@
         }
       </p>
     </div>
-    <figure class="hero-captura">
-      <img src="img/gestion-resumen.png" width="1440" height="900" alt="Panel de resumen de la administradora: ventas del día, productos bajo el mínimo, tareas urgentes y comparación entre tiendas" />
+    <figure class="captura captura-hero">
+      <img src="img/gestion-resumen.png" width="1440" height="900"
+        alt="Resumen del día de la administración: ventas, productos bajo el mínimo, tareas urgentes y comparación entre sedes" />
     </figure>
   </section>
 
-  <!-- Cómo funciona -->
-  <section class="seccion contenedor" aria-labelledby="flujos-titulo">
-    <header class="seccion-cabecera">
-      <h2 id="flujos-titulo">Cómo funciona</h2>
-      <p>La operación de cada tienda genera trabajo concreto, sin que nadie tenga que anotarlo.</p>
-    </header>
-    <ul class="flujos">
-      @for (f of flujos; track f.titulo) {
-        <li>
-          <span class="flujo-icono"><app-icono [nombre]="f.icono" [tamano]="20" /></span>
-          <h3>{{ f.titulo }}</h3>
-          <p>{{ f.texto }}</p>
-        </li>
-      }
-    </ul>
-  </section>
-
-  <!-- Roles -->
-  <section class="seccion contenedor" aria-labelledby="roles-titulo">
-    <header class="seccion-cabecera">
-      <h2 id="roles-titulo">Dos roles, dos interfaces</h2>
-      <p>Los permisos se validan en el servidor con JWT: cada tienda solo puede ver y modificar lo suyo.</p>
-    </header>
-    <div class="roles">
-      @for (r of roles; track r.nombre) {
-        <article class="rol card">
-          <h3>{{ r.nombre }}</h3>
-          <p class="rol-cuenta">Cuenta de prueba: <code>{{ r.cuenta }}</code> · clave <code>demo1234</code></p>
-          <ul>
-            @for (p of r.puede; track p) {
-              <li><app-icono nombre="check" [tamano]="16" />{{ p }}</li>
-            }
-          </ul>
-        </article>
-      }
-    </div>
-  </section>
-
-  <!-- En vivo -->
-  <section class="seccion contenedor" aria-labelledby="vivo-titulo">
-    <header class="seccion-cabecera">
-      <h2 id="vivo-titulo">Arquitectura en tiempo real</h2>
-      <p>Cada cambio se guarda en PostgreSQL y se difunde por Server-Sent Events a los usuarios conectados.</p>
-    </header>
-    <div class="vivo card">
-      <app-diagrama-vivo [latido]="vivo.latido()"></app-diagrama-vivo>
-      <div class="vivo-registro">
-        <h3>Actividad reciente en la tienda online</h3>
-        <ol class="vivo-lista" aria-live="polite">
-          @for (a of vivo.actividad(); track a.id) {
-            <li>
-              <span>{{ a.texto }}</span>
-              <span class="vivo-hora">{{ haceCuanto(a.fecha) }}</span>
-            </li>
-          } @empty {
-            <li class="vivo-vacio">Sin actividad desde que abriste la página. Las compras de otros visitantes aparecen aquí al instante.</li>
-          }
-        </ol>
-      </div>
-    </div>
-  </section>
-
-  <!-- Tecnología -->
-  <section class="seccion contenedor" aria-labelledby="stack-titulo">
-    <header class="seccion-cabecera">
-      <h2 id="stack-titulo">Tecnología</h2>
-      <p>Backend reactivo que no bloquea hilos mientras espera a la base de datos, con pruebas automatizadas y despliegue continuo.</p>
-    </header>
-    <dl class="stack">
-      @for (s of stack; track s[0]) {
-        <div>
-          <dt>{{ s[0] }}</dt>
-          <dd>{{ s[1] }}</dd>
-        </div>
-      }
-    </dl>
-    <p class="enlaces">
-      <a [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">Documentación de la API (Swagger)</a>
-      <a href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">Código fuente en GitHub</a>
-    </p>
-  </section>
-
-  <!-- Autor -->
-  <section class="autor-seccion" aria-labelledby="autor-titulo">
-    <div class="contenedor autor-contenido">
-      <div>
+  <!-- 2. Quién lo construyó y cómo, en corto -->
+  <section class="banda" aria-labelledby="autor-titulo">
+    <div class="contenedor autor">
+      <div class="autor-perfil">
+        <p class="sobretitulo">Quién lo construyó</p>
         <h2 id="autor-titulo">Boris Medrano</h2>
-        <p>
-          Desarrollador Full Stack Java con más de 3 años de experiencia en Spring Boot, WebFlux y Angular.
-          Disponible para trabajo remoto desde Lima, Perú.
+        <p class="autor-rol">Desarrollador Full Stack Java · Lima, Perú · trabajo remoto</p>
+        <p class="autor-texto">
+          Diseñé y programé TaskFlow de punta a punta: modelo de datos, API reactiva, seguridad por roles, interfaz y despliegue.
+        </p>
+        <div class="contacto">
+          <a class="btn btn-primary" href="mailto:mdrncastro@gmail.com"><app-icono nombre="correo" [tamano]="16" />Escríbeme</a>
+          <a class="btn btn-secondary" href="https://www.linkedin.com/in/boris-hernan-dev" target="_blank" rel="noopener"><app-icono nombre="linkedin" [tamano]="16" />LinkedIn</a>
+          <a class="btn btn-secondary" href="https://github.com/BorisHernan" target="_blank" rel="noopener"><app-icono nombre="github" [tamano]="16" />GitHub</a>
+        </div>
+      </div>
+
+      <div class="como">
+        <h3>Cómo está hecho, en corto</h3>
+        <dl>
+          @for (c of como; track c[0]) {
+            <div>
+              <dt>{{ c[0] }}</dt>
+              <dd>{{ c[1] }}</dd>
+            </div>
+          }
+        </dl>
+        <p class="enlaces">
+          <a href="https://github.com/BorisHernan/taskflow-pro-suite" target="_blank" rel="noopener">Ver el código</a>
+          <a [href]="backendBaseUrl + '/swagger-ui.html'" target="_blank" rel="noopener">Documentación de la API</a>
         </p>
       </div>
-      <div class="contacto">
-        <a class="btn btn-primary" href="mailto:mdrncastro@gmail.com"><app-icono nombre="correo" [tamano]="17" />mdrncastro&#64;gmail.com</a>
-        <a class="btn btn-secondary" href="https://www.linkedin.com/in/boris-hernan-dev" target="_blank" rel="noopener"><app-icono nombre="linkedin" [tamano]="17" />LinkedIn</a>
-        <a class="btn btn-secondary" href="https://github.com/BorisHernan" target="_blank" rel="noopener"><app-icono nombre="github" [tamano]="17" />GitHub</a>
-      </div>
+    </div>
+  </section>
+
+  <!-- 3. Cómo funciona -->
+  <section class="seccion contenedor" aria-labelledby="flujo-titulo">
+    <header class="seccion-cabecera">
+      <h2 id="flujo-titulo">De una venta a una tarea, sin que nadie la anote</h2>
+      <p>Lo mismo pasa con las incidencias graves, las mermas por robo y el checklist de cada turno.</p>
+    </header>
+    <ol class="flujo">
+      @for (p of flujo; track p.titulo) {
+        <li>
+          <span class="flujo-icono"><app-icono [nombre]="p.icono" [tamano]="20" /></span>
+          <h3>{{ p.titulo }}</h3>
+          <p>{{ p.texto }}</p>
+        </li>
+      }
+    </ol>
+    <div class="cierre">
+      <p>La mejor forma de entenderlo es verlo: entra con un rol y sigue el recorrido guiado de menos de un minuto.</p>
+      <a class="btn btn-primary" [routerLink]="sesion.activa() ? '/gestion' : '/ingresar'">
+        {{ sesion.activa() ? 'Ir a la gestión' : 'Explorar el sistema' }}
+      </a>
     </div>
   </section>
 
   <footer class="pie contenedor">
-    <span>© {{ anio }} Boris Medrano</span>
-    <span>TaskFlow · Spring WebFlux, PostgreSQL y Angular</span>
+    <span>© {{ anio }} Boris Medrano · TaskFlow</span>
+    <a routerLink="/arena">Arena, módulo multijugador</a>
   </footer>
 </main>

@@ -1,0 +1,39 @@
+<section class="sedes" aria-labelledby="sedes-titulo">
+  <header>
+    <h2 id="sedes-titulo">Tres sedes en Lima, cada una con su realidad</h2>
+    <p>
+      Cada tienda atiende a un público distinto, por eso tiene su propio surtido, su propio stock y su propio encargado.
+      La administración ve y gestiona las tres; cada encargado, solo la suya.
+    </p>
+  </header>
+
+  <div class="contenido">
+    <app-mapa-sedes class="mapa" [tiendas]="tiendas()" [seleccionada]="seleccionada()" (elegir)="seleccionada.set($event)" />
+
+    <ul class="fichas">
+      @for (f of fichas(); track f.tienda.id; let i = $index) {
+        <li>
+          <button type="button" class="ficha" [class.activa]="seleccionada() === f.tienda.id" [style.--i]="i"
+            (mouseenter)="seleccionada.set(f.tienda.id)" (focus)="seleccionada.set(f.tienda.id)"
+            [attr.aria-pressed]="seleccionada() === f.tienda.id">
+            <span class="ficha-cabecera">
+              <strong>{{ f.tienda.nombre }}</strong>
+              <span class="cifras">
+                <span>{{ f.productos }} productos</span>
+                <span class="exclusivos">{{ f.exclusivos }} exclusivos</span>
+              </span>
+            </span>
+            <span class="enfoque">{{ f.tienda.enfoque }}</span>
+            <span class="datos">
+              <span><app-icono nombre="persona" [tamano]="14" />{{ f.encargado }}</span>
+              <span><app-icono nombre="sede" [tamano]="14" />{{ f.tienda.direccion }}</span>
+              <span><app-icono nombre="reloj" [tamano]="14" />{{ f.tienda.horario }}</span>
+            </span>
+          </button>
+        </li>
+      } @empty {
+        <li class="cargando">Cargando las sedes…</li>
+      }
+    </ul>
+  </div>
+</section>

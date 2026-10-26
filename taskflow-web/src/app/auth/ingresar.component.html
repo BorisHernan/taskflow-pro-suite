@@ -1,41 +1,130 @@
-<main class="page ingresar">
-  <header class="ingresar-cabecera">
-    <h1 class="page-title">Entra a la gestión de tiendas</h1>
-    <p class="ingresar-lead">
-      Una cadena de tres tiendas en Lima. Cada rol ve una interfaz distinta: elige una cuenta para entrar con un clic.
-    </p>
+<main class="ingresar">
+  <header class="cabecera">
+    <div>
+      <h1>Elige con qué rol entrar</h1>
+      <p>Una cadena de tres tiendas en Lima. Cada rol ve una interfaz distinta: quien compra, quien atiende la tienda y quien supervisa la cadena.</p>
+    </div>
+    <div class="pestanas segmentado" role="tablist" aria-label="Secciones">
+      <button type="button" role="tab" id="tab-roles" aria-controls="panel-roles" [attr.aria-selected]="pestana() === 'roles'"
+        [attr.aria-pressed]="pestana() === 'roles'" (click)="pestana.set('roles')">
+        <app-icono nombre="usuarios" [tamano]="16" />Elige tu rol
+      </button>
+      <button type="button" role="tab" id="tab-sedes" aria-controls="panel-sedes" [attr.aria-selected]="pestana() === 'sedes'"
+        [attr.aria-pressed]="pestana() === 'sedes'" (click)="pestana.set('sedes')">
+        <app-icono nombre="sede" [tamano]="16" />Conoce las sedes
+      </button>
+    </div>
   </header>
 
+  @if (pestana() === 'roles') {
+  <section id="panel-roles" role="tabpanel" aria-labelledby="tab-roles">
+  <div class="sugerencia" role="note">
+    <span class="sugerencia-icono"><app-icono nombre="chispas" [tamano]="18" /></span>
+    <p>
+      <strong>¿Primera vez aquí?</strong> Entra con el <strong>recorrido guiado</strong>: pasa por cada opción del menú
+      del rol que elijas y te explica para qué sirve.
+    </p>
+  </div>
+
   @if (error()) {
-    <div class="alerta alerta-error" role="alert">{{ error() }}</div>
+    <div class="alerta alerta-error" role="alert"><app-icono nombre="alerta" /><span>{{ error() }}</span></div>
   }
 
-  <ul class="cuentas">
-    @for (c of cuentas; track c.usuario) {
-      <li>
-        <button type="button" class="cuenta" [class.admin]="c.usuario === 'admin'" (click)="entrarComo(c)" [disabled]="enviando() !== null">
-          <span class="cuenta-rol">{{ c.rol }}</span>
-          <span class="cuenta-nombre">{{ c.nombre }}</span>
-          <span class="cuenta-detalle">{{ c.detalle }}</span>
-          <span class="cuenta-accion">{{ enviando() === c.usuario ? 'Entrando…' : 'Entrar como ' + c.usuario }}</span>
-        </button>
-      </li>
-    }
-  </ul>
+  <div class="roles">
+    @for (rol of roles; track rol.clave; let i = $index) {
+      <article class="rol" [style.--i]="i" [attr.aria-labelledby]="'rol-' + rol.clave" (mouseleave)="soltar(rol)">
+        <app-vista-rol class="rol-imagen" [imagen]="imagenDe(rol)" [alt]="rol.alt" [zona]="zonaDe(rol)" />
 
-  <form class="formulario card" (ngSubmit)="entrar()">
-    <h2>O con usuario y clave</h2>
-    <div class="campos">
-      <label>
-        Usuario
-        <input class="input" name="usuario" [(ngModel)]="usuario" autocomplete="username" spellcheck="false" />
-      </label>
-      <label>
-        Clave
-        <input class="input" type="password" name="clave" [(ngModel)]="clave" autocomplete="current-password" />
-      </label>
-      <button type="submit" class="btn btn-primary" [disabled]="!usuario.trim() || !clave || enviando() !== null">Entrar</button>
-    </div>
-    <p class="nota">Todas las cuentas de la demo usan la clave <strong>{{ claveDemo }}</strong>. Los datos son compartidos con otros visitantes.</p>
-  </form>
+        <div class="rol-cuerpo">
+          @for (p of [personaDe(rol)]; track p) {
+            <p class="rol-etiqueta">
+              {{ p }} ·
+              @if (rol.clave === 'cliente') {
+                sin cuenta
+              } @else {
+                usuario <span class="codigo">{{ usuarioDe(rol) }}</span>
+              }
+            </p>
+          }
+          <h2 [id]="'rol-' + rol.clave">{{ rol.nombre }}</h2>
+          <p class="rol-resumen">{{ rol.resumen }}</p>
+
+          <ul class="funciones" (focusout)="soltar(rol)">
+            @for (f of rol.funciones; track f.texto; let j = $index) {
+              <li>
+                <button type="button" class="funcion" [class.activa]="activa()[rol.clave] === j"
+                  (mouseenter)="enfocar(rol, j)" (focus)="enfocar(rol, j)" (click)="enfocar(rol, j)"
+                  [attr.aria-pressed]="activa()[rol.clave] === j">
+                  <app-icono nombre="check" [tamano]="16" />
+                  <span>{{ f.texto }}</span>
+                </button>
+              </li>
+            }
+          </ul>
+
+          @if (rol.clave === 'tienda') {
+            <div class="sedes">
+              <span id="sede-etiqueta">Sede</span>
+              <div class="segmentado" role="group" aria-labelledby="sede-etiqueta">
+                @for (s of sedes; track s.usuario) {
+                  <button type="button" [attr.aria-pressed]="sede().usuario === s.usuario" (click)="sede.set(s)">{{ s.tienda }}</button>
+                }
+              </div>
+              <button type="button" class="enlace-sedes" (click)="pestana.set('sedes')">¿En qué se diferencian las sedes?</button>
+            </div>
+          }
+
+          <div class="acciones">
+            <button type="button" class="btn btn-primary" [disabled]="enviando() !== null" (click)="entrar(rol, true)">
+              <app-icono nombre="chispas" [tamano]="16" />
+              {{ enviando() === usuarioDe(rol) + ':tour' ? 'Entrando…' : rol.clave === 'cliente' ? 'Comprar con recorrido' : 'Entrar con recorrido' }}
+            </button>
+            <button type="button" class="btn btn-secondary" [disabled]="enviando() !== null" (click)="entrar(rol, false)">
+              {{ enviando() === usuarioDe(rol) && rol.clave !== 'cliente' ? 'Entrando…' : rol.clave === 'cliente' ? 'Ir a la tienda' : 'Entrar sin guía' }}
+            </button>
+          </div>
+        </div>
+      </article>
+    }
+  </div>
+
+  </section>
+  } @else {
+    <section id="panel-sedes" role="tabpanel" aria-labelledby="tab-sedes">
+      <app-sedes-presentacion class="bloque-sedes" />
+      <ol class="proceso" aria-label="Cómo llega una compra">
+        <li>
+          <span class="proceso-icono"><app-icono nombre="billete" [tamano]="18" /></span>
+          <div>
+            <strong>1 · Pagas en la sede que elijas</strong>
+            <p>Un solo cobro: si falta stock de algo, no se cobra nada. Recibes tu boleta con un código.</p>
+          </div>
+        </li>
+        <li>
+          <span class="proceso-icono"><app-icono nombre="inventario" [tamano]="18" /></span>
+          <div>
+            <strong>2 · La sede lo prepara</strong>
+            <p>Al encargado le llega la tarea "Preparar pedido" al instante y marca cada avance.</p>
+          </div>
+        </li>
+        <li>
+          <span class="proceso-icono"><app-icono nombre="envio" [tamano]="18" /></span>
+          <div>
+            <strong>3 · Recoges o te lo llevan</strong>
+            <p>Recojo en tienda o envío desde esa sede a tu casa; sigues cada paso con tu código.</p>
+          </div>
+        </li>
+      </ol>
+      <p class="volver-roles">
+        <button type="button" class="btn btn-primary" (click)="pestana.set('roles')">
+          <app-icono nombre="anterior" [tamano]="16" />Volver a elegir rol
+        </button>
+      </p>
+    </section>
+  }
+
+  <p class="nota">
+    <app-icono nombre="info" [tamano]="14" />
+    Son cuentas de demostración: los datos se comparten con otros visitantes, así que verás lo que ellos hagan en tiempo real.
+  </p>
 </main>

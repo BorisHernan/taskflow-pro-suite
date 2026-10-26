@@ -1,136 +1,310 @@
 .ingresar {
-  max-width: 1080px;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 24px var(--gutter) 40px;
 }
 
-.ingresar-cabecera {
-  margin: 24px 0 32px;
+.cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  margin-bottom: 14px;
+  animation: sube 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  > div:first-child {
+    flex: 1 1 520px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: var(--fs-2xl);
+  }
+
+  p {
+    margin: 8px 0 0;
+    font-size: 16px;
+    color: var(--tf-text-secondary);
+  }
 }
 
-.ingresar-lead {
-  max-width: 56ch;
-  margin: 12px 0 0;
-  font-size: 18px;
-  color: var(--text-secondary);
-}
-
-.cuentas {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+// La recomendación del recorrido, visible antes de elegir.
+.sugerencia {
+  display: flex;
+  align-items: center;
   gap: 12px;
-  margin: 0 0 32px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  border: 1px solid color-mix(in srgb, var(--tf-primary) 35%, transparent);
+  border-radius: var(--radius-lg);
+  background: var(--tf-primary-subtle);
+  animation: sube 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+.sugerencia-icono {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius);
+  background: var(--tf-surface);
+  color: var(--tf-primary);
+}
+
+.roles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+// Las tarjetas entran escalonadas.
+.rol {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--tf-border);
+  border-radius: var(--radius-lg);
+  background: var(--tf-surface);
+  animation: sube 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(0.16s + var(--i) * 0.12s);
+  transition: border-color 0.2s;
+
+  &:hover,
+  &:focus-within {
+    border-color: color-mix(in srgb, var(--tf-primary) 50%, var(--tf-border));
+  }
+}
+
+.rol-imagen {
+  border-bottom: 1px solid var(--tf-border);
+}
+
+.rol-cuerpo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px 20px 18px;
+
+  h2 {
+    margin: 4px 0 0;
+    font-size: 20px;
+  }
+}
+
+.rol-etiqueta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--tf-text-secondary);
+  animation: aparece 0.35s ease both;
+}
+
+.rol-resumen {
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: var(--tf-text-secondary);
+}
+
+.funciones {
+  display: grid;
+  gap: 2px;
+  margin: 14px 0 0;
   padding: 0;
   list-style: none;
 }
 
-.cuenta {
+// Cada función es un botón: al pasar por ella, la captura se acerca a esa zona.
+.funcion {
+  position: relative;
   display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
-  height: 100%;
-  padding: 20px;
+  padding: 6px 10px;
   border: 0;
-  background: var(--surface);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--tf-text);
+  font-size: 14px;
   text-align: left;
-  cursor: pointer;
-  transition: background-color 0.15s, transform 0.1s;
+  cursor: default;
+  transition: background-color 0.3s, color 0.3s;
 
-  &:hover:not(:disabled) {
-    background: var(--surface-hover);
+  app-icono {
+    margin-top: 2px;
+    color: var(--tf-success);
   }
 
-  &:active:not(:disabled) {
-    transform: translateY(1px);
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--tf-primary);
+    transform: scaleY(0);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  &:disabled {
-    cursor: wait;
-    opacity: 0.6;
-  }
+  &.activa {
+    background: var(--tf-primary-subtle);
+    color: var(--tf-primary);
+    font-weight: 500;
 
-  &.admin {
-    background: var(--text-primary);
-    color: var(--bg);
-
-    .cuenta-detalle,
-    .cuenta-rol {
-      color: color-mix(in srgb, var(--bg) 70%, transparent);
-    }
-
-    &:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--text-primary) 88%, var(--bg));
+    &::before {
+      transform: scaleY(1);
     }
   }
 }
 
-.cuenta-rol {
+.sedes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 16px;
+
+  > span {
+    font-size: 13px;
+    font-weight: 500;
+  }
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.pestanas button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.enlace-sedes {
+  flex-basis: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
   font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.cuenta-nombre {
-  font-size: 22px;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
-
-.cuenta-detalle {
-  flex: 1;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--text-secondary);
-}
-
-.cuenta-accion {
-  margin-top: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  color: var(--tf-primary);
+  text-align: left;
   text-decoration: underline;
-  text-underline-offset: 4px;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
-.formulario {
-  padding: 20px;
-
-  h2 {
-    margin: 0 0 14px;
-    font-size: 18px;
-  }
+.bloque-sedes {
+  display: block;
 }
 
-.campos {
+.proceso {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  align-items: end;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
 
-  label {
-    display: grid;
-    gap: 6px;
-    font-size: 14px;
-    color: var(--text-secondary);
+  li {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--tf-border);
+    border-radius: var(--radius-lg);
+    background: var(--tf-surface);
   }
+
+  strong {
+    font-size: 14px;
+  }
+
+  p {
+    margin: 2px 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--tf-text-secondary);
+  }
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.proceso-icono {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+  background: var(--tf-primary-subtle);
+  color: var(--tf-primary);
+}
+
+.volver-roles {
+  margin: 16px 0 0;
 }
 
 .nota {
-  margin: 14px 0 0;
-  font-size: 14px;
-  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 0;
+  font-size: 13px;
+  color: var(--tf-text-secondary);
+  animation: aparece 0.6s ease 0.5s both;
 }
 
-@media (max-width: 860px) {
-  .cuentas {
+@keyframes sube {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 1100px) {
+  .roles {
     grid-template-columns: 1fr 1fr;
   }
+}
 
-  .campos {
+@media (max-width: 760px) {
+  .roles {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 480px) {
-  .cuentas {
-    grid-template-columns: 1fr;
+@media (prefers-reduced-motion: reduce) {
+  .cabecera,
+  .sugerencia,
+  .rol,
+  .rol-etiqueta,
+  .bloque-sedes {
+  display: block;
+  margin-top: 40px;
+}
+
+.nota {
+    animation: none;
   }
 }
