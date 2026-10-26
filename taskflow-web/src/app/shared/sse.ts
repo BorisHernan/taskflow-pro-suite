@@ -1,10 +1,17 @@
 import { Observable } from 'rxjs';
 
+export type EstadoConexion = 'conectando' | 'conectado' | 'reconectando' | 'sin-permiso';
+
 /**
  * Server-Sent Events con cabecera Authorization: EventSource no permite
  * enviarla, así que se lee el stream con fetch. Reintenta solo si se corta.
  */
-export function sseConToken<T>(url: string, token: string | null, reintentoMs = 3000): Observable<T> {
+export function sseConToken<T>(
+  url: string,
+  token: string | null,
+  alEstado: (e: EstadoConexion) => void = () => {},
+  reintentoMs = 3000,
+): Observable<T> {
   return new Observable<T>((suscriptor) => {
     let control: AbortController | null = null;
     let reintento: ReturnType<typeof setTimeout> | undefined;
@@ -18,10 +25,12 @@ export function sseConToken<T>(url: string, token: string | null, reintentoMs = 
           signal: control.signal,
         });
         if (respuesta.status === 401 || respuesta.status === 403) {
+          alEstado('sin-permiso');
           suscriptor.error(new Error(`SSE ${respuesta.status}`));
           return;
         }
         if (!respuesta.ok || !respuesta.body) throw new Error(`SSE ${respuesta.status}`);
+        alEstado('conectado');
 
         const lector = respuesta.body.pipeThrough(new TextDecoderStream()).getReader();
         let pendiente = '';
@@ -44,9 +53,13 @@ export function sseConToken<T>(url: string, token: string | null, reintentoMs = 
         if (cerrado) return;
         console.warn('SSE: conexión interrumpida, reintentando…', e);
       }
-      if (!cerrado) reintento = setTimeout(conectar, reintentoMs);
+      if (!cerrado) {
+        alEstado('reconectando');
+        reintento = setTimeout(conectar, reintentoMs);
+      }
     };
 
+    alEstado('conectando');
     conectar();
     return () => {
       cerrado = true;

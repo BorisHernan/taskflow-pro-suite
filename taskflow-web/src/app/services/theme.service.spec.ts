@@ -47,22 +47,36 @@ describe('ThemeService', () => {
     expect(service.theme()).toBe('light');
   });
 
-  it('toggle alterna el tema, lo aplica al <html> y lo persiste en localStorage', () => {
+  it('toggle recorre claro, oscuro y sistema; aplica el tema al <html> y lo persiste', () => {
     mockMatchMedia(false);
+    localStorage.setItem('taskflow-theme', 'light');
     const service = TestBed.inject(ThemeService);
 
     expect(service.theme()).toBe('light');
 
     service.toggle();
-
+    expect(service.preference()).toBe('dark');
     expect(service.theme()).toBe('dark');
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
     expect(localStorage.getItem('taskflow-theme')).toBe('dark');
 
     service.toggle();
-
+    expect(service.preference()).toBe('system');
     expect(service.theme()).toBe('light');
     expect(document.documentElement.getAttribute('data-theme')).toBe('light');
-    expect(localStorage.getItem('taskflow-theme')).toBe('light');
+    expect(localStorage.getItem('taskflow-theme')).toBe('system');
+
+    service.toggle();
+    expect(service.preference()).toBe('light');
+  });
+
+  it('en modo sistema sigue la preferencia del sistema operativo', () => {
+    mockMatchMedia(true);
+    localStorage.setItem('taskflow-theme', 'system');
+
+    const service = TestBed.inject(ThemeService);
+
+    expect(service.preference()).toBe('system');
+    expect(service.theme()).toBe('dark');
   });
 });

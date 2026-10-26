@@ -13,7 +13,8 @@ import { ICONOS, NombreIcono } from './iconos';
       viewBox="0 0 24 24"
       [attr.width]="tamano()"
       [attr.height]="tamano()"
-      fill="none"
+      [attr.fill]="relleno() ? 'currentColor' : 'none'"
+      [attr.fill-opacity]="relleno() || null"
       stroke="currentColor"
       [attr.stroke-width]="grosor()"
       stroke-linecap="round"
@@ -51,6 +52,8 @@ export class IconoComponent {
   readonly icono = input<IconNode>();
   readonly tamano = input(18);
   readonly grosor = input(2);
+  /** Opacidad del relleno (0 = solo contorno). */
+  readonly relleno = input(0);
 
   readonly nodos = computed(
     () => (this.icono() ?? ICONOS[this.nombre() ?? 'paquete']) as unknown as [string, Record<string, string>][],

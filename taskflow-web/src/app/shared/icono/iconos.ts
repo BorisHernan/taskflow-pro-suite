@@ -55,6 +55,12 @@ import {
   Store,
   UserRound,
   CircleCheck,
+  Monitor,
+  Menu,
+  ArrowUpDown,
+  CircleX,
+  History,
+  Bot,
   type IconNode,
 } from 'lucide';
 
@@ -116,6 +122,12 @@ export const ICONOS = {
   sede: Store,
   persona: UserRound,
   hecho: CircleCheck,
+  sistema: Monitor,
+  menu: Menu,
+  ordenarCol: ArrowUpDown,
+  error: CircleX,
+  historial: History,
+  automatica: Bot,
 } satisfies Record<string, IconNode>;
 
 export type NombreIcono = keyof typeof ICONOS;
