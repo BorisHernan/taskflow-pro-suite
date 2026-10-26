@@ -1,0 +1,283 @@
+// Un teléfono flotante sobre el menú lateral (y por encima de la penumbra del recorrido).
+.telefono {
+  position: fixed;
+  left: 12px;
+  bottom: 16px;
+  z-index: 89;
+  width: 236px;
+  height: min(520px, calc(100vh - 32px));
+  padding: 10px;
+  border-radius: 34px;
+  background: #0d1311;
+  box-shadow:
+    0 0 0 2px #2a3531,
+    0 24px 60px -12px rgb(0 0 0 / 0.6);
+  animation: entra 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @media (max-width: 640px) {
+    left: auto;
+    right: 12px;
+    bottom: 12px;
+    width: 230px;
+    height: 400px;
+  }
+}
+
+.pantalla {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 10px 12px;
+  overflow: hidden;
+  border-radius: 26px;
+  background: var(--tf-bg);
+  color: var(--tf-text);
+}
+
+.barra-estado {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tf-text-secondary);
+}
+
+// Notificación tipo "push" que baja desde arriba.
+.push {
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: var(--tf-surface);
+  border: 1px solid var(--tf-primary);
+  box-shadow: 0 10px 24px -10px rgb(0 0 0 / 0.5);
+  animation: baja 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+
+  p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+}
+
+.push-app {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--tf-text-secondary);
+}
+
+.perfil {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--tf-surface);
+
+  p {
+    margin: 0;
+  }
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--tf-primary);
+  color: var(--tf-primary-on);
+  font-weight: 700;
+}
+
+.nombre {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.dato {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--tf-text-secondary);
+}
+
+.punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tf-text-secondary);
+
+  &.ok {
+    background: var(--tf-success);
+  }
+}
+
+.titulo {
+  margin: 0 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tf-text-secondary);
+}
+
+.ahora-hago p:last-child {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tf-primary);
+}
+
+.lista {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.notificacion {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 10px;
+  background: var(--tf-surface);
+  font-size: 12px;
+
+  app-icono {
+    margin-top: 2px;
+    color: var(--tf-primary);
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.35;
+  }
+
+  small {
+    color: var(--tf-text-secondary);
+  }
+
+  &.reciente {
+    box-shadow: inset 3px 0 0 var(--tf-primary);
+  }
+}
+
+.vacio {
+  margin: 0;
+  font-size: 12px;
+  color: var(--tf-text-secondary);
+}
+
+.cerrar {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--tf-border-strong);
+  border-radius: 50%;
+  background: var(--tf-surface);
+  color: var(--tf-text);
+  cursor: pointer;
+}
+
+@keyframes entra {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+}
+
+@keyframes baja {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  60% {
+    transform: translateY(2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .telefono,
+  .push {
+    animation: none;
+  }
+}
+
+// En computadora el teléfono es más grande y se lee sin esfuerzo.
+@media (min-width: 1100px) {
+  .telefono {
+    width: 312px;
+    height: min(640px, calc(100vh - 32px));
+  }
+
+  .pantalla {
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .push p,
+  .notificacion {
+    font-size: 13px;
+  }
+
+  .nombre {
+    font-size: 15px;
+  }
+
+  .dato {
+    font-size: 12px;
+  }
+}
+
+.lista-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.contador-nuevas {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--tf-accent);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.notificacion.nueva {
+  background: color-mix(in srgb, var(--tf-primary) 16%, var(--tf-surface));
+  box-shadow: inset 3px 0 0 var(--tf-primary);
+  animation: llega 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.etiqueta-nueva {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--tf-accent);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+
+@keyframes llega {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}

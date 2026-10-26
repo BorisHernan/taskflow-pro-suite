@@ -36,19 +36,21 @@ describe('App', () => {
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     const links = Array.from(compiled.querySelectorAll('.app-nav-links a')).map((a) => a.textContent?.trim());
+    const accion = compiled.querySelector('.app-nav-acciones a')?.textContent?.trim();
 
-    expect(links).toEqual(['Ingresar', 'Tienda online', 'Arena']);
+    expect(links).toEqual(['Tienda online', 'Arena']);
+    expect(accion).toBe('Ingresar');
   });
 
   it('el botón de tema alterna el tema al hacer click', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const app = fixture.componentInstance;
-    const initialTheme = app.themeService.theme();
+    const inicial = app.themeService.preference();
 
-    const button = fixture.nativeElement.querySelector('.theme-toggle') as HTMLButtonElement;
+    const button = fixture.nativeElement.querySelector('app-selector-tema button') as HTMLButtonElement;
     button.click();
 
-    expect(app.themeService.theme()).not.toBe(initialTheme);
+    expect(app.themeService.preference()).not.toBe(inicial);
   });
 });

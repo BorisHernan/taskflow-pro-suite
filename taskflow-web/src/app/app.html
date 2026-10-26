@@ -1,31 +1,39 @@
-<header class="app-header">
-  <nav class="app-nav" aria-label="Principal">
-    <a class="app-marca" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-      <img src="favicon.svg?v=3" alt="" width="26" height="26" />
-      TaskFlow
-    </a>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
 
-    <div class="app-nav-links">
-      @if (sesion.activa()) {
-        <a routerLink="/gestion" routerLinkActive="active" data-seccion="gestion"><app-icono nombre="resumen" [tamano]="17" />Gestión</a>
-      } @else {
-        <a routerLink="/ingresar" routerLinkActive="active" data-seccion="gestion"><app-icono nombre="persona" [tamano]="17" />Ingresar</a>
-      }
-      <a routerLink="/tienda" routerLinkActive="active" data-seccion="tienda"><app-icono nombre="tienda" [tamano]="17" />Tienda online</a>
-      <a routerLink="/arena" routerLinkActive="active" data-seccion="arena"><app-icono nombre="arena" [tamano]="17" />Arena</a>
-    </div>
+@if (!enGestion()) {
+  <header class="app-header">
+    <nav class="app-nav" aria-label="Principal">
+      <a class="app-marca" routerLink="/" aria-label="TaskFlow, inicio">
+        <img src="favicon.svg?v=4" alt="" width="28" height="28" />
+        TaskFlow
+      </a>
 
-    <button
-      type="button"
-      class="btn btn-icon theme-toggle"
-      (click)="themeService.toggle()"
-      [attr.aria-label]="themeService.theme() === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
-    >
-      <app-icono [nombre]="themeService.theme() === 'dark' ? 'sol' : 'luna'" />
-    </button>
-  </nav>
+      <div class="app-nav-links">
+        <a routerLink="/tienda" routerLinkActive="active">Tienda online</a>
+        <a routerLink="/arena" routerLinkActive="active">Arena</a>
+      </div>
 
-  <app-guia-recorrido></app-guia-recorrido>
-</header>
+      <div class="app-nav-acciones">
+        <app-selector-tema />
+        @if (sesion.activa()) {
+          <a class="btn btn-primary btn-sm" routerLink="/gestion">Ir a la gestión</a>
+        } @else {
+          <a class="btn btn-primary btn-sm" routerLink="/ingresar">Ingresar</a>
+        }
+      </div>
+    </nav>
 
-<router-outlet></router-outlet>
+  </header>
+}
+
+<div id="contenido" tabindex="-1">
+  <router-outlet></router-outlet>
+</div>
+
+<app-avisos />
+<app-confirmacion />
+@if (!enMonitor) {
+  <app-tour />
+  <app-telefono-empleado />
+  <app-monitor />
+}

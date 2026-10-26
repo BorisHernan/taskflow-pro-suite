@@ -7,6 +7,7 @@ import { ActivatedRouteSnapshot, provideRouter, withInMemoryScrolling, withViewT
 import { routes } from './app.routes';
 import { registroHttpInterceptor } from './shared/registro-http.interceptor';
 import { authInterceptor } from './auth/auth.interceptor';
+import { demoInterceptor } from './shared/demo/demo-backend.service';
 
 registerLocaleData(localeEsPe);
 
@@ -33,7 +34,7 @@ export const appConfig: ApplicationConfig = {
       }),
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
     ),
-    provideHttpClient(withInterceptors([authInterceptor, registroHttpInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, registroHttpInterceptor, demoInterceptor])),
     { provide: LOCALE_ID, useValue: 'es-PE' },
   ],
 };

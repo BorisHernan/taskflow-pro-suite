@@ -1,0 +1,137 @@
+@if (tour.bienvenida()) {
+  <div class="velo-bienvenida">
+    <section class="bienvenida" role="dialog" aria-modal="true" aria-labelledby="bienvenida-titulo">
+      <span class="bienvenida-icono"><app-icono nombre="chispas" [tamano]="22" /></span>
+      <p class="bienvenida-saludo">Hola, {{ sesion.usuario()?.nombre }}</p>
+      <h2 id="bienvenida-titulo">¿Te muestro cómo funciona?</h2>
+      <p>
+        Te recomiendo un recorrido de un par de minutos: pasa por cada opción del menú y te explica para qué sirve,
+        desde lo urgente del día hasta quién está en cada caja.
+      </p>
+      <div class="bienvenida-acciones">
+        <button type="button" class="btn btn-primary btn-lg" (click)="tour.iniciar()">Empezar recorrido</button>
+        <button type="button" class="btn btn-ghost btn-lg" (click)="tour.explorarSolo()">Prefiero explorar solo</button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (demo.activo() || tour.preparando()) {
+  <p class="modo-demo" role="status">
+    <span class="latido"></span>
+    {{ tour.preparando() ? 'Preparando una sede de prueba…' : 'Modo demo · nada de esto se guarda' }}
+  </p>
+}
+
+@if (demo.activo() && (mostrarLogs || tour.escena())) {
+  <aside class="consola" [class.solo-monitor]="!mostrarLogs" aria-label="Pantalla de otro usuario">
+    @if (tour.escena(); as e) {
+      <section class="otra-pantalla" [class.enfocada]="monitorEnfocado()" [attr.data-estado]="e.estado" aria-live="polite">
+        @if (monitorEnfocado()) {
+          <span class="otra-etiqueta">{{ tour.etiqueta() ?? 'Mira aquí' }}</span>
+        }
+        <p class="otra-quien"><span class="otra-punto"></span>Otro usuario · {{ e.quien }}</p>
+        <div class="dispositivo">
+          <p class="dispositivo-barra">{{ e.dispositivo }} · TaskFlow</p>
+          <p class="dispositivo-titulo">{{ e.pantalla }}</p>
+          @for (c of e.campos; track c.etiqueta) {
+            <label class="dispositivo-campo">
+              <span>{{ c.etiqueta }}</span>
+              <span class="dispositivo-valor">{{ c.valor }}<span class="caret"></span></span>
+            </label>
+          }
+          <p class="dispositivo-boton">{{ e.estado === 'hecho' ? '✓ ' + (e.resultado ?? 'Registrado') : e.estado === 'enviando' ? 'Enviando…' : e.boton }}</p>
+        </div>
+      </section>
+    }
+    <!-- El detalle técnico va plegado: le interesa a quien quiera ver cómo funciona por dentro. -->
+    @if (mostrarLogs) {
+    <button type="button" class="consola-toggle" [attr.aria-expanded]="verLogs()" aria-controls="consola-registro" (click)="verLogs.set(!verLogs())">
+      <span>{{ verLogs() ? 'Ocultar' : 'Ver' }} detalle técnico</span>
+      <small>Logs internos del sistema: API, reglas, tareas y tiempo real · {{ demo.registro().length }} eventos</small>
+    </button>
+    @if (verLogs()) {
+      <header>
+        <p class="consola-titulo"><span class="latido"></span>Lo que hace el sistema</p>
+        <p class="consola-ayuda">Registro en vivo de la sede de prueba: llamadas a la API, reglas, tareas y avisos.</p>
+      </header>
+      <ol #consola id="consola-registro" class="consola-lineas">
+        @for (l of demo.registro(); track l.id) {
+          <li [attr.data-tipo]="l.tipo">
+            <span class="consola-hora">{{ l.hora }}</span>
+            <span class="consola-tipo">{{ etiquetaTipo[l.tipo] }}</span>
+            <span class="consola-texto">{{ l.texto }}</span>
+          </li>
+        }
+      </ol>
+    }
+    }
+  </aside>
+}
+
+@if (tour.activo()) {
+  <!-- El foco: un recorte que se desliza entre elementos; lo demás queda en penumbra. -->
+  <div class="foco" [class.oculto]="!caja()" aria-hidden="true"
+    [style.top.px]="caja()?.top" [style.left.px]="caja()?.left"
+    [style.width.px]="caja()?.width" [style.height.px]="caja()?.height">
+    @if (!monitorEnfocado()) {
+      <span class="foco-etiqueta" [class.nuevo]="tour.etiqueta()">{{ tour.etiqueta() ?? (tour.ocupado() ? 'En vivo aquí' : 'Mira aquí') }}</span>
+    }
+  </div>
+  <div class="bloqueo" (click)="$event.stopPropagation()"></div>
+  @if (tour.cursor(); as c) {
+    <div class="cursor" [class.clic]="c.modo === 'clic'" [class.arrastra]="c.modo === 'arrastra'" aria-hidden="true"
+      [style.top.px]="c.y" [style.left.px]="c.x">
+      <svg width="30" height="30" viewBox="0 0 24 24"><path d="M4 3l7 17 2.5-7.5L21 10z" fill="#fff" stroke="#0b6b62" stroke-width="1.6" stroke-linejoin="round" /></svg>
+      <span class="cursor-etiqueta">Demo</span>
+    </div>
+  }
+  @if (menu(); as m) {
+    <div class="foco-menu" aria-hidden="true" [style.top.px]="m.top" [style.left.px]="m.left" [style.width.px]="m.width" [style.height.px]="m.height">
+      {{ m.texto }}
+    </div>
+  }
+
+  @if (tour.paso(); as p) {
+    @if (caja()) {
+      @for (k of [tour.indice()]; track k) {
+        <section #globo class="globo" tabindex="-1" role="dialog" aria-live="polite" [attr.aria-label]="'Paso ' + (k + 1) + ': ' + p.titulo"
+          [class.movil]="!posicionGlobo()" [class.en-accion]="tour.ocupado()"
+          [style.top.px]="posicionGlobo()?.top" [style.left.px]="posicionGlobo()?.left">
+          <p class="globo-paso">Paso {{ k + 1 }} de {{ tour.pasos().length }}</p>
+          <h3>{{ p.titulo }}</h3>
+          <p class="globo-texto">{{ p.texto }}</p>
+          @if (tour.haciendo(); as h) {
+            <div class="globo-vivo" role="status" [class.listo]="!tour.ocupado()">
+              <p class="vivo-etiqueta">
+                @if (tour.ocupado()) {
+                  <span class="latido"></span>Demo en vivo · mira el puntero
+                } @else {
+                  ✓ Listo · avanza cuando quieras
+                }
+              </p>
+              @for (t of [h]; track t) {
+                <p class="vivo-texto">{{ t }}</p>
+              }
+            </div>
+          }
+          <div class="globo-progreso" aria-hidden="true">
+            @for (x of tour.pasos(); track $index) {
+              <span [class.hecho]="$index <= k"></span>
+            }
+          </div>
+          <div class="globo-acciones">
+            <button type="button" class="btn btn-ghost btn-sm" (click)="tour.salir()">Salir</button>
+            <span class="espacio"></span>
+            @if (k > 0) {
+              <button type="button" class="btn btn-secondary btn-sm" (click)="tour.atras()">Atrás</button>
+            }
+            <button type="button" class="btn btn-primary btn-sm" (click)="tour.siguiente()" [disabled]="tour.ocupado()">
+              {{ k === tour.pasos().length - 1 ? 'Terminar' : 'Siguiente' }}
+            </button>
+          </div>
+        </section>
+      }
+    }
+  }
+}
