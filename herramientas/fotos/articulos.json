@@ -1,0 +1,3860 @@
+[
+ {
+  "slug": "alitas-de-pollo",
+  "base": "Alitas de pollo",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Pollo",
+  "prioridad": 1,
+  "consultas": [
+   "raw chicken wings",
+   "alitas de pollo"
+  ],
+  "marcas": 2,
+  "excluir": [
+   "baked",
+   "barbecue",
+   "bbq",
+   "chick",
+   "chicks",
+   "curry",
+   "dinner",
+   "egg",
+   "eggs",
+   "foodie",
+   "fried",
+   "gallina",
+   "gallo",
+   "grilled",
+   "hen",
+   "hens",
+   "huevo",
+   "huevos",
+   "potatoes",
+   "recipe",
+   "rice",
+   "roast",
+   "roasted",
+   "rooster",
+   "sauce",
+   "soup",
+   "stew"
+  ],
+  "no_es": [
+   "an egg or eggs",
+   "a live chicken, hen or rooster"
+  ]
+ },
+ {
+  "slug": "bistec-de-res",
+  "base": "Bistec de res",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Res y cerdo",
+  "prioridad": 1,
+  "consultas": [
+   "raw beef steak",
+   "bistec de res"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "camaron-pelado",
+  "base": "Camarón pelado",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Pescados y mariscos",
+  "prioridad": 1,
+  "consultas": [
+   "peeled shrimp",
+   "camarón pelado"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "carne-molida-de-res",
+  "base": "Carne molida de res",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Res y cerdo",
+  "prioridad": 1,
+  "consultas": [
+   "ground beef",
+   "carne molida de res"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "chorizo-parrillero",
+  "base": "Chorizo parrillero",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Embutidos",
+  "prioridad": 1,
+  "consultas": [
+   "chorizo sausage",
+   "chorizo parrillero"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "chuleta-de-cerdo",
+  "base": "Chuleta de cerdo",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Res y cerdo",
+  "prioridad": 1,
+  "consultas": [
+   "raw pork chop",
+   "chuleta de cerdo"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "costillar-de-cerdo",
+  "base": "Costillar de cerdo",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Res y cerdo",
+  "prioridad": 1,
+  "consultas": [
+   "raw pork ribs",
+   "costillar de cerdo"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "filete-de-pescado-blanco",
+  "base": "Filete de pescado blanco",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Pescados y mariscos",
+  "prioridad": 1,
+  "consultas": [
+   "white fish fillet",
+   "filete de pescado blanco"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "filete-de-pollo",
+  "base": "Filete de pollo",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Pollo",
+  "prioridad": 1,
+  "consultas": [
+   "chicken fillet",
+   "filete de pollo"
+  ],
+  "marcas": 2,
+  "excluir": [
+   "baked",
+   "barbecue",
+   "bbq",
+   "chick",
+   "chicks",
+   "curry",
+   "dinner",
+   "egg",
+   "eggs",
+   "foodie",
+   "fried",
+   "gallina",
+   "gallo",
+   "grilled",
+   "hen",
+   "hens",
+   "huevo",
+   "huevos",
+   "potatoes",
+   "recipe",
+   "rice",
+   "roast",
+   "roasted",
+   "rooster",
+   "sauce",
+   "soup",
+   "stew"
+  ],
+  "no_es": [
+   "an egg or eggs",
+   "a live chicken, hen or rooster"
+  ]
+ },
+ {
+  "slug": "filete-de-salmon",
+  "base": "Filete de salmón",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Pescados y mariscos",
+  "prioridad": 1,
+  "consultas": [
+   "salmon fillet",
+   "filete de salmón"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "filete-de-trucha",
+  "base": "Filete de trucha",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Pescados y mariscos",
+  "prioridad": 1,
+  "consultas": [
+   "trout fillet",
+   "filete de trucha"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "hot-dog-de-res",
+  "base": "Hot dog de res",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Embutidos",
+  "prioridad": 1,
+  "consultas": [
+   "hot dog sausage",
+   "hot dog de res"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "jamon-de-pavo",
+  "base": "Jamón de pavo",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Embutidos",
+  "prioridad": 1,
+  "consultas": [
+   "turkey ham slices",
+   "jamón de pavo"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "lomo-fino-de-res",
+  "base": "Lomo fino de res",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Res y cerdo",
+  "prioridad": 1,
+  "consultas": [
+   "beef tenderloin",
+   "lomo fino de res"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "menudencia-de-pollo",
+  "base": "Menudencia de pollo",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Pollo",
+  "prioridad": 1,
+  "consultas": [
+   "chicken giblets",
+   "menudencia de pollo"
+  ],
+  "marcas": 2,
+  "excluir": [
+   "baked",
+   "barbecue",
+   "bbq",
+   "chick",
+   "chicks",
+   "curry",
+   "dinner",
+   "egg",
+   "eggs",
+   "foodie",
+   "fried",
+   "gallina",
+   "gallo",
+   "grilled",
+   "hen",
+   "hens",
+   "huevo",
+   "huevos",
+   "potatoes",
+   "recipe",
+   "rice",
+   "roast",
+   "roasted",
+   "rooster",
+   "sauce",
+   "soup",
+   "stew"
+  ],
+  "no_es": [
+   "an egg or eggs",
+   "a live chicken, hen or rooster"
+  ]
+ },
+ {
+  "slug": "mortadela",
+  "base": "Mortadela",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Embutidos",
+  "prioridad": 1,
+  "consultas": [
+   "mortadella",
+   "mortadela"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pechuga-de-pollo",
+  "base": "Pechuga de pollo",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Pollo",
+  "prioridad": 1,
+  "consultas": [
+   "raw chicken breast",
+   "pechuga de pollo"
+  ],
+  "marcas": 1,
+  "excluir": [
+   "baked",
+   "barbecue",
+   "bbq",
+   "chick",
+   "chicks",
+   "curry",
+   "dinner",
+   "egg",
+   "eggs",
+   "foodie",
+   "fried",
+   "gallina",
+   "gallo",
+   "grilled",
+   "hen",
+   "hens",
+   "huevo",
+   "huevos",
+   "potatoes",
+   "recipe",
+   "rice",
+   "roast",
+   "roasted",
+   "rooster",
+   "sauce",
+   "soup",
+   "stew"
+  ],
+  "no_es": [
+   "an egg or eggs",
+   "a live chicken, hen or rooster"
+  ]
+ },
+ {
+  "slug": "pierna-de-pollo",
+  "base": "Pierna de pollo",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Pollo",
+  "prioridad": 1,
+  "consultas": [
+   "raw chicken leg",
+   "pierna de pollo"
+  ],
+  "marcas": 1,
+  "excluir": [
+   "baked",
+   "barbecue",
+   "bbq",
+   "chick",
+   "chicks",
+   "curry",
+   "dinner",
+   "egg",
+   "eggs",
+   "foodie",
+   "fried",
+   "gallina",
+   "gallo",
+   "grilled",
+   "hen",
+   "hens",
+   "huevo",
+   "huevos",
+   "potatoes",
+   "recipe",
+   "rice",
+   "roast",
+   "roasted",
+   "rooster",
+   "sauce",
+   "soup",
+   "stew"
+  ],
+  "no_es": [
+   "an egg or eggs",
+   "a live chicken, hen or rooster"
+  ]
+ },
+ {
+  "slug": "pollo-entero",
+  "base": "Pollo entero",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Pollo",
+  "prioridad": 1,
+  "consultas": [
+   "whole raw chicken",
+   "pollo entero"
+  ],
+  "marcas": 1,
+  "excluir": [
+   "baked",
+   "barbecue",
+   "bbq",
+   "chick",
+   "chicks",
+   "curry",
+   "dinner",
+   "egg",
+   "eggs",
+   "foodie",
+   "fried",
+   "gallina",
+   "gallo",
+   "grilled",
+   "hen",
+   "hens",
+   "huevo",
+   "huevos",
+   "potatoes",
+   "recipe",
+   "rice",
+   "roast",
+   "roasted",
+   "rooster",
+   "sauce",
+   "soup",
+   "stew"
+  ],
+  "no_es": [
+   "an egg or eggs",
+   "a live chicken, hen or rooster"
+  ]
+ },
+ {
+  "slug": "pulpa-de-cerdo",
+  "base": "Pulpa de cerdo",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Res y cerdo",
+  "prioridad": 1,
+  "consultas": [
+   "raw pork loin",
+   "pulpa de cerdo"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "salchicha-de-pollo",
+  "base": "Salchicha de pollo",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Embutidos",
+  "prioridad": 1,
+  "consultas": [
+   "sausages",
+   "salchicha de pollo"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "tocino-ahumado",
+  "base": "Tocino ahumado",
+  "departamento": "Carnes y pescados",
+  "subcategoria": "Embutidos",
+  "prioridad": 1,
+  "consultas": [
+   "bacon",
+   "tocino ahumado"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "almendras",
+  "base": "Almendras",
+  "departamento": "Despensa",
+  "subcategoria": "Frutos secos",
+  "prioridad": 1,
+  "consultas": [
+   "almonds",
+   "almendras"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "arroz-extra",
+  "base": "Arroz extra",
+  "departamento": "Despensa",
+  "subcategoria": "Arroz y menestras",
+  "prioridad": 1,
+  "consultas": [
+   "white rice grains",
+   "arroz extra"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "arroz-integral",
+  "base": "Arroz integral",
+  "departamento": "Despensa",
+  "subcategoria": "Arroz y menestras",
+  "prioridad": 1,
+  "consultas": [
+   "brown rice",
+   "arroz integral"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "arroz-superior",
+  "base": "Arroz superior",
+  "departamento": "Despensa",
+  "subcategoria": "Arroz y menestras",
+  "prioridad": 1,
+  "consultas": [
+   "white rice",
+   "arroz superior"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "frejol-canario",
+  "base": "Frejol canario",
+  "departamento": "Despensa",
+  "subcategoria": "Arroz y menestras",
+  "prioridad": 1,
+  "consultas": [
+   "canary beans",
+   "frejol canario"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "frejol-negro",
+  "base": "Frejol negro",
+  "departamento": "Despensa",
+  "subcategoria": "Arroz y menestras",
+  "prioridad": 1,
+  "consultas": [
+   "black beans",
+   "frejol negro"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "garbanzo",
+  "base": "Garbanzo",
+  "departamento": "Despensa",
+  "subcategoria": "Arroz y menestras",
+  "prioridad": 1,
+  "consultas": [
+   "chickpeas",
+   "garbanzo"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "lenteja",
+  "base": "Lenteja",
+  "departamento": "Despensa",
+  "subcategoria": "Arroz y menestras",
+  "prioridad": 1,
+  "consultas": [
+   "lentils",
+   "lenteja"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "mani-tostado",
+  "base": "Maní tostado",
+  "departamento": "Despensa",
+  "subcategoria": "Frutos secos",
+  "prioridad": 1,
+  "consultas": [
+   "roasted peanuts",
+   "maní tostado"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pecanas",
+  "base": "Pecanas",
+  "departamento": "Despensa",
+  "subcategoria": "Frutos secos",
+  "prioridad": 1,
+  "consultas": [
+   "pecans",
+   "pecanas"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "quinua",
+  "base": "Quinua",
+  "departamento": "Despensa",
+  "subcategoria": "Arroz y menestras",
+  "prioridad": 1,
+  "consultas": [
+   "quinoa",
+   "quinua"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "brocoli",
+  "base": "Brócoli",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Verduras",
+  "prioridad": 1,
+  "consultas": [
+   "broccoli",
+   "brócoli"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "camote-amarillo",
+  "base": "Camote amarillo",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Tubérculos",
+  "prioridad": 1,
+  "consultas": [
+   "sweet potato",
+   "camote amarillo"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "cebolla-roja",
+  "base": "Cebolla roja",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Verduras",
+  "prioridad": 1,
+  "consultas": [
+   "red onion",
+   "cebolla roja"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "espinaca",
+  "base": "Espinaca",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Verduras",
+  "prioridad": 1,
+  "consultas": [
+   "spinach",
+   "espinaca"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "fresa",
+  "base": "Fresa",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Frutas",
+  "prioridad": 1,
+  "consultas": [
+   "strawberries",
+   "fresa"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "lechuga-americana",
+  "base": "Lechuga americana",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Verduras",
+  "prioridad": 1,
+  "consultas": [
+   "iceberg lettuce",
+   "lechuga americana"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "mandarina",
+  "base": "Mandarina",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Frutas",
+  "prioridad": 1,
+  "consultas": [
+   "mandarin orange",
+   "mandarina"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "manzana-roja",
+  "base": "Manzana roja",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Frutas",
+  "prioridad": 1,
+  "consultas": [
+   "red apple",
+   "manzana roja"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "naranja-de-jugo",
+  "base": "Naranja de jugo",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Frutas",
+  "prioridad": 1,
+  "consultas": [
+   "orange fruit",
+   "naranja de jugo"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "olluco",
+  "base": "Olluco",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Tubérculos",
+  "prioridad": 1,
+  "consultas": [
+   "ullucus tuber",
+   "olluco"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "palta-fuerte",
+  "base": "Palta fuerte",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Frutas",
+  "prioridad": 1,
+  "consultas": [
+   "avocado",
+   "palta fuerte"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "papa-amarilla",
+  "base": "Papa amarilla",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Tubérculos",
+  "prioridad": 1,
+  "consultas": [
+   "yellow potato",
+   "papa amarilla"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "papa-blanca",
+  "base": "Papa blanca",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Tubérculos",
+  "prioridad": 1,
+  "consultas": [
+   "white potato",
+   "papa blanca"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "pimiento-rojo",
+  "base": "Pimiento rojo",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Verduras",
+  "prioridad": 1,
+  "consultas": [
+   "red bell pepper",
+   "pimiento rojo"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pina",
+  "base": "Piña",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Frutas",
+  "prioridad": 1,
+  "consultas": [
+   "pineapple",
+   "piña"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "platano-de-seda",
+  "base": "Plátano de seda",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Frutas",
+  "prioridad": 1,
+  "consultas": [
+   "banana",
+   "plátano de seda"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "tomate",
+  "base": "Tomate",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Verduras",
+  "prioridad": 1,
+  "consultas": [
+   "tomato",
+   "tomate"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "uva-red-globe",
+  "base": "Uva red globe",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Frutas",
+  "prioridad": 1,
+  "consultas": [
+   "red grapes",
+   "uva red globe"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "yuca",
+  "base": "Yuca",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Tubérculos",
+  "prioridad": 1,
+  "consultas": [
+   "cassava root",
+   "yuca"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "zanahoria",
+  "base": "Zanahoria",
+  "departamento": "Frutas y verduras",
+  "subcategoria": "Verduras",
+  "prioridad": 1,
+  "consultas": [
+   "carrots",
+   "zanahoria"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "huevos-blancos",
+  "base": "Huevos blancos",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Huevos",
+  "prioridad": 1,
+  "consultas": [
+   "white eggs",
+   "huevos blancos"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "huevos-de-codorniz",
+  "base": "Huevos de codorniz",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Huevos",
+  "prioridad": 1,
+  "consultas": [
+   "quail eggs",
+   "huevos de codorniz"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "huevos-jumbo",
+  "base": "Huevos jumbo",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Huevos",
+  "prioridad": 1,
+  "consultas": [
+   "carton of eggs",
+   "huevos jumbo"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "huevos-organicos",
+  "base": "Huevos orgánicos",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Huevos",
+  "prioridad": 1,
+  "consultas": [
+   "organic eggs",
+   "huevos orgánicos"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "huevos-pardos",
+  "base": "Huevos pardos",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Huevos",
+  "prioridad": 1,
+  "consultas": [
+   "brown eggs",
+   "huevos pardos"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "mantequilla-con-sal",
+  "base": "Mantequilla con sal",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Quesos y mantequilla",
+  "prioridad": 1,
+  "consultas": [
+   "butter",
+   "mantequilla con sal"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "mantequilla-sin-sal",
+  "base": "Mantequilla sin sal",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Quesos y mantequilla",
+  "prioridad": 1,
+  "consultas": [
+   "butter block",
+   "mantequilla sin sal"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "queso-edam",
+  "base": "Queso edam",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Quesos y mantequilla",
+  "prioridad": 1,
+  "consultas": [
+   "edam cheese",
+   "queso edam"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "queso-fresco",
+  "base": "Queso fresco",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Quesos y mantequilla",
+  "prioridad": 1,
+  "consultas": [
+   "fresh cheese",
+   "queso fresco"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "queso-mozzarella",
+  "base": "Queso mozzarella",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Quesos y mantequilla",
+  "prioridad": 1,
+  "consultas": [
+   "mozzarella cheese",
+   "queso mozzarella"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "queso-parmesano-rallado",
+  "base": "Queso parmesano rallado",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Quesos y mantequilla",
+  "prioridad": 1,
+  "consultas": [
+   "grated parmesan",
+   "queso parmesano rallado"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "brownie",
+  "base": "Brownie",
+  "departamento": "Panadería",
+  "subcategoria": "Pasteles y tortas",
+  "prioridad": 1,
+  "consultas": [
+   "chocolate brownie dessert squares",
+   "brownie de chocolate postre"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "croissant",
+  "base": "Croissant",
+  "departamento": "Panadería",
+  "subcategoria": "Panes",
+  "prioridad": 1,
+  "consultas": [
+   "croissant",
+   "croissant"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "cupcakes-de-vainilla",
+  "base": "Cupcakes de vainilla",
+  "departamento": "Panadería",
+  "subcategoria": "Pasteles y tortas",
+  "prioridad": 1,
+  "consultas": [
+   "vanilla cupcakes",
+   "cupcakes de vainilla"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pan-ciabatta",
+  "base": "Pan ciabatta",
+  "departamento": "Panadería",
+  "subcategoria": "Panes",
+  "prioridad": 1,
+  "consultas": [
+   "ciabatta bread",
+   "pan ciabatta"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pan-de-hamburguesa",
+  "base": "Pan de hamburguesa",
+  "departamento": "Panadería",
+  "subcategoria": "Panes",
+  "prioridad": 1,
+  "consultas": [
+   "hamburger buns",
+   "pan de hamburguesa"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pan-de-molde",
+  "base": "Pan de molde",
+  "departamento": "Panadería",
+  "subcategoria": "Panes",
+  "prioridad": 1,
+  "consultas": [
+   "sliced bread loaf",
+   "pan de molde"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "pan-frances",
+  "base": "Pan francés",
+  "departamento": "Panadería",
+  "subcategoria": "Panes",
+  "prioridad": 1,
+  "consultas": [
+   "french bread rolls",
+   "pan francés"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "pan-integral",
+  "base": "Pan integral",
+  "departamento": "Panadería",
+  "subcategoria": "Panes",
+  "prioridad": 1,
+  "consultas": [
+   "whole wheat bread",
+   "pan integral"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "pan-pita",
+  "base": "Pan pita",
+  "departamento": "Panadería",
+  "subcategoria": "Panes",
+  "prioridad": 1,
+  "consultas": [
+   "pita bread",
+   "pan pita"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "queque-de-vainilla",
+  "base": "Queque de vainilla",
+  "departamento": "Panadería",
+  "subcategoria": "Pasteles y tortas",
+  "prioridad": 1,
+  "consultas": [
+   "vanilla sponge cake",
+   "queque de vainilla"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "torta-de-chocolate",
+  "base": "Torta de chocolate",
+  "departamento": "Panadería",
+  "subcategoria": "Pasteles y tortas",
+  "prioridad": 1,
+  "consultas": [
+   "chocolate cake",
+   "torta de chocolate"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "torta-tres-leches",
+  "base": "Torta tres leches",
+  "departamento": "Panadería",
+  "subcategoria": "Pasteles y tortas",
+  "prioridad": 1,
+  "consultas": [
+   "tres leches cake",
+   "torta tres leches"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "bolsas-de-regalo",
+  "base": "Bolsas de regalo",
+  "departamento": "Accesorios",
+  "subcategoria": "Regalos y detalles",
+  "prioridad": 2,
+  "consultas": [
+   "gift bags",
+   "Bolsas de regalo"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "caja-de-regalo-decorada",
+  "base": "Caja de regalo decorada",
+  "departamento": "Accesorios",
+  "subcategoria": "Regalos y detalles",
+  "prioridad": 2,
+  "consultas": [
+   "decorated gift box",
+   "Caja de regalo decorada"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "cartera-de-mano",
+  "base": "Cartera de mano",
+  "departamento": "Accesorios",
+  "subcategoria": "Bolsos y mochilas",
+  "prioridad": 2,
+  "consultas": [
+   "handbag purse",
+   "Cartera de mano"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "lentes-de-lectura",
+  "base": "Lentes de lectura",
+  "departamento": "Accesorios",
+  "subcategoria": "Relojes y lentes",
+  "prioridad": 2,
+  "consultas": [
+   "reading glasses",
+   "Lentes de lectura"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "lentes-polarizados",
+  "base": "Lentes polarizados",
+  "departamento": "Accesorios",
+  "subcategoria": "Relojes y lentes",
+  "prioridad": 2,
+  "consultas": [
+   "polarized sunglasses",
+   "Lentes polarizados"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "llaveros-de-colores",
+  "base": "Llaveros de colores",
+  "departamento": "Accesorios",
+  "subcategoria": "Llaveros y pines",
+  "prioridad": 2,
+  "consultas": [
+   "colorful keychains",
+   "Llaveros de colores"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "lonchera-termica",
+  "base": "Lonchera térmica",
+  "departamento": "Accesorios",
+  "subcategoria": "Bolsos y mochilas",
+  "prioridad": 2,
+  "consultas": [
+   "insulated lunch bag",
+   "Lonchera térmica"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "mochila-escolar",
+  "base": "Mochila escolar",
+  "departamento": "Accesorios",
+  "subcategoria": "Bolsos y mochilas",
+  "prioridad": 2,
+  "consultas": [
+   "school backpack",
+   "Mochila escolar"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "parches-bordados",
+  "base": "Parches bordados",
+  "departamento": "Accesorios",
+  "subcategoria": "Llaveros y pines",
+  "prioridad": 2,
+  "consultas": [
+   "embroidered patches",
+   "Parches bordados"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pines-de-metal",
+  "base": "Pines de metal",
+  "departamento": "Accesorios",
+  "subcategoria": "Llaveros y pines",
+  "prioridad": 2,
+  "consultas": [
+   "metal enamel pins",
+   "Pines de metal"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "reloj-digital",
+  "base": "Reloj digital",
+  "departamento": "Accesorios",
+  "subcategoria": "Relojes y lentes",
+  "prioridad": 2,
+  "consultas": [
+   "digital watch",
+   "Reloj digital"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "tarjetas-de-felicitacion",
+  "base": "Tarjetas de felicitación",
+  "departamento": "Accesorios",
+  "subcategoria": "Regalos y detalles",
+  "prioridad": 2,
+  "consultas": [
+   "greeting cards",
+   "Tarjetas de felicitación"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "agua-alcalina",
+  "base": "Agua alcalina",
+  "departamento": "Bebidas",
+  "subcategoria": "Aguas",
+  "prioridad": 2,
+  "consultas": [
+   "alkaline water bottle",
+   "Agua alcalina"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "agua-con-gas",
+  "base": "Agua con gas",
+  "departamento": "Bebidas",
+  "subcategoria": "Aguas",
+  "prioridad": 2,
+  "consultas": [
+   "sparkling water bottle",
+   "Agua con gas"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "agua-mineral-sin-gas",
+  "base": "Agua mineral sin gas",
+  "departamento": "Bebidas",
+  "subcategoria": "Aguas",
+  "prioridad": 2,
+  "consultas": [
+   "still mineral water bottle",
+   "Agua mineral sin gas"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "agua-saborizada",
+  "base": "Agua saborizada",
+  "departamento": "Bebidas",
+  "subcategoria": "Aguas",
+  "prioridad": 2,
+  "consultas": [
+   "flavored water bottle",
+   "Agua saborizada"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "agua-sin-gas",
+  "base": "Agua sin gas",
+  "departamento": "Bebidas",
+  "subcategoria": "Aguas",
+  "prioridad": 2,
+  "consultas": [
+   "bottled water",
+   "Agua sin gas"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "cafe-instantaneo",
+  "base": "Café instantáneo",
+  "departamento": "Bebidas",
+  "subcategoria": "Café y té",
+  "prioridad": 2,
+  "consultas": [
+   "instant coffee jar",
+   "Café instantáneo"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "cafe-molido",
+  "base": "Café molido",
+  "departamento": "Bebidas",
+  "subcategoria": "Café y té",
+  "prioridad": 2,
+  "consultas": [
+   "ground coffee",
+   "Café molido"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "cerveza-artesanal-ambar",
+  "base": "Cerveza artesanal ámbar",
+  "departamento": "Bebidas",
+  "subcategoria": "Cervezas",
+  "prioridad": 2,
+  "consultas": [
+   "amber craft beer bottle",
+   "Cerveza artesanal ámbar"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "cerveza-negra",
+  "base": "Cerveza negra",
+  "departamento": "Bebidas",
+  "subcategoria": "Cervezas",
+  "prioridad": 2,
+  "consultas": [
+   "dark stout beer bottle",
+   "Cerveza negra"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "cerveza-rubia",
+  "base": "Cerveza rubia",
+  "departamento": "Bebidas",
+  "subcategoria": "Cervezas",
+  "prioridad": 2,
+  "consultas": [
+   "lager beer bottle",
+   "Cerveza rubia"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "cerveza-sin-alcohol",
+  "base": "Cerveza sin alcohol",
+  "departamento": "Bebidas",
+  "subcategoria": "Cervezas",
+  "prioridad": 2,
+  "consultas": [
+   "non alcoholic beer bottle",
+   "Cerveza sin alcohol"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "chocolate-para-taza",
+  "base": "Chocolate para taza",
+  "departamento": "Bebidas",
+  "subcategoria": "Café y té",
+  "prioridad": 2,
+  "consultas": [
+   "drinking chocolate cocoa powder",
+   "Chocolate para taza"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "filtrantes-de-manzanilla",
+  "base": "Filtrantes de manzanilla",
+  "departamento": "Bebidas",
+  "subcategoria": "Café y té",
+  "prioridad": 2,
+  "consultas": [
+   "chamomile tea bags",
+   "Filtrantes de manzanilla"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "gaseosa-de-naranja",
+  "base": "Gaseosa de naranja",
+  "departamento": "Bebidas",
+  "subcategoria": "Gaseosas",
+  "prioridad": 2,
+  "consultas": [
+   "orange soda bottle",
+   "Gaseosa de naranja"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "gaseosa-de-uva",
+  "base": "Gaseosa de uva",
+  "departamento": "Bebidas",
+  "subcategoria": "Gaseosas",
+  "prioridad": 2,
+  "consultas": [
+   "grape soda bottle",
+   "Gaseosa de uva"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "gaseosa-light",
+  "base": "Gaseosa light",
+  "departamento": "Bebidas",
+  "subcategoria": "Gaseosas",
+  "prioridad": 2,
+  "consultas": [
+   "diet soda bottle",
+   "Gaseosa light"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "gaseosa-sabor-cola",
+  "base": "Gaseosa sabor cola",
+  "departamento": "Bebidas",
+  "subcategoria": "Gaseosas",
+  "prioridad": 2,
+  "consultas": [
+   "cola soda bottle",
+   "Gaseosa sabor cola"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "gaseosa-sabor-lima-limon",
+  "base": "Gaseosa sabor lima limón",
+  "departamento": "Bebidas",
+  "subcategoria": "Gaseosas",
+  "prioridad": 2,
+  "consultas": [
+   "lemon lime soda bottle",
+   "Gaseosa sabor lima limón"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "jugo-de-naranja",
+  "base": "Jugo de naranja",
+  "departamento": "Bebidas",
+  "subcategoria": "Jugos",
+  "prioridad": 2,
+  "consultas": [
+   "orange juice carton",
+   "Jugo de naranja"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "jugo-de-pina",
+  "base": "Jugo de piña",
+  "departamento": "Bebidas",
+  "subcategoria": "Jugos",
+  "prioridad": 2,
+  "consultas": [
+   "pineapple juice carton",
+   "Jugo de piña"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "nectar-de-durazno",
+  "base": "Néctar de durazno",
+  "departamento": "Bebidas",
+  "subcategoria": "Jugos",
+  "prioridad": 2,
+  "consultas": [
+   "peach nectar juice",
+   "Néctar de durazno"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "nectar-de-mango",
+  "base": "Néctar de mango",
+  "departamento": "Bebidas",
+  "subcategoria": "Jugos",
+  "prioridad": 2,
+  "consultas": [
+   "mango juice",
+   "Néctar de mango"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "nectar-de-maracuya",
+  "base": "Néctar de maracuyá",
+  "departamento": "Bebidas",
+  "subcategoria": "Jugos",
+  "prioridad": 2,
+  "consultas": [
+   "passion fruit juice",
+   "Néctar de maracuyá"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "te-verde",
+  "base": "Té verde",
+  "departamento": "Bebidas",
+  "subcategoria": "Café y té",
+  "prioridad": 2,
+  "consultas": [
+   "green tea bags",
+   "Té verde"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "brocoli-congelado",
+  "base": "Brócoli congelado",
+  "departamento": "Congelados",
+  "subcategoria": "Verduras congeladas",
+  "prioridad": 2,
+  "consultas": [
+   "frozen broccoli bag",
+   "Brócoli congelado"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "choclo-congelado",
+  "base": "Choclo congelado",
+  "departamento": "Congelados",
+  "subcategoria": "Verduras congeladas",
+  "prioridad": 2,
+  "consultas": [
+   "frozen corn kernels bag",
+   "Choclo congelado"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "helado-de-chocolate",
+  "base": "Helado de chocolate",
+  "departamento": "Congelados",
+  "subcategoria": "Helados",
+  "prioridad": 2,
+  "consultas": [
+   "chocolate ice cream tub",
+   "Helado de chocolate"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "helado-de-lucuma",
+  "base": "Helado de lúcuma",
+  "departamento": "Congelados",
+  "subcategoria": "Helados",
+  "prioridad": 2,
+  "consultas": [
+   "lucuma ice cream",
+   "Helado de lúcuma"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "helado-de-vainilla",
+  "base": "Helado de vainilla",
+  "departamento": "Congelados",
+  "subcategoria": "Helados",
+  "prioridad": 2,
+  "consultas": [
+   "vanilla ice cream tub",
+   "Helado de vainilla"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "mix-de-verduras",
+  "base": "Mix de verduras",
+  "departamento": "Congelados",
+  "subcategoria": "Verduras congeladas",
+  "prioridad": 2,
+  "consultas": [
+   "frozen mixed vegetables bag",
+   "Mix de verduras"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "nuggets-de-pollo",
+  "base": "Nuggets de pollo",
+  "departamento": "Congelados",
+  "subcategoria": "Pizzas y snacks",
+  "prioridad": 2,
+  "consultas": [
+   "chicken nuggets",
+   "Nuggets de pollo"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "papas-prefritas",
+  "base": "Papas prefritas",
+  "departamento": "Congelados",
+  "subcategoria": "Pizzas y snacks",
+  "prioridad": 2,
+  "consultas": [
+   "frozen french fries bag",
+   "Papas prefritas"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pizza-de-pepperoni",
+  "base": "Pizza de pepperoni",
+  "departamento": "Congelados",
+  "subcategoria": "Pizzas y snacks",
+  "prioridad": 2,
+  "consultas": [
+   "frozen pepperoni pizza box",
+   "Pizza de pepperoni"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "acondicionador",
+  "base": "Acondicionador",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Cuidado del cabello",
+  "prioridad": 2,
+  "consultas": [
+   "hair conditioner bottle",
+   "Acondicionador"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "cepillo-dental",
+  "base": "Cepillo dental",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Higiene bucal",
+  "prioridad": 2,
+  "consultas": [
+   "toothbrush",
+   "Cepillo dental"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "crema-corporal",
+  "base": "Crema corporal",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Jabones y baño",
+  "prioridad": 2,
+  "consultas": [
+   "body lotion bottle",
+   "Crema corporal"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "crema-de-peinar",
+  "base": "Crema de peinar",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Cuidado del cabello",
+  "prioridad": 2,
+  "consultas": [
+   "hair styling cream tube",
+   "Crema de peinar"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "desodorante-roll-on",
+  "base": "Desodorante roll-on",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Jabones y baño",
+  "prioridad": 2,
+  "consultas": [
+   "roll-on deodorant",
+   "Desodorante roll-on"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "enjuague-bucal",
+  "base": "Enjuague bucal",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Higiene bucal",
+  "prioridad": 2,
+  "consultas": [
+   "mouthwash bottle",
+   "Enjuague bucal"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "gel-de-ducha",
+  "base": "Gel de ducha",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Jabones y baño",
+  "prioridad": 2,
+  "consultas": [
+   "shower gel bottle",
+   "Gel de ducha"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "jabon-de-glicerina",
+  "base": "Jabón de glicerina",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Jabones y baño",
+  "prioridad": 2,
+  "consultas": [
+   "glycerin soap bar",
+   "Jabón de glicerina"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "jabon-de-tocador",
+  "base": "Jabón de tocador",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Jabones y baño",
+  "prioridad": 2,
+  "consultas": [
+   "bar of soap",
+   "Jabón de tocador"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "jabon-liquido-de-manos",
+  "base": "Jabón líquido de manos",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Jabones y baño",
+  "prioridad": 2,
+  "consultas": [
+   "liquid hand soap pump bottle",
+   "Jabón líquido de manos"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pasta-dental",
+  "base": "Pasta dental",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Higiene bucal",
+  "prioridad": 2,
+  "consultas": [
+   "toothpaste tube",
+   "Pasta dental"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "pasta-dental-blanqueadora",
+  "base": "Pasta dental blanqueadora",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Higiene bucal",
+  "prioridad": 2,
+  "consultas": [
+   "whitening toothpaste tube",
+   "Pasta dental blanqueadora"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pasta-dental-infantil",
+  "base": "Pasta dental infantil",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Higiene bucal",
+  "prioridad": 2,
+  "consultas": [
+   "kids toothpaste tube",
+   "Pasta dental infantil"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pasta-dental-para-encias",
+  "base": "Pasta dental para encías",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Higiene bucal",
+  "prioridad": 2,
+  "consultas": [
+   "toothpaste tube",
+   "Pasta dental para encías"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "panales-talla-g",
+  "base": "Pañales talla G",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Bebés",
+  "prioridad": 2,
+  "consultas": [
+   "diaper pack",
+   "Pañales talla G"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "panales-talla-m",
+  "base": "Pañales talla M",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Bebés",
+  "prioridad": 2,
+  "consultas": [
+   "diaper pack",
+   "Pañales talla M"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "panales-talla-xg",
+  "base": "Pañales talla XG",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Bebés",
+  "prioridad": 2,
+  "consultas": [
+   "diaper pack",
+   "Pañales talla XG"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "shampoo",
+  "base": "Shampoo",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Cuidado del cabello",
+  "prioridad": 2,
+  "consultas": [
+   "shampoo bottle",
+   "Shampoo"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "shampoo-anticaspa",
+  "base": "Shampoo anticaspa",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Cuidado del cabello",
+  "prioridad": 2,
+  "consultas": [
+   "anti dandruff shampoo bottle",
+   "Shampoo anticaspa"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "shampoo-para-cabello-graso",
+  "base": "Shampoo para cabello graso",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Cuidado del cabello",
+  "prioridad": 2,
+  "consultas": [
+   "shampoo bottle for oily hair",
+   "Shampoo para cabello graso"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "toallitas-con-aloe",
+  "base": "Toallitas con aloe",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Bebés",
+  "prioridad": 2,
+  "consultas": [
+   "baby wipes pack",
+   "Toallitas con aloe"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "toallitas-humedas",
+  "base": "Toallitas húmedas",
+  "departamento": "Cuidado personal",
+  "subcategoria": "Bebés",
+  "prioridad": 2,
+  "consultas": [
+   "wet wipes pack",
+   "Toallitas húmedas"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "balon-de-futbol",
+  "base": "Balón de fútbol",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Fútbol y balones",
+  "prioridad": 2,
+  "consultas": [
+   "soccer ball",
+   "Balón de fútbol"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "balon-de-voley",
+  "base": "Balón de vóley",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Fútbol y balones",
+  "prioridad": 2,
+  "consultas": [
+   "volleyball",
+   "Balón de vóley"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "bolsa-de-dormir",
+  "base": "Bolsa de dormir",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Camping",
+  "prioridad": 2,
+  "consultas": [
+   "sleeping bag",
+   "Bolsa de dormir"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "candado-de-cable",
+  "base": "Candado de cable",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Ciclismo",
+  "prioridad": 2,
+  "consultas": [
+   "bicycle cable lock",
+   "Candado de cable"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "carpa",
+  "base": "Carpa",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Camping",
+  "prioridad": 2,
+  "consultas": [
+   "camping tent",
+   "Carpa"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "casco-de-ciclismo",
+  "base": "Casco de ciclismo",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Ciclismo",
+  "prioridad": 2,
+  "consultas": [
+   "bicycle helmet",
+   "Casco de ciclismo"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "colchoneta-de-yoga",
+  "base": "Colchoneta de yoga",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Fitness",
+  "prioridad": 2,
+  "consultas": [
+   "yoga mat",
+   "Colchoneta de yoga"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "guantes-de-arquero",
+  "base": "Guantes de arquero",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Fútbol y balones",
+  "prioridad": 2,
+  "consultas": [
+   "goalkeeper gloves",
+   "Guantes de arquero"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "linterna-de-campamento",
+  "base": "Linterna de campamento",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Camping",
+  "prioridad": 2,
+  "consultas": [
+   "camping lantern",
+   "Linterna de campamento"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "luces-para-bicicleta",
+  "base": "Luces para bicicleta",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Ciclismo",
+  "prioridad": 2,
+  "consultas": [
+   "bicycle lights",
+   "Luces para bicicleta"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "mancuernas",
+  "base": "Mancuernas",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Fitness",
+  "prioridad": 2,
+  "consultas": [
+   "dumbbells",
+   "Mancuernas"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "soga-para-saltar",
+  "base": "Soga para saltar",
+  "departamento": "Deportes y aire libre",
+  "subcategoria": "Fitness",
+  "prioridad": 2,
+  "consultas": [
+   "jump rope",
+   "Soga para saltar"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "aceite-de-girasol",
+  "base": "Aceite de girasol",
+  "departamento": "Despensa",
+  "subcategoria": "Aceites y vinagres",
+  "prioridad": 2,
+  "consultas": [
+   "sunflower oil bottle",
+   "Aceite de girasol"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "aceite-de-oliva-extra-virgen",
+  "base": "Aceite de oliva extra virgen",
+  "departamento": "Despensa",
+  "subcategoria": "Aceites y vinagres",
+  "prioridad": 2,
+  "consultas": [
+   "extra virgin olive oil bottle",
+   "Aceite de oliva extra virgen"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "aceite-de-soya",
+  "base": "Aceite de soya",
+  "departamento": "Despensa",
+  "subcategoria": "Aceites y vinagres",
+  "prioridad": 2,
+  "consultas": [
+   "soybean oil bottle",
+   "Aceite de soya"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "aceite-vegetal",
+  "base": "Aceite vegetal",
+  "departamento": "Despensa",
+  "subcategoria": "Aceites y vinagres",
+  "prioridad": 2,
+  "consultas": [
+   "vegetable oil bottle",
+   "Aceite vegetal"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "aji-amarillo-molido",
+  "base": "Ají amarillo molido",
+  "departamento": "Despensa",
+  "subcategoria": "Salsas y condimentos",
+  "prioridad": 2,
+  "consultas": [
+   "ground yellow chili pepper",
+   "Ají amarillo molido"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "azucar-blanca",
+  "base": "Azúcar blanca",
+  "departamento": "Despensa",
+  "subcategoria": "Harinas y azúcar",
+  "prioridad": 2,
+  "consultas": [
+   "white sugar",
+   "Azúcar blanca"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "azucar-rubia",
+  "base": "Azúcar rubia",
+  "departamento": "Despensa",
+  "subcategoria": "Harinas y azúcar",
+  "prioridad": 2,
+  "consultas": [
+   "brown sugar",
+   "Azúcar rubia"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "champinones",
+  "base": "Champiñones",
+  "departamento": "Despensa",
+  "subcategoria": "Conservas",
+  "prioridad": 2,
+  "consultas": [
+   "canned mushrooms",
+   "Champiñones"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "choclo-desgranado",
+  "base": "Choclo desgranado",
+  "departamento": "Despensa",
+  "subcategoria": "Conservas",
+  "prioridad": 2,
+  "consultas": [
+   "canned corn",
+   "Choclo desgranado"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "comino-molido",
+  "base": "Comino molido",
+  "departamento": "Despensa",
+  "subcategoria": "Salsas y condimentos",
+  "prioridad": 2,
+  "consultas": [
+   "ground cumin",
+   "Comino molido"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "durazno-en-almibar",
+  "base": "Durazno en almíbar",
+  "departamento": "Despensa",
+  "subcategoria": "Conservas",
+  "prioridad": 2,
+  "consultas": [
+   "canned peaches in syrup",
+   "Durazno en almíbar"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "fideos-cabello-de-angel",
+  "base": "Fideos cabello de ángel",
+  "departamento": "Despensa",
+  "subcategoria": "Fideos y pastas",
+  "prioridad": 2,
+  "consultas": [
+   "angel hair pasta",
+   "Fideos cabello de ángel"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "fideos-canutos",
+  "base": "Fideos canutos",
+  "departamento": "Despensa",
+  "subcategoria": "Fideos y pastas",
+  "prioridad": 2,
+  "consultas": [
+   "elbow macaroni pasta",
+   "Fideos canutos"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "fideos-coditos",
+  "base": "Fideos coditos",
+  "departamento": "Despensa",
+  "subcategoria": "Fideos y pastas",
+  "prioridad": 2,
+  "consultas": [
+   "elbow macaroni pasta",
+   "Fideos coditos"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "fideos-spaghetti",
+  "base": "Fideos spaghetti",
+  "departamento": "Despensa",
+  "subcategoria": "Fideos y pastas",
+  "prioridad": 2,
+  "consultas": [
+   "spaghetti pasta package",
+   "Fideos spaghetti"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "fideos-tornillo",
+  "base": "Fideos tornillo",
+  "departamento": "Despensa",
+  "subcategoria": "Fideos y pastas",
+  "prioridad": 2,
+  "consultas": [
+   "fusilli pasta",
+   "Fideos tornillo"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "filete-de-atun-en-agua",
+  "base": "Filete de atún en agua",
+  "departamento": "Despensa",
+  "subcategoria": "Conservas",
+  "prioridad": 2,
+  "consultas": [
+   "canned tuna",
+   "Filete de atún en agua"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "harina-preparada",
+  "base": "Harina preparada",
+  "departamento": "Despensa",
+  "subcategoria": "Harinas y azúcar",
+  "prioridad": 2,
+  "consultas": [
+   "flour bag",
+   "Harina preparada"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "harina-sin-preparar",
+  "base": "Harina sin preparar",
+  "departamento": "Despensa",
+  "subcategoria": "Harinas y azúcar",
+  "prioridad": 2,
+  "consultas": [
+   "wheat flour bag",
+   "Harina sin preparar"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "ketchup",
+  "base": "Kétchup",
+  "departamento": "Despensa",
+  "subcategoria": "Salsas y condimentos",
+  "prioridad": 2,
+  "consultas": [
+   "ketchup bottle",
+   "Kétchup"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "lasana",
+  "base": "Lasaña",
+  "departamento": "Despensa",
+  "subcategoria": "Fideos y pastas",
+  "prioridad": 2,
+  "consultas": [
+   "lasagna noodles sheets",
+   "Lasaña"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "maicena",
+  "base": "Maicena",
+  "departamento": "Despensa",
+  "subcategoria": "Harinas y azúcar",
+  "prioridad": 2,
+  "consultas": [
+   "cornstarch",
+   "Maicena"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "manjar-blanco",
+  "base": "Manjar blanco",
+  "departamento": "Despensa",
+  "subcategoria": "Desayuno y untables",
+  "prioridad": 2,
+  "consultas": [
+   "dulce de leche jar",
+   "Manjar blanco"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "mayonesa",
+  "base": "Mayonesa",
+  "departamento": "Despensa",
+  "subcategoria": "Salsas y condimentos",
+  "prioridad": 2,
+  "consultas": [
+   "mayonnaise jar",
+   "Mayonesa"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "mermelada-de-fresa",
+  "base": "Mermelada de fresa",
+  "departamento": "Despensa",
+  "subcategoria": "Desayuno y untables",
+  "prioridad": 2,
+  "consultas": [
+   "strawberry jam jar",
+   "Mermelada de fresa"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "miel-de-abeja",
+  "base": "Miel de abeja",
+  "departamento": "Despensa",
+  "subcategoria": "Desayuno y untables",
+  "prioridad": 2,
+  "consultas": [
+   "honey jar",
+   "Miel de abeja"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "oregano-seco",
+  "base": "Orégano seco",
+  "departamento": "Despensa",
+  "subcategoria": "Salsas y condimentos",
+  "prioridad": 2,
+  "consultas": [
+   "dried oregano",
+   "Orégano seco"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "sal-de-mesa",
+  "base": "Sal de mesa",
+  "departamento": "Despensa",
+  "subcategoria": "Salsas y condimentos",
+  "prioridad": 2,
+  "consultas": [
+   "table salt",
+   "Sal de mesa"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "sardina-en-tomate",
+  "base": "Sardina en tomate",
+  "departamento": "Despensa",
+  "subcategoria": "Conservas",
+  "prioridad": 2,
+  "consultas": [
+   "canned sardines in tomato sauce",
+   "Sardina en tomate"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "trozos-de-atun-en-aceite",
+  "base": "Trozos de atún en aceite",
+  "departamento": "Despensa",
+  "subcategoria": "Conservas",
+  "prioridad": 2,
+  "consultas": [
+   "canned tuna in oil",
+   "Trozos de atún en aceite"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "vinagre-blanco",
+  "base": "Vinagre blanco",
+  "departamento": "Despensa",
+  "subcategoria": "Aceites y vinagres",
+  "prioridad": 2,
+  "consultas": [
+   "white vinegar bottle",
+   "Vinagre blanco"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "vinagre-de-manzana",
+  "base": "Vinagre de manzana",
+  "departamento": "Despensa",
+  "subcategoria": "Aceites y vinagres",
+  "prioridad": 2,
+  "consultas": [
+   "apple cider vinegar bottle",
+   "Vinagre de manzana"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "congeladora-horizontal",
+  "base": "Congeladora horizontal",
+  "departamento": "Electrohogar",
+  "subcategoria": "Refrigeración",
+  "prioridad": 2,
+  "consultas": [
+   "chest freezer",
+   "Congeladora horizontal"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "estufa-electrica",
+  "base": "Estufa eléctrica",
+  "departamento": "Electrohogar",
+  "subcategoria": "Ventilación y clima",
+  "prioridad": 2,
+  "consultas": [
+   "electric space heater",
+   "Estufa eléctrica"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "frigobar",
+  "base": "Frigobar",
+  "departamento": "Electrohogar",
+  "subcategoria": "Refrigeración",
+  "prioridad": 2,
+  "consultas": [
+   "mini fridge",
+   "Frigobar"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "lavadora",
+  "base": "Lavadora",
+  "departamento": "Electrohogar",
+  "subcategoria": "Lavado y planchado",
+  "prioridad": 2,
+  "consultas": [
+   "washing machine",
+   "Lavadora"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "licuadora",
+  "base": "Licuadora",
+  "departamento": "Electrohogar",
+  "subcategoria": "Cocina y cocción",
+  "prioridad": 2,
+  "consultas": [
+   "blender",
+   "Licuadora"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "microondas",
+  "base": "Microondas",
+  "departamento": "Electrohogar",
+  "subcategoria": "Cocina y cocción",
+  "prioridad": 2,
+  "consultas": [
+   "microwave oven",
+   "Microondas"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "olla-arrocera",
+  "base": "Olla arrocera",
+  "departamento": "Electrohogar",
+  "subcategoria": "Cocina y cocción",
+  "prioridad": 2,
+  "consultas": [
+   "rice cooker",
+   "Olla arrocera"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "plancha-a-vapor",
+  "base": "Plancha a vapor",
+  "departamento": "Electrohogar",
+  "subcategoria": "Lavado y planchado",
+  "prioridad": 2,
+  "consultas": [
+   "steam iron",
+   "Plancha a vapor"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "purificador-de-aire",
+  "base": "Purificador de aire",
+  "departamento": "Electrohogar",
+  "subcategoria": "Ventilación y clima",
+  "prioridad": 2,
+  "consultas": [
+   "air purifier",
+   "Purificador de aire"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "refrigeradora",
+  "base": "Refrigeradora",
+  "departamento": "Electrohogar",
+  "subcategoria": "Refrigeración",
+  "prioridad": 2,
+  "consultas": [
+   "refrigerator",
+   "Refrigeradora"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "secadora-de-ropa",
+  "base": "Secadora de ropa",
+  "departamento": "Electrohogar",
+  "subcategoria": "Lavado y planchado",
+  "prioridad": 2,
+  "consultas": [
+   "clothes dryer",
+   "Secadora de ropa"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "ventilador",
+  "base": "Ventilador",
+  "departamento": "Electrohogar",
+  "subcategoria": "Ventilación y clima",
+  "prioridad": 2,
+  "consultas": [
+   "electric fan",
+   "Ventilador"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "almohada",
+  "base": "Almohada",
+  "departamento": "Hogar",
+  "subcategoria": "Dormitorio",
+  "prioridad": 2,
+  "consultas": [
+   "pillow",
+   "Almohada"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "edredon",
+  "base": "Edredón",
+  "departamento": "Hogar",
+  "subcategoria": "Dormitorio",
+  "prioridad": 2,
+  "consultas": [
+   "duvet comforter",
+   "Edredón"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "espejo-de-pared",
+  "base": "Espejo de pared",
+  "departamento": "Hogar",
+  "subcategoria": "Decoración",
+  "prioridad": 2,
+  "consultas": [
+   "wall mirror",
+   "Espejo de pared"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "florero-de-ceramica",
+  "base": "Florero de cerámica",
+  "departamento": "Hogar",
+  "subcategoria": "Decoración",
+  "prioridad": 2,
+  "consultas": [
+   "ceramic vase",
+   "Florero de cerámica"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "juego-de-cubiertos-de-acero",
+  "base": "Juego de cubiertos de acero",
+  "departamento": "Hogar",
+  "subcategoria": "Cocina y mesa",
+  "prioridad": 2,
+  "consultas": [
+   "stainless steel cutlery set",
+   "Juego de cubiertos de acero"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "juego-de-platos-de-ceramica",
+  "base": "Juego de platos de cerámica",
+  "departamento": "Hogar",
+  "subcategoria": "Cocina y mesa",
+  "prioridad": 2,
+  "consultas": [
+   "ceramic dinner plate set",
+   "Juego de platos de cerámica"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "juego-de-sabanas",
+  "base": "Juego de sábanas",
+  "departamento": "Hogar",
+  "subcategoria": "Dormitorio",
+  "prioridad": 2,
+  "consultas": [
+   "bed sheet set",
+   "Juego de sábanas"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "juego-de-vasos-de-vidrio",
+  "base": "Juego de vasos de vidrio",
+  "departamento": "Hogar",
+  "subcategoria": "Cocina y mesa",
+  "prioridad": 2,
+  "consultas": [
+   "glass tumbler set",
+   "Juego de vasos de vidrio"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "marco-de-fotos",
+  "base": "Marco de fotos",
+  "departamento": "Hogar",
+  "subcategoria": "Decoración",
+  "prioridad": 2,
+  "consultas": [
+   "photo frame",
+   "Marco de fotos"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "ajedrez-de-madera",
+  "base": "Ajedrez de madera",
+  "departamento": "Juegos",
+  "subcategoria": "Juegos de mesa",
+  "prioridad": 2,
+  "consultas": [
+   "wooden chess set",
+   "Ajedrez de madera"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "audifonos-gamer",
+  "base": "Audífonos gamer",
+  "departamento": "Juegos",
+  "subcategoria": "Videojuegos",
+  "prioridad": 2,
+  "consultas": [
+   "gaming headset",
+   "Audífonos gamer"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "bloques-de-construccion",
+  "base": "Bloques de construcción",
+  "departamento": "Juegos",
+  "subcategoria": "Juguetes",
+  "prioridad": 2,
+  "consultas": [
+   "building blocks toy",
+   "Bloques de construcción"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "carro-de-juguete",
+  "base": "Carro de juguete",
+  "departamento": "Juegos",
+  "subcategoria": "Juguetes",
+  "prioridad": 2,
+  "consultas": [
+   "toy car",
+   "Carro de juguete"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "domino",
+  "base": "Dominó",
+  "departamento": "Juegos",
+  "subcategoria": "Juegos de mesa",
+  "prioridad": 2,
+  "consultas": [
+   "domino set",
+   "Dominó"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "juego-de-ludo-y-damas",
+  "base": "Juego de ludo y damas",
+  "departamento": "Juegos",
+  "subcategoria": "Juegos de mesa",
+  "prioridad": 2,
+  "consultas": [
+   "ludo board game",
+   "Juego de ludo y damas"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "muneca-de-trapo",
+  "base": "Muñeca de trapo",
+  "departamento": "Juegos",
+  "subcategoria": "Juguetes",
+  "prioridad": 2,
+  "consultas": [
+   "rag doll",
+   "Muñeca de trapo"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "silla-gamer",
+  "base": "Silla gamer",
+  "departamento": "Juegos",
+  "subcategoria": "Videojuegos",
+  "prioridad": 2,
+  "consultas": [
+   "gaming chair",
+   "Silla gamer"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "volante-para-consola",
+  "base": "Volante para consola",
+  "departamento": "Juegos",
+  "subcategoria": "Videojuegos",
+  "prioridad": 2,
+  "consultas": [
+   "racing wheel controller",
+   "Volante para consola"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "bolsas-para-basura",
+  "base": "Bolsas para basura",
+  "departamento": "Limpieza",
+  "subcategoria": "Papel y descartables",
+  "prioridad": 2,
+  "consultas": [
+   "trash bags roll",
+   "Bolsas para basura"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "desengrasante-de-cocina",
+  "base": "Desengrasante de cocina",
+  "departamento": "Limpieza",
+  "subcategoria": "Desinfectantes",
+  "prioridad": 2,
+  "consultas": [
+   "kitchen degreaser spray bottle",
+   "Desengrasante de cocina"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "desinfectante-multiusos",
+  "base": "Desinfectante multiusos",
+  "departamento": "Limpieza",
+  "subcategoria": "Desinfectantes",
+  "prioridad": 2,
+  "consultas": [
+   "all purpose cleaner spray bottle",
+   "Desinfectante multiusos"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "detergente-en-polvo",
+  "base": "Detergente en polvo",
+  "departamento": "Limpieza",
+  "subcategoria": "Detergentes",
+  "prioridad": 2,
+  "consultas": [
+   "laundry detergent powder box",
+   "Detergente en polvo"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "detergente-hipoalergenico",
+  "base": "Detergente hipoalergénico",
+  "departamento": "Limpieza",
+  "subcategoria": "Detergentes",
+  "prioridad": 2,
+  "consultas": [
+   "laundry detergent bottle",
+   "Detergente hipoalergénico"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "detergente-liquido",
+  "base": "Detergente líquido",
+  "departamento": "Limpieza",
+  "subcategoria": "Detergentes",
+  "prioridad": 2,
+  "consultas": [
+   "liquid laundry detergent bottle",
+   "Detergente líquido"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "detergente-para-ropa-blanca",
+  "base": "Detergente para ropa blanca",
+  "departamento": "Limpieza",
+  "subcategoria": "Detergentes",
+  "prioridad": 2,
+  "consultas": [
+   "laundry detergent",
+   "Detergente para ropa blanca"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "detergente-para-ropa-de-color",
+  "base": "Detergente para ropa de color",
+  "departamento": "Limpieza",
+  "subcategoria": "Detergentes",
+  "prioridad": 2,
+  "consultas": [
+   "laundry detergent",
+   "Detergente para ropa de color"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "esponja-de-cocina",
+  "base": "Esponja de cocina",
+  "departamento": "Limpieza",
+  "subcategoria": "Lavavajillas",
+  "prioridad": 2,
+  "consultas": [
+   "kitchen sponge",
+   "Esponja de cocina"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "lavavajillas-con-limon",
+  "base": "Lavavajillas con limón",
+  "departamento": "Limpieza",
+  "subcategoria": "Lavavajillas",
+  "prioridad": 2,
+  "consultas": [
+   "dish soap bottle",
+   "Lavavajillas con limón"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "lavavajillas-en-gel",
+  "base": "Lavavajillas en gel",
+  "departamento": "Limpieza",
+  "subcategoria": "Lavavajillas",
+  "prioridad": 2,
+  "consultas": [
+   "dish soap bottle",
+   "Lavavajillas en gel"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "lavavajillas-liquido",
+  "base": "Lavavajillas líquido",
+  "departamento": "Limpieza",
+  "subcategoria": "Lavavajillas",
+  "prioridad": 2,
+  "consultas": [
+   "dish soap bottle",
+   "Lavavajillas líquido"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "lejia",
+  "base": "Lejía",
+  "departamento": "Limpieza",
+  "subcategoria": "Desinfectantes",
+  "prioridad": 2,
+  "consultas": [
+   "bleach bottle",
+   "Lejía"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "limpiador-de-banos",
+  "base": "Limpiador de baños",
+  "departamento": "Limpieza",
+  "subcategoria": "Desinfectantes",
+  "prioridad": 2,
+  "consultas": [
+   "bathroom cleaner bottle",
+   "Limpiador de baños"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "limpiador-de-pisos",
+  "base": "Limpiador de pisos",
+  "departamento": "Limpieza",
+  "subcategoria": "Desinfectantes",
+  "prioridad": 2,
+  "consultas": [
+   "floor cleaner bottle",
+   "Limpiador de pisos"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "limpiavidrios",
+  "base": "Limpiavidrios",
+  "departamento": "Limpieza",
+  "subcategoria": "Desinfectantes",
+  "prioridad": 2,
+  "consultas": [
+   "glass cleaner spray bottle",
+   "Limpiavidrios"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "papel-higienico-doble-hoja",
+  "base": "Papel higiénico doble hoja",
+  "departamento": "Limpieza",
+  "subcategoria": "Papel y descartables",
+  "prioridad": 2,
+  "consultas": [
+   "toilet paper rolls",
+   "Papel higiénico doble hoja"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "papel-higienico-triple-hoja",
+  "base": "Papel higiénico triple hoja",
+  "departamento": "Limpieza",
+  "subcategoria": "Papel y descartables",
+  "prioridad": 2,
+  "consultas": [
+   "toilet paper rolls",
+   "Papel higiénico triple hoja"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "papel-toalla",
+  "base": "Papel toalla",
+  "departamento": "Limpieza",
+  "subcategoria": "Papel y descartables",
+  "prioridad": 2,
+  "consultas": [
+   "paper towel rolls",
+   "Papel toalla"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "pastillas-lavavajillas",
+  "base": "Pastillas lavavajillas",
+  "departamento": "Limpieza",
+  "subcategoria": "Lavavajillas",
+  "prioridad": 2,
+  "consultas": [
+   "dishwasher tablets",
+   "Pastillas lavavajillas"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "servilletas",
+  "base": "Servilletas",
+  "departamento": "Limpieza",
+  "subcategoria": "Papel y descartables",
+  "prioridad": 2,
+  "consultas": [
+   "paper napkins",
+   "Servilletas"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "suavizante-de-telas",
+  "base": "Suavizante de telas",
+  "departamento": "Limpieza",
+  "subcategoria": "Detergentes",
+  "prioridad": 2,
+  "consultas": [
+   "fabric softener bottle",
+   "Suavizante de telas"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "vasos-descartables",
+  "base": "Vasos descartables",
+  "departamento": "Limpieza",
+  "subcategoria": "Papel y descartables",
+  "prioridad": 2,
+  "consultas": [
+   "disposable plastic cups",
+   "Vasos descartables"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "leche-chocolatada",
+  "base": "Leche chocolatada",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Leches",
+  "prioridad": 2,
+  "consultas": [
+   "chocolate milk bottle",
+   "Leche chocolatada"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "leche-descremada",
+  "base": "Leche descremada",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Leches",
+  "prioridad": 2,
+  "consultas": [
+   "skim milk carton",
+   "Leche descremada"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "leche-deslactosada",
+  "base": "Leche deslactosada",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Leches",
+  "prioridad": 2,
+  "consultas": [
+   "lactose free milk carton",
+   "Leche deslactosada"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "leche-entera",
+  "base": "Leche entera",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Leches",
+  "prioridad": 2,
+  "consultas": [
+   "whole milk carton",
+   "Leche entera"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "leche-evaporada",
+  "base": "Leche evaporada",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Leches",
+  "prioridad": 2,
+  "consultas": [
+   "evaporated milk can",
+   "Leche evaporada"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "leche-semidescremada",
+  "base": "Leche semidescremada",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Leches",
+  "prioridad": 2,
+  "consultas": [
+   "milk carton",
+   "Leche semidescremada"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "yogurt-de-durazno",
+  "base": "Yogurt de durazno",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Yogures",
+  "prioridad": 2,
+  "consultas": [
+   "peach yogurt cup",
+   "Yogurt de durazno"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "yogurt-de-fresa",
+  "base": "Yogurt de fresa",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Yogures",
+  "prioridad": 2,
+  "consultas": [
+   "strawberry yogurt cup",
+   "Yogurt de fresa"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "yogurt-de-vainilla",
+  "base": "Yogurt de vainilla",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Yogures",
+  "prioridad": 2,
+  "consultas": [
+   "vanilla yogurt cup",
+   "Yogurt de vainilla"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "yogurt-griego-natural",
+  "base": "Yogurt griego natural",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Yogures",
+  "prioridad": 2,
+  "consultas": [
+   "greek yogurt cup",
+   "Yogurt griego natural"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "yogurt-natural",
+  "base": "Yogurt natural",
+  "departamento": "Lácteos y huevos",
+  "subcategoria": "Yogures",
+  "prioridad": 2,
+  "consultas": [
+   "plain yogurt cup",
+   "Yogurt natural"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "alimento-humedo-para-perro",
+  "base": "Alimento húmedo para perro",
+  "departamento": "Mascotas",
+  "subcategoria": "Perros",
+  "prioridad": 2,
+  "consultas": [
+   "wet dog food can",
+   "Alimento húmedo para perro"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "alimento-para-cachorro",
+  "base": "Alimento para cachorro",
+  "departamento": "Mascotas",
+  "subcategoria": "Perros",
+  "prioridad": 2,
+  "consultas": [
+   "puppy food bag",
+   "Alimento para cachorro"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "alimento-para-gatito",
+  "base": "Alimento para gatito",
+  "departamento": "Mascotas",
+  "subcategoria": "Gatos",
+  "prioridad": 2,
+  "consultas": [
+   "kitten food",
+   "Alimento para gatito"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "alimento-para-gato-adulto",
+  "base": "Alimento para gato adulto",
+  "departamento": "Mascotas",
+  "subcategoria": "Gatos",
+  "prioridad": 2,
+  "consultas": [
+   "cat food bag",
+   "Alimento para gato adulto"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "alimento-para-perro-de-raza-grande",
+  "base": "Alimento para perro de raza grande",
+  "departamento": "Mascotas",
+  "subcategoria": "Perros",
+  "prioridad": 2,
+  "consultas": [
+   "large breed dog food bag",
+   "Alimento para perro de raza grande"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "alimento-seco-para-gato",
+  "base": "Alimento seco para gato",
+  "departamento": "Mascotas",
+  "subcategoria": "Gatos",
+  "prioridad": 2,
+  "consultas": [
+   "dry cat food bag",
+   "Alimento seco para gato"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "alimento-seco-para-perro-adulto",
+  "base": "Alimento seco para perro adulto",
+  "departamento": "Mascotas",
+  "subcategoria": "Perros",
+  "prioridad": 2,
+  "consultas": [
+   "dry dog food bag",
+   "Alimento seco para perro adulto"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "arena-sanitaria",
+  "base": "Arena sanitaria",
+  "departamento": "Mascotas",
+  "subcategoria": "Gatos",
+  "prioridad": 2,
+  "consultas": [
+   "cat litter bag",
+   "Arena sanitaria"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "snack-para-perro",
+  "base": "Snack para perro",
+  "departamento": "Mascotas",
+  "subcategoria": "Perros",
+  "prioridad": 2,
+  "consultas": [
+   "dog treats",
+   "Snack para perro"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "cuaderno-universitario",
+  "base": "Cuaderno universitario",
+  "departamento": "Oficina",
+  "subcategoria": "Papelería",
+  "prioridad": 2,
+  "consultas": [
+   "spiral notebook",
+   "Cuaderno universitario"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "folder-manila",
+  "base": "Folder manila",
+  "departamento": "Oficina",
+  "subcategoria": "Papelería",
+  "prioridad": 2,
+  "consultas": [
+   "manila file folders",
+   "Folder manila"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "organizador-de-escritorio",
+  "base": "Organizador de escritorio",
+  "departamento": "Oficina",
+  "subcategoria": "Escritorio",
+  "prioridad": 2,
+  "consultas": [
+   "desk organizer",
+   "Organizador de escritorio"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "reposapies",
+  "base": "Reposapiés",
+  "departamento": "Oficina",
+  "subcategoria": "Escritorio",
+  "prioridad": 2,
+  "consultas": [
+   "footrest under desk",
+   "Reposapiés"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "resaltadores",
+  "base": "Resaltadores",
+  "departamento": "Oficina",
+  "subcategoria": "Papelería",
+  "prioridad": 2,
+  "consultas": [
+   "highlighter pens",
+   "Resaltadores"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "silla-de-oficina",
+  "base": "Silla de oficina",
+  "departamento": "Oficina",
+  "subcategoria": "Escritorio",
+  "prioridad": 2,
+  "consultas": [
+   "office chair",
+   "Silla de oficina"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "bata-de-bano",
+  "base": "Bata de baño",
+  "departamento": "Ropa",
+  "subcategoria": "Ropa de dormir",
+  "prioridad": 2,
+  "consultas": [
+   "bathrobe",
+   "Bata de baño"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "bufanda",
+  "base": "Bufanda",
+  "departamento": "Ropa",
+  "subcategoria": "Complementos",
+  "prioridad": 2,
+  "consultas": [
+   "scarf",
+   "Bufanda"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "camisa-de-vestir",
+  "base": "Camisa de vestir",
+  "departamento": "Ropa",
+  "subcategoria": "Polos y poleras",
+  "prioridad": 2,
+  "consultas": [
+   "dress shirt",
+   "Camisa de vestir"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "camiseta-de-dormir",
+  "base": "Camiseta de dormir",
+  "departamento": "Ropa",
+  "subcategoria": "Ropa de dormir",
+  "prioridad": 2,
+  "consultas": [
+   "sleep t-shirt",
+   "Camiseta de dormir"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "casaca-ligera",
+  "base": "Casaca ligera",
+  "departamento": "Ropa",
+  "subcategoria": "Polos y poleras",
+  "prioridad": 2,
+  "consultas": [
+   "light jacket",
+   "Casaca ligera"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "gorro-de-lana",
+  "base": "Gorro de lana",
+  "departamento": "Ropa",
+  "subcategoria": "Complementos",
+  "prioridad": 2,
+  "consultas": [
+   "wool beanie hat",
+   "Gorro de lana"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "guantes",
+  "base": "Guantes",
+  "departamento": "Ropa",
+  "subcategoria": "Complementos",
+  "prioridad": 2,
+  "consultas": [
+   "winter gloves",
+   "Guantes"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "pantalon-de-pijama",
+  "base": "Pantalón de pijama",
+  "departamento": "Ropa",
+  "subcategoria": "Ropa de dormir",
+  "prioridad": 2,
+  "consultas": [
+   "pajama pants",
+   "Pantalón de pijama"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "polo-estampado",
+  "base": "Polo estampado",
+  "departamento": "Ropa",
+  "subcategoria": "Polos y poleras",
+  "prioridad": 2,
+  "consultas": [
+   "printed t-shirt",
+   "Polo estampado"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "avena-en-hojuelas",
+  "base": "Avena en hojuelas",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Cereales",
+  "prioridad": 2,
+  "consultas": [
+   "rolled oats",
+   "Avena en hojuelas"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "camote-frito",
+  "base": "Camote frito",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Snacks",
+  "prioridad": 2,
+  "consultas": [
+   "sweet potato chips",
+   "Camote frito"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "cancha-serrana",
+  "base": "Cancha serrana",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Snacks",
+  "prioridad": 2,
+  "consultas": [
+   "toasted corn kernels cancha",
+   "Cancha serrana"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "caramelos-surtidos",
+  "base": "Caramelos surtidos",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Chocolates y dulces",
+  "prioridad": 2,
+  "consultas": [
+   "assorted hard candy",
+   "Caramelos surtidos"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "cereal-de-arroz-inflado",
+  "base": "Cereal de arroz inflado",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Cereales",
+  "prioridad": 2,
+  "consultas": [
+   "puffed rice cereal",
+   "Cereal de arroz inflado"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "cereal-de-chocolate",
+  "base": "Cereal de chocolate",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Cereales",
+  "prioridad": 2,
+  "consultas": [
+   "chocolate cereal",
+   "Cereal de chocolate"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "chifles",
+  "base": "Chifles",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Snacks",
+  "prioridad": 2,
+  "consultas": [
+   "plantain chips",
+   "Chifles"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "chocolate-amargo",
+  "base": "Chocolate amargo",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Chocolates y dulces",
+  "prioridad": 2,
+  "consultas": [
+   "dark chocolate bar",
+   "Chocolate amargo"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "chocolate-de-leche",
+  "base": "Chocolate de leche",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Chocolates y dulces",
+  "prioridad": 2,
+  "consultas": [
+   "milk chocolate bar",
+   "Chocolate de leche"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "galletas-de-avena",
+  "base": "Galletas de avena",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Galletas",
+  "prioridad": 2,
+  "consultas": [
+   "oatmeal cookies",
+   "Galletas de avena"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "galletas-de-coco",
+  "base": "Galletas de coco",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Galletas",
+  "prioridad": 2,
+  "consultas": [
+   "coconut cookies",
+   "Galletas de coco"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "galletas-de-soda",
+  "base": "Galletas de soda",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Galletas",
+  "prioridad": 2,
+  "consultas": [
+   "saltine crackers",
+   "Galletas de soda"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "galletas-de-vainilla",
+  "base": "Galletas de vainilla",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Galletas",
+  "prioridad": 2,
+  "consultas": [
+   "vanilla cookies",
+   "Galletas de vainilla"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "galletas-integrales",
+  "base": "Galletas integrales",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Galletas",
+  "prioridad": 2,
+  "consultas": [
+   "whole wheat crackers",
+   "Galletas integrales"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "galletas-rellenas-de-chocolate",
+  "base": "Galletas rellenas de chocolate",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Galletas",
+  "prioridad": 2,
+  "consultas": [
+   "chocolate sandwich cookies",
+   "Galletas rellenas de chocolate"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "gomitas-de-frutas",
+  "base": "Gomitas de frutas",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Chocolates y dulces",
+  "prioridad": 2,
+  "consultas": [
+   "fruit gummies",
+   "Gomitas de frutas"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "granola-con-frutas",
+  "base": "Granola con frutas",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Cereales",
+  "prioridad": 2,
+  "consultas": [
+   "granola with fruit",
+   "Granola con frutas"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "hojuelas-de-maiz",
+  "base": "Hojuelas de maíz",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Cereales",
+  "prioridad": 2,
+  "consultas": [
+   "corn flakes cereal",
+   "Hojuelas de maíz"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "maiz-tostado",
+  "base": "Maíz tostado",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Snacks",
+  "prioridad": 2,
+  "consultas": [
+   "toasted corn snack",
+   "Maíz tostado"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "papas-fritas",
+  "base": "Papas fritas",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Snacks",
+  "prioridad": 2,
+  "consultas": [
+   "potato chips bag",
+   "Papas fritas"
+  ],
+  "marcas": 1
+ },
+ {
+  "slug": "turron",
+  "base": "Turrón",
+  "departamento": "Snacks y dulces",
+  "subcategoria": "Chocolates y dulces",
+  "prioridad": 2,
+  "consultas": [
+   "turron nougat",
+   "Turrón"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "audifonos-de-cable",
+  "base": "Audífonos de cable",
+  "departamento": "Tecnología",
+  "subcategoria": "Audio y video",
+  "prioridad": 2,
+  "consultas": [
+   "wired earphones",
+   "Audífonos de cable"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "barra-de-sonido",
+  "base": "Barra de sonido",
+  "departamento": "Tecnología",
+  "subcategoria": "Audio y video",
+  "prioridad": 2,
+  "consultas": [
+   "soundbar",
+   "Barra de sonido"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "cargador-de-pared-usb-c",
+  "base": "Cargador de pared USB-C",
+  "departamento": "Tecnología",
+  "subcategoria": "Celulares y energía",
+  "prioridad": 2,
+  "consultas": [
+   "usb c wall charger",
+   "Cargador de pared USB-C"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "disco-duro-externo-1-tb",
+  "base": "Disco duro externo 1 TB",
+  "departamento": "Tecnología",
+  "subcategoria": "Computación",
+  "prioridad": 2,
+  "consultas": [
+   "external hard drive",
+   "Disco duro externo 1 TB"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "funda-para-celular",
+  "base": "Funda para celular",
+  "departamento": "Tecnología",
+  "subcategoria": "Celulares y energía",
+  "prioridad": 2,
+  "consultas": [
+   "phone case",
+   "Funda para celular"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "mouse-con-cable",
+  "base": "Mouse con cable",
+  "departamento": "Tecnología",
+  "subcategoria": "Computación",
+  "prioridad": 2,
+  "consultas": [
+   "wired computer mouse",
+   "Mouse con cable"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "parlante-portatil",
+  "base": "Parlante portátil",
+  "departamento": "Tecnología",
+  "subcategoria": "Audio y video",
+  "prioridad": 2,
+  "consultas": [
+   "portable bluetooth speaker",
+   "Parlante portátil"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "power-bank-10000-mah",
+  "base": "Power bank 10000 mAh",
+  "departamento": "Tecnología",
+  "subcategoria": "Celulares y energía",
+  "prioridad": 2,
+  "consultas": [
+   "power bank",
+   "Power bank 10000 mAh"
+  ],
+  "marcas": 2
+ },
+ {
+  "slug": "teclado-inalambrico",
+  "base": "Teclado inalámbrico",
+  "departamento": "Tecnología",
+  "subcategoria": "Computación",
+  "prioridad": 2,
+  "consultas": [
+   "wireless keyboard",
+   "Teclado inalámbrico"
+  ],
+  "marcas": 2
+ }
+]

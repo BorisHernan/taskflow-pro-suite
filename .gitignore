@@ -10,3 +10,10 @@ skills-lock.json
 
 # Archivos de trabajo del skill de diseño
 .taste-skill/
+
+# Fotos: originales y archivos de trabajo (lo publicable va en taskflow-web/public/img/articulos)
+herramientas/fotos/salida/
+__pycache__/
+
+# Imágenes de productos que no se versionan
+taskflow-web/public/img/productos/
