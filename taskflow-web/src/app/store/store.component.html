@@ -146,6 +146,14 @@
                 }
               </p>
             }
+            <div class="vistas" role="group" aria-label="Forma de ver los productos">
+              <button type="button" class="vista" [attr.aria-pressed]="vista() === 'cuadricula'" (click)="cambiarVista('cuadricula')" aria-label="Ver en cuadrícula">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
+              </button>
+              <button type="button" class="vista" [attr.aria-pressed]="vista() === 'lista'" (click)="cambiarVista('lista')" aria-label="Ver en lista">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></svg>
+              </button>
+            </div>
             <label class="orden">
               <span class="sr-only">Ordenar por</span>
               <select class="input" [ngModel]="orden()" (ngModelChange)="filtrar({ orden: $event })">
@@ -158,6 +166,20 @@
             </label>
           </div>
 
+          @if (chips().length) {
+            <ul class="chips" aria-label="Filtros aplicados">
+              @for (c of chips(); track c.clave) {
+                <li>
+                  <button type="button" class="chip-filtro" (click)="quitarFiltro(c.clave)" [attr.aria-label]="'Quitar el filtro ' + c.texto">
+                    {{ c.texto }}
+                    <app-icono nombre="cerrar" [tamano]="14" />
+                  </button>
+                </li>
+              }
+              <li><button type="button" class="chip-limpiar" (click)="limpiarTodo()">Quitar todos</button></li>
+            </ul>
+          }
+
           @if (catalogo.error(); as error) {
             <div class="alerta alerta-error" role="alert">
               <app-icono nombre="alerta" />
@@ -166,7 +188,7 @@
             </div>
           }
 
-          <section class="catalogo" aria-label="Productos">
+          <section class="catalogo" [class.lista]="vista() === 'lista'" [attr.aria-busy]="!catalogo.cargado()" aria-label="Productos">
             @if (!catalogo.cargado() && !catalogo.error()) {
               @for (n of [1, 2, 3, 4, 5, 6, 7, 8]; track n) {
                 <div class="esqueleto card" aria-hidden="true">
@@ -184,6 +206,7 @@
                 class="entrar"
                 [style.--i]="i % 12"
                 [producto]="p"
+                [compacta]="vista() === 'lista'"
                 [valoracion]="catalogo.valoraciones()[p.id]"
               />
             } @empty {

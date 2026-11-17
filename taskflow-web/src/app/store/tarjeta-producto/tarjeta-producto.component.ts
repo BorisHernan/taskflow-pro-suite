@@ -6,7 +6,7 @@ import { IconoComponent } from '../../shared/icono/icono.component';
 import { ProductIconComponent } from '../product-icon/product-icon.component';
 import { EstrellasComponent } from '../estrellas/estrellas.component';
 import { CarritoService } from '../servicios/carrito.service';
-import { fotosDe } from '../fotos-productos';
+import { FotosProductos } from '../fotos-productos';
 
 @Component({
   selector: 'app-tarjeta-producto',
@@ -20,10 +20,13 @@ export class TarjetaProductoComponent {
   readonly carrito = inject(CarritoService);
 
   readonly producto = input.required<Product>();
+  /** En la vista de lista la tarjeta es una fila. */
+  readonly compacta = input(false);
   readonly valoracion = input<RatingSummary | undefined>();
 
   readonly stockBajo = STOCK_BAJO;
-  readonly fotos = computed(() => fotosDe(this.producto().id));
+  private readonly galeria = inject(FotosProductos);
+  readonly fotos = computed(() => this.galeria.fotosDe(this.producto()));
   readonly descuento = computed(() => {
     const { price, listPrice } = this.producto();
     return listPrice && listPrice > price ? Math.round((1 - price / listPrice) * 100) : 0;

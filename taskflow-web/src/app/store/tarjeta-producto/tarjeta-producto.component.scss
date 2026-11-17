@@ -398,3 +398,88 @@
     animation: none;
   }
 }
+
+// Fila de la vista de lista: foto o pictograma a la izquierda, datos al centro y precio con compra a la derecha.
+.producto.compacta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 24px;
+  height: auto;
+  padding: 8px 12px 8px 8px;
+  border-radius: var(--radius);
+  background: var(--tf-surface);
+
+  .producto-enlace {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    align-content: center;
+    column-gap: 16px;
+  }
+
+  .producto-icono {
+    grid-row: 1 / span 3;
+    width: 96px;
+    height: 96px;
+    margin: 0;
+  }
+
+  .halo {
+    width: 72px;
+    height: 72px;
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--cat) 12%, transparent);
+  }
+
+  .medida {
+    display: none;
+  }
+
+  .producto-valoracion {
+    margin: -26px 0 0 112px;
+    grid-column: 1;
+  }
+
+  .producto-pie {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .producto-precio-fila {
+    justify-content: flex-end;
+    gap: 16px;
+    flex-wrap: nowrap;
+  }
+
+  .producto-precio {
+    min-width: 92px;
+    text-align: right;
+  }
+}
+
+@media (max-width: 640px) {
+  .producto.compacta {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+
+    .producto-pie {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    .producto-valoracion {
+      margin-top: 0;
+    }
+  }
+}
+
+// Zonas táctiles de al menos 40 px en el contador.
+.contador-menos,
+.producto-pie .contador-mas {
+  width: 40px;
+  height: 40px;
+}

@@ -67,7 +67,7 @@
                 <li [style.--i]="i + subs().length">
                   <a [routerLink]="['/tienda/producto', p.id]">
                     <span class="dest-imagen">
-                      @if (fotosDe(p.id)[0]; as foto) {
+                      @if (galeria.fotosDe(p)[0]; as foto) {
                         <img [src]="foto" alt="" width="800" height="800" />
                       } @else {
                         <app-product-icon [icon]="p.icon || ''" [size]="34" />

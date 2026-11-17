@@ -25,6 +25,17 @@ interface Estado {
 }
 
 const POR_PAGINA = 24;
+const CLAVE_VISTA = 'quechuti-vista';
+
+type Vista = 'cuadricula' | 'lista';
+
+function leerVista(): Vista {
+  try {
+    return localStorage.getItem(CLAVE_VISTA) === 'lista' ? 'lista' : 'cuadricula';
+  } catch {
+    return 'cuadricula';
+  }
+}
 
 /** Catálogo: filtros, orden y página viven en la URL (se pueden compartir y el "atrás" funciona). */
 @Component({
@@ -119,6 +130,23 @@ export class StoreComponent implements OnInit {
       .slice(0, 12);
   });
   readonly departamentoTotal = computed(() => this.enDepartamento().length);
+  /** Cuadrícula o lista: la elección se recuerda en este navegador. */
+  readonly vista = signal<Vista>(leerVista());
+
+  /** Filtros que están aplicando: cada uno se quita con un clic. */
+  readonly chips = computed(() => {
+    const lista: { clave: keyof Estado; texto: string }[] = [];
+    if (this.busqueda()) lista.push({ clave: 'q', texto: `“${this.busqueda()}”` });
+    if (this.categoria()) lista.push({ clave: 'cat', texto: this.categoria() });
+    if (this.subcategoria()) lista.push({ clave: 'sub', texto: this.subcategoria() });
+    if (this.coleccion()) lista.push({ clave: 'col', texto: this.coleccion()!.nombre });
+    if (this.oferta()) lista.push({ clave: 'oferta', texto: this.oferta() === '2x1' ? 'Ofertas 2 × 1' : 'Con descuento' });
+    const rango = RANGOS_PRECIO.find((r) => r.id === this.precio());
+    if (rango) lista.push({ clave: 'precio', texto: rango.etiqueta });
+    if (this.marca()) lista.push({ clave: 'marca', texto: this.marca() });
+    return lista;
+  });
+
   readonly hayFiltros = computed(() => !!(this.subcategoria() || this.precio() || this.marca() || this.oferta() || this.coleccion()));
 
   readonly filtrados = computed(() => {
@@ -173,6 +201,24 @@ export class StoreComponent implements OnInit {
       nuevo.marca = '';
     }
     this.navegar({ ...nuevo, pag: 1 }, cambios.q !== undefined);
+  }
+
+  cambiarVista(v: Vista): void {
+    this.vista.set(v);
+    try {
+      localStorage.setItem(CLAVE_VISTA, v);
+    } catch {
+      // Sin almacenamiento: la vista vale solo para esta visita.
+    }
+  }
+
+  quitarFiltro(clave: keyof Estado): void {
+    this.filtrar({ [clave]: '' } as Partial<Estado>);
+  }
+
+  /** Quita todos los filtros pero se queda en el catálogo completo (sin volver a la pantalla principal). */
+  limpiarTodo(): void {
+    this.router.navigate([], { relativeTo: this.route, queryParams: { todos: '1' } });
   }
 
   limpiarFiltros(): void {

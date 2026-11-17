@@ -6,7 +6,7 @@ import { IconoComponent } from '../../shared/icono/icono.component';
 import { SolesPipe } from '../../shared/soles.pipe';
 import { ProductIconComponent } from '../product-icon/product-icon.component';
 import { CatalogoService } from '../servicios/catalogo.service';
-import { fotosDe } from '../fotos-productos';
+import { FotosProductos } from '../fotos-productos';
 import { DEPARTAMENTOS } from '../categorias';
 
 /** Botón "Menú" de la cabecera: departamentos, subcategorías con su cantidad y las ofertas del departamento. */
@@ -21,7 +21,7 @@ import { DEPARTAMENTOS } from '../categorias';
 export class MenuCategoriasComponent {
   private readonly catalogo = inject(CatalogoService);
   readonly departamentos = DEPARTAMENTOS;
-  readonly fotosDe = fotosDe;
+  readonly galeria = inject(FotosProductos);
   readonly abierto = signal(false);
   readonly activo = signal(DEPARTAMENTOS[0].nombre);
   readonly actual = computed(() => DEPARTAMENTOS.find((d) => d.nombre === this.activo()) ?? DEPARTAMENTOS[0]);

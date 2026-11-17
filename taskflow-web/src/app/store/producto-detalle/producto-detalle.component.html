@@ -27,6 +27,11 @@
             <app-product-icon [icon]="p.icon || ''" [size]="120" />
           }
         </div>
+        @if (credito(); as c) {
+          <p class="credito-foto">
+            Foto: <a [href]="c.origen" target="_blank" rel="noopener noreferrer">{{ c.autor || 'autor desconocido' }}</a> · {{ c.licencia }}
+          </p>
+        }
         @if (fotos().length > 1) {
           <div class="miniaturas" role="group" aria-label="Fotos del producto">
             @for (f of fotos(); track f; let i = $index) {

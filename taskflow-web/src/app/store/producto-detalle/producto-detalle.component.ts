@@ -12,7 +12,7 @@ import { EstrellasComponent } from '../estrellas/estrellas.component';
 import { TarjetaProductoComponent } from '../tarjeta-producto/tarjeta-producto.component';
 import { CatalogoService } from '../servicios/catalogo.service';
 import { CarritoService, mensajeDeError } from '../servicios/carrito.service';
-import { fotosDe } from '../fotos-productos';
+import { FotosProductos, articuloDe } from '../fotos-productos';
 
 const RESENAS_POR_PAGINA = 5;
 const RELATIVO = new Intl.RelativeTimeFormat('es', { numeric: 'auto' });
@@ -22,6 +22,8 @@ const FECHA = new Intl.DateTimeFormat('es-PE', { dateStyle: 'long', timeStyle: '
 function aFecha(texto: string): Date {
   return new Date(/(Z|[+-]\d\d:\d\d)$/.test(texto) ? texto : texto + 'Z');
 }
+
+interface CreditoFoto { n: number; autor: string; licencia: string; origen: string }
 
 @Component({
   selector: 'app-producto-detalle',
@@ -42,7 +44,18 @@ export class ProductoDetalleComponent implements OnInit {
   readonly id = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => Number(p.get('id')))), { requireSync: true });
   readonly producto = computed(() => this.catalogo.producto(this.id()));
   readonly stockBajo = STOCK_BAJO;
-  readonly fotos = computed(() => fotosDe(this.id()));
+  private readonly galeria = inject(FotosProductos);
+  readonly fotos = computed(() => {
+    const p = this.producto();
+    return p ? this.galeria.fotosDe(p) : [];
+  });
+  private readonly creditos = signal<Record<string, { fotos: CreditoFoto[] }>>({});
+  /** Autor y licencia de la foto que se está viendo (las licencias CC piden nombrar al autor). */
+  readonly credito = computed(() => {
+    const slug = articuloDe(this.producto()?.name ?? '');
+    const n = Number(/(\d+)\.webp$/.exec(this.fotos()[this.fotoActual()] ?? '')?.[1]);
+    return slug ? this.creditos()[slug]?.fotos.find((f) => f.n === n) : undefined;
+  });
   /** Foto elegida en la galería (vuelve a la principal al cambiar de producto). */
   readonly fotoActual = signal(0);
 
@@ -102,6 +115,10 @@ export class ProductoDetalleComponent implements OnInit {
   readonly etiquetas = ['', 'Muy malo', 'Malo', 'Regular', 'Bueno', 'Excelente'];
 
   constructor() {
+    fetch('creditos-fotos.json')
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((c) => this.creditos.set(c))
+      .catch(() => undefined);
     effect(() => {
       this.id();
       this.fotoActual.set(0);

@@ -25,7 +25,7 @@
         @for (item of carrito.items(); track item.product.id; let i = $index) {
           <li class="item entrar" [style.--i]="i">
             <a class="item-icono" [routerLink]="['/tienda/producto', item.product.id]" (click)="cerrar()" [attr.aria-label]="'Ver ' + item.product.name">
-              @if (fotosDe(item.product.id)[0]; as foto) {
+              @if (galeria.fotosDe(item.product)[0]; as foto) {
                 <img class="item-foto" [src]="foto" alt="" width="800" height="800" />
               } @else {
                 <app-product-icon [icon]="item.product.icon || ''" [size]="24" />

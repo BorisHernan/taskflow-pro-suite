@@ -1,5 +1,5 @@
 @let p = producto();
-<article class="producto card" [class.agotado]="p.stock === 0">
+<article class="producto card" [class.agotado]="p.stock === 0" [class.compacta]="compacta()">
   <a class="producto-enlace" [routerLink]="['/tienda/producto', p.id]" [attr.aria-label]="'Ver detalle de ' + p.name">
     <div class="producto-icono" [class.con-foto]="fotos().length" [attr.data-categoria]="p.category" [style.view-transition-name]="'producto-' + p.id">
       @if (fotos(); as f) {

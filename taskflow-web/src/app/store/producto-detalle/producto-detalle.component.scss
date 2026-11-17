@@ -782,3 +782,14 @@
     font-size: var(--fs-sm);
   }
 }
+
+.credito-foto {
+  margin: 8px 0 0;
+  font-size: var(--fs-xs, 0.75rem);
+  color: var(--text-secondary);
+
+  a {
+    color: inherit;
+    text-underline-offset: 2px;
+  }
+}

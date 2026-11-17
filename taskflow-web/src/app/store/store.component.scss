@@ -469,3 +469,112 @@
   color: inherit;
   text-underline-offset: 2px;
 }
+
+// ── Forma de ver los productos y filtros aplicados ──
+
+.vistas {
+  display: inline-flex;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.vista {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: var(--tf-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease);
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+  }
+
+  &[aria-pressed='true'] {
+    background: var(--accion);
+    color: var(--sobre-accion);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tf-focus);
+    outline-offset: -3px;
+  }
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.chip-filtro,
+.chip-limpiar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.chip-filtro {
+  border: 1px solid var(--border-strong);
+  background: var(--tf-surface);
+  color: var(--text-primary);
+  font-weight: 600;
+
+  &:hover {
+    border-color: var(--oferta);
+    background: color-mix(in srgb, var(--oferta) 10%, var(--tf-surface));
+  }
+}
+
+.chip-limpiar {
+  border: 0;
+  background: none;
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
+// Vista en lista: una fila por producto, ideal para armar la compra rápido.
+.catalogo.lista {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.opcion {
+  min-height: 40px;
+}
+
+.pagina {
+  min-width: 40px;
+  height: 40px;
+}
+
+@media (max-width: 900px) {
+  .opcion {
+    min-height: 44px;
+  }
+
+  .vista {
+    height: 44px;
+  }
+}
