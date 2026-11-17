@@ -9,8 +9,9 @@
 ### Qué es esto
 
 TaskFlow es un **sistema de operaciones para una cadena de tres tiendas en Lima**, con tiempo real de punta a
-punta (Angular + Spring WebFlux reactivo + PostgreSQL). La tienda online vende contra el stock real de cada sede y
-todo lo que pasa en la operación se convierte en trabajo concreto, asignado a una persona y con su avance a la vista:
+punta (Angular + Spring WebFlux reactivo + PostgreSQL). Su tienda online, **Quechuti**, es un supermercado de
+**926 productos en 19 departamentos** que vende contra el stock real de cada sede, y todo lo que pasa en la operación
+se convierte en trabajo concreto, asignado a una persona y con su avance a la vista:
 
 - **Una venta deja un producto en su mínimo** → se crea sola una alerta y su orden de reposición. Si hay unidades
   en el almacén, se asigna a un reponedor; si no, alguien de la sede lo pide al distribuidor y la administración aprueba.
@@ -104,21 +105,59 @@ Los permisos viven en el backend: una sede no puede ver ni tocar lo de otra aunq
   <img src="docs/screenshots/centro-operaciones-dark.png" width="100%" alt="Centro de operaciones">
 </p>
 
-#### 🛒 Tienda online (`/tienda`): sedes, entrega y seguimiento
+#### 🛒 Tienda online (`/tienda`): Quechuti, un supermercado con sedes, entrega y seguimiento
 
-El cliente elige la sede y ve **su stock real, en vivo** (SSE): cada sede tiene productos exclusivos. En el carrito
-elige **recojo en tienda** o **envío a domicilio** marcando su casa en el mapa (o usando su ubicación). El sistema
-calcula la distancia en línea recta y por calles, el tiempo estimado y el **vehículo según el tamaño del pedido**
-(moto hasta 8 unidades, auto de 9 a 12, camión desde 13); el reparto llega hasta 15 km de la sede, y el servidor
-valida lo mismo.
+**Quechuti** tiene **926 productos en 19 departamentos** (despensa, lácteos, carnes, panadería, limpieza, hogar,
+tecnología, ropa…), con sus subcategorías y marcas. El cliente elige la sede y ve **su stock real, en vivo** (SSE):
+cada sede tiene productos exclusivos.
+
+- **Pantalla principal**: un carrusel de temas (2 × 1, desayuno, parrilla, hogar limpio y frutas y verduras) con
+  diseños propios, accesos por departamento, **ofertas relámpago** con cuenta regresiva y un riel de productos por
+  departamento. El cupón `BIENVENIDO10` da 10 % en la primera compra.
+- **Menú de departamentos** con sus subcategorías, la cantidad de productos y las ofertas de la semana.
+- **Catálogo** con filtros por subcategoría, marca, precio y ofertas, orden, vista de cuadrícula o lista y paginación.
+  Todo vive en la URL: se puede compartir y el botón "atrás" funciona.
+- **Promociones**: precio regular tachado con su porcentaje de descuento y **2 × 1**, que se aplica igual en el carrito
+  y en el cobro del servidor.
+- **Detalle de producto** con galería de fotos, marca, presentación, reseñas con estrellas (moderadas) y el **crédito
+  de cada foto**.
+- **Entrega**: en el carrito el cliente elige **recojo en tienda** o **envío a domicilio** marcando su casa en el mapa
+  (o usando su ubicación). El sistema calcula la distancia en línea recta y por calles, el tiempo estimado y el
+  **vehículo según el tamaño del pedido** (moto hasta 8 unidades, auto de 9 a 12, camión desde 13); el reparto llega
+  hasta 15 km de la sede, y el servidor valida lo mismo.
 
 Pagar crea el pedido en una sola transacción y entrega una **boleta con código**. En **Seguir mi pedido** el cliente
 ve cada estado, el mapa con el vehículo avanzando por la ruta y un botón para **simular la entrega** en 12 segundos.
 
 <p>
+  <img src="docs/screenshots/tienda-principal.png" width="100%" alt="Quechuti: carrusel de temas y departamentos">
+</p>
+<p>
+  <img src="docs/screenshots/tienda-menu.png" width="49%" alt="Menú de departamentos con ofertas de la semana">
+  <img src="docs/screenshots/tienda-departamento.png" width="49%" alt="Catálogo de un departamento con filtros">
+</p>
+<p>
+  <img src="docs/screenshots/tienda-ofertas.png" width="49%" alt="Ofertas relámpago con cuenta regresiva">
+  <img src="docs/screenshots/tienda-producto.png" width="49%" alt="Detalle de producto con galería y crédito de la foto">
+</p>
+<p>
   <img src="docs/screenshots/tienda-entrega-light.png" width="49%" alt="Carrito con envío a domicilio">
   <img src="docs/screenshots/seguimiento-pedido-light.png" width="49%" alt="Seguimiento del pedido">
 </p>
+
+#### 📸 Fotos de producto con licencia libre
+
+Los productos usan **fotos reales con licencia libre** (CC0, dominio público, CC BY y CC BY-SA): unas 960 imágenes de
+179 artículos. Cada foto muestra su autor y su licencia bajo la imagen, y los productos del mismo artículo con marcas
+distintas reparten sus fotos para no repetir portada. Se obtienen con scripts propios en
+[`herramientas/fotos`](herramientas/fotos/LEEME.md):
+
+- **Búsqueda** en Openverse y Wikimedia Commons, con filtro de licencia, de títulos (platos, plantas, personas, dibujos)
+  y un revisor de imágenes con CLIP que descarta lo que no es el producto suelto.
+- **Fotos casi idénticas** descartadas con un hash perceptual, y una segunda pasada que solo agrega fotos nuevas.
+- **Revisión manual en grupo** con una página local (`revisar_fotos.py`): se marcan las que no sirven y se descartan
+  de una vez.
+- **Procesamiento** a WebP cuadrado de 800 × 800 con sus créditos en `creditos-fotos.json`.
 
 #### 📊 Estadísticas: observabilidad del propio demo
 
@@ -172,7 +211,7 @@ diseño adaptado a celular.
   Leaflet se carga solo cuando aparece un mapa.
 - **Backend**: Spring Boot 3 + WebFlux + R2DBC, un único servicio (`board-service`) con REST, SSE y WebSocket.
   Spring Security como resource server con **JWT (HS256)** y permisos por rol y sede.
-- **Datos**: PostgreSQL con Flyway (`V1` a `V13`). Las reglas críticas son atómicas en SQL: descuento de stock con
+- **Datos**: PostgreSQL con Flyway (`V1` a `V18`). Las reglas críticas son atómicas en SQL: descuento de stock con
   `UPDATE … RETURNING`, alerta única por producto con índice parcial y `ON CONFLICT`, y el cobro del pedido online
   en una transacción (`@Transactional`).
 - **Tiempo real**: SSE para "el servidor empuja cambios a muchos clientes" (órdenes, stock); WebSocket solo para Arena.
@@ -223,8 +262,8 @@ npm start   # ng serve, http://localhost:4200
 ### Tests
 
 ```bash
-cd board-service && mvn test    # 59 pruebas: JUnit + Reactor Test + Mockito + Postgres embebido
-cd taskflow-web && npm test     # 48 pruebas: Vitest
+cd board-service && mvn test    # 60 pruebas: JUnit + Reactor Test + Mockito + Postgres embebido
+cd taskflow-web && npm test     # 50 pruebas: Vitest
 ```
 
 Corren en cada push/PR a `main` con GitHub Actions ([`ci.yml`](.github/workflows/ci.yml)). Las de integración usan
@@ -254,8 +293,9 @@ taskflow-pro/
 │       └── demo/            # Moderación, mantenimiento diario y estadísticas
 ├── taskflow-web/            # Frontend: Angular standalone + signals
 │   └── src/app/
-│       ├── auth/ home/ gestion/ kanban-board/ store/ dashboard/ arena/
+│       ├── auth/ home/ gestion/ kanban-board/ store/ (Quechuti) dashboard/ arena/
 │       └── shared/          # tour/ (recorrido), demo/ (sede de prueba), monitor/, telefono/, mapa/, entrega/, ui/
+├── herramientas/fotos/      # Búsqueda, filtro, revisión y proceso de las fotos libres de los productos
 ├── .github/workflows/ci.yml
 ├── docs/screenshots/        # Capturas de este README
 ├── docker-compose.yml
@@ -277,8 +317,9 @@ taskflow-pro/
 ### What this is
 
 TaskFlow is an **operations system for a chain of three stores in Lima**, real-time end to end (Angular +
-reactive Spring WebFlux + PostgreSQL). The online store sells against each location's real stock, and everything
-that happens in the store turns into concrete work, assigned to a person with its progress visible:
+reactive Spring WebFlux + PostgreSQL). Its online store, **Quechuti**, is a supermarket with **926 products in 19
+departments** that sells against each location's real stock, and everything that happens in the store turns into
+concrete work, assigned to a person with its progress visible:
 
 - **A sale leaves a product at its minimum** → an alert and a restock order are created automatically. If the
   backroom has units, a stocker is assigned; if not, someone requests it from the distributor and admin approves.
@@ -340,10 +381,18 @@ screen in real time.
   assignee and time-based progress), **Staff** (working, available, off shift, day off or absent), **Online orders**,
   **Shifts**, **Stock** (floor and backroom), **Purchases** to the distributor, **Shrinkage**, **Incidents**, and for
   admins **Statistics** and **CSV reports**. Permissions are enforced on the backend.
-- **Online store (`/tienda`)**: live per-location stock, **pickup or home delivery** with a map, straight-line and
-  street distance, estimated time and a **vehicle based on order size** (motorbike up to 8 units, car 9-12, truck 13+),
-  15 km delivery radius validated by the server, a receipt with a code and **order tracking** with the vehicle moving
-  along the route and a 12-second delivery simulation.
+- **Online store (`/tienda`)**: **Quechuti**, 926 products in 19 departments with live per-location stock; a themed
+  home carousel, flash deals with a countdown, a department menu, a catalog with filters (subcategory, brand, price,
+  deals), sorting, grid/list view and URL-shareable state, **2×1 promotions** and discounts applied identically in the
+  cart and on the server, moderated reviews, and a product page with a photo gallery and **per-photo credits**.
+  Checkout offers **pickup or home delivery** with a map, straight-line and street distance, estimated time and a
+  **vehicle based on order size** (motorbike up to 8 units, car 9-12, truck 13+), a 15 km delivery radius validated by
+  the server, a receipt with a code and **order tracking** with the vehicle moving along the route and a 12-second
+  delivery simulation.
+- **Free-licensed product photos**: about 960 images of 179 articles (CC0, public domain, CC BY and CC BY-SA) with
+  author and license shown under each photo. Home-made scripts in [`herramientas/fotos`](herramientas/fotos/LEEME.md)
+  search Openverse and Wikimedia Commons, filter by title and with a CLIP image check, drop near-duplicates with a
+  perceptual hash, split photos per brand, and offer a local page to review and discard photos in bulk.
 - **Statistics**: PostgreSQL aggregates with `GROUP BY`; **hand-made SVG charts** with "How to read it" explanations
   and automatic insights.
 - **Arena (`/arena`)**: a multiplayer `agar.io`-style clone over **WebSocket** (the client also streams its position),
@@ -359,7 +408,7 @@ Angular (Vercel) talks to a single reactive Spring WebFlux service (Render, Dock
 with **JWT** and per-role/per-store permissions, which talks to Postgres (Neon) over R2DBC. Critical rules are atomic
 in SQL: stock decrements with `UPDATE … RETURNING`, a single open alert per product via a partial unique index and
 `ON CONFLICT`, and the online order charged in one transaction. A scheduled job closes work orders whose estimated
-time has elapsed (moving stock from the backroom to the floor). Flyway migrations `V1` to `V13`.
+time has elapsed (moving stock from the backroom to the floor). Flyway migrations `V1` to `V18`.
 
 ### Tech stack
 
@@ -390,8 +439,8 @@ npm start
 ### Tests
 
 ```bash
-cd board-service && mvn test    # 59 tests: JUnit + Reactor Test + Mockito + embedded Postgres
-cd taskflow-web && npm test     # 48 tests: Vitest
+cd board-service && mvn test    # 60 tests: JUnit + Reactor Test + Mockito + embedded Postgres
+cd taskflow-web && npm test     # 50 tests: Vitest
 ```
 
 Both run on every push/PR to `main` via GitHub Actions. Integration tests use a real embedded PostgreSQL and cover
