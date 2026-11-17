@@ -2,12 +2,15 @@
   [class.pausado]="pausado()" (mouseenter)="pausado.set(true)" (mouseleave)="pausado.set(false)" (focusin)="pausado.set(true)" (focusout)="pausado.set(false)">
   <div class="temas-pista" [style.transform]="'translateX(-' + indice() * 100 + '%)'">
     @for (t of temas(); track t.id; let i = $index) {
-      <article class="tema" [style.background]="t.fondo" [style.color]="t.texto" [attr.aria-hidden]="i !== indice()" [attr.inert]="i !== indice() ? '' : null">
-        <div class="tema-texto">
-          <span class="tema-etiqueta">{{ t.etiqueta }}</span>
-          <h2 class="tema-titulo" [class.gigante]="t.id === 'dos-por-uno'">{{ t.id === 'dos-por-uno' ? '2 × 1' : t.titulo }}</h2>
-          <p>{{ t.id === 'dos-por-uno' ? t.titulo + '. ' + t.detalle : t.detalle }}</p>
-          <a class="tema-cta" routerLink="/tienda" [queryParams]="t.enlace" fragment="catalogo" [style.background]="t.texto" [style.color]="t.fondo">{{ t.cta }}</a>
+      <article class="tema" [style]="t.estilo" [attr.aria-hidden]="i !== indice()" [attr.inert]="i !== indice() ? '' : null">
+        <div class="lienzo">
+          <img class="tema-fondo" [src]="t.imagen" width="2000" height="590" alt="" decoding="async" [attr.loading]="i === 0 ? null : 'lazy'" />
+          <div class="sr-only">
+            <p>{{ t.etiqueta }}</p>
+            <h2>{{ t.titulo }}</h2>
+            <p>{{ t.detalle }}</p>
+          </div>
+          <a class="tema-cta" routerLink="/tienda" [queryParams]="t.enlace" fragment="catalogo">{{ t.cta }}</a>
         </div>
 
         <ul class="mosaico">
