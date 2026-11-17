@@ -24,7 +24,7 @@
   @if (portadaVisible() && sedeActual(); as t) {
     <section class="sede-info" aria-label="Sede elegida">
       <div class="sede-texto">
-        <p class="sede-nombre"><app-icono nombre="sede" [tamano]="16" />{{ t.nombre }} · {{ catalogo.productos().length }} productos</p>
+        <p class="sede-nombre"><app-icono nombre="sede" [tamano]="16" />{{ t.nombre }}@if (catalogo.cargado()) { · {{ catalogo.productos().length }} productos }</p>
         <p class="sede-detalle">{{ t.direccion }} · {{ t.horario }}</p>
         <p class="sede-enfoque">{{ t.enfoque }}</p>
       </div>
@@ -42,7 +42,7 @@
   }
 
   @if (portadaVisible()) {
-    <app-portada-tienda [productos]="catalogo.productos()" [valoraciones]="catalogo.valoraciones()" />
+    <app-portada-tienda [productos]="catalogo.productos()" [valoraciones]="catalogo.valoraciones()" [cargando]="!catalogo.cargado() && !catalogo.error()" />
   } @else {
     <div class="zona" id="catalogo">
       <nav class="migas" aria-label="Ubicación en la tienda">

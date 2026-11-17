@@ -84,6 +84,8 @@ function descuento(p: Product): number {
 export class PortadaTiendaComponent {
   readonly productos = input.required<Product[]>();
   readonly valoraciones = input<Record<number, RatingSummary>>({});
+  readonly cargando = input(false);
+  readonly esqueletos = [1, 2, 3, 4, 5, 6];
   readonly carrito = inject(CarritoService);
 
   readonly indice = signal(0);

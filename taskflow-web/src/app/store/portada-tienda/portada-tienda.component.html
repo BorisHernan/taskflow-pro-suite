@@ -1,3 +1,6 @@
+@if (cargando()) {
+  <span class="esq esq-banner" aria-hidden="true"></span>
+} @else {
 <section class="temas" aria-roledescription="carrusel" aria-label="Productos por tema" data-tour="cupon"
   [class.pausado]="pausado()" (mouseenter)="pausado.set(true)" (mouseleave)="pausado.set(false)" (focusin)="pausado.set(true)" (focusout)="pausado.set(false)">
   <div class="temas-pista" [style.transform]="'translateX(-' + indice() * 100 + '%)'">
@@ -43,6 +46,7 @@
     }
   </div>
 </section>
+}
 
 <p class="cupon">
   <strong>10 % en tu primera compra.</strong> Usa el cupón <code>BIENVENIDO10</code> al pagar en el carrito.
@@ -62,6 +66,24 @@
   </ul>
 </nav>
 
+@if (cargando()) {
+<div class="esq-rieles" aria-busy="true" aria-label="Cargando productos">
+  @for (r of [1, 2]; track r) {
+    <div class="esq-riel">
+      <span class="esq esq-titulo"></span>
+      <div class="esq-fila">
+        @for (n of esqueletos; track n) {
+          <div class="esq-tarjeta">
+            <span class="esq esq-img"></span>
+            <span class="esq esq-linea corta"></span>
+            <span class="esq esq-linea"></span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
+} @else {
 @if (relampago().length >= 4) {
   <section class="relampago" aria-labelledby="relampago-titulo">
     <header class="relampago-cabecera">
@@ -117,3 +139,4 @@
 <p class="todos">
   <a class="todos-enlace" routerLink="/tienda" [queryParams]="{ todos: '1' }" fragment="catalogo">Ver los {{ productos().length }} productos</a>
 </p>
+}
